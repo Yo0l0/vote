@@ -17,7 +17,6 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
   data[userId] = { pending: true, timestamp: Date.now() };
   fs.writeFileSync('vote_rewards.json', JSON.stringify(data, null, 2));
 
-  res.sendStatus(200);
 });
 
 app.get('/', (req, res) => {
