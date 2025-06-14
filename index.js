@@ -18,12 +18,14 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
   fs.writeFileSync('vote_rewards.json', JSON.stringify(data, null, 2));
 
 });
+// Serve Terms of Service
 app.get('/terms-of-service', (req, res) => {
-  res.sendFile(__dirname + '/public/terms-of-service.html');
+  res.sendFile(path.join(__dirname, 'terms-of-service.html'));
 });
 
+// Serve Privacy Policy
 app.get('/privacy-policy', (req, res) => {
-  res.sendFile(__dirname + '/public/privacy-policy.html');
+  res.sendFile(path.join(__dirname, 'privacy-policy.html'));
 });
 app.get('/', (req, res) => {
   res.send('✅ Webhook server running.');
