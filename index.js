@@ -18,7 +18,13 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
   fs.writeFileSync('vote_rewards.json', JSON.stringify(data, null, 2));
 
 });
+app.get('/terms-of-service', (req, res) => {
+  res.sendFile(__dirname + '/public/terms-of-service.html');
+});
 
+app.get('/privacy-policy', (req, res) => {
+  res.sendFile(__dirname + '/public/privacy-policy.html');
+});
 app.get('/', (req, res) => {
   res.send('✅ Webhook server running.');
 });
