@@ -4,7 +4,7 @@ const app = express();
 const fs = require('fs');
 app.use(express.json());
 const webhook = new Webhook('252566'); // Must match Top.gg exactly
-
+const path = require('path');
 app.post('/dblwebhook', webhook.middleware(), (req, res) => {
   const userId = req.vote.user;
   console.log('✅ Vote received from', userId);
