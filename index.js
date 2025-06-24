@@ -29,7 +29,7 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
 
 // Serve homepage
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'Public'));
+  res.sendFile(path.join(__dirname, 'Public.html'));
 });
 
 // Serve Terms of Service
