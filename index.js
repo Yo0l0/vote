@@ -4,10 +4,10 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const webhook = new Webhook('252566'); // Must match Top.gg exactly
+const webhook = new Webhook('252566');
 
 app.use(express.json());
-
+app.use(express.static(__dirname)); // Serve files like GengarImage.png
 
 // Webhook vote listener
 app.post('/dblwebhook', webhook.middleware(), (req, res) => {
@@ -30,17 +30,17 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'Public.html'));
 });
 
-// Serve Terms of Service
+// Terms of Service
 app.get('/terms-of-service', (req, res) => {
   res.sendFile(path.join(__dirname, 'terms-of-service.html'));
 });
 
-// Serve Privacy Policy
+// Privacy Policy
 app.get('/privacy-policy', (req, res) => {
   res.sendFile(path.join(__dirname, 'privacy-policy.html'));
 });
 
-// JSON file for vote rewards
+// Vote rewards JSON
 app.get('/vote_rewards.json', (req, res) => {
   const data = fs.readFileSync('vote_rewards.json', 'utf8');
   res.setHeader('Content-Type', 'application/json');
