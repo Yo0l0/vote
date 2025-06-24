@@ -38,20 +38,34 @@
             line-height: 1.5;
         }
         .btn {
-            display: block;
-            margin: 10px auto;
-            padding: 15px 30px;
-            background: #cc0066; /* Dark pink */
-            color: #fff;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            min-width: 220px;
-            transition: background 0.3s;
-        }
-        .btn:hover {
-            background: #b30059; /* Slightly darker on hover */
-        }
+    display: block;
+    margin: 10px auto;
+    padding: 15px 30px;
+    background: #cc0066;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    min-width: 220px;
+    transition: background 0.3s, box-shadow 0.3s;
+    box-shadow: 0 0 10px rgba(204, 0, 102, 0.4);
+}
+.btn:hover {
+    background: #b30059;
+    box-shadow: 0 0 20px rgba(204, 0, 102, 0.8);
+}
+
+.container {
+    text-align: center;
+    margin-top: 80px;
+    padding: 20px;
+    animation: fadeIn 1.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
         .features {
             margin-top: 40px;
             text-align: center;
