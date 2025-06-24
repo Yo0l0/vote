@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Pokebot - Discord Bot</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/YOUR_USERNAME/pokebot-images/main/GengarIcon.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,6 +19,7 @@
             text-align: center;
             margin-top: 80px;
             padding: 20px;
+            animation: fadeIn 1.2s ease;
         }
         .bot-image {
             width: 150px;
@@ -38,34 +39,22 @@
             line-height: 1.5;
         }
         .btn {
-    display: block;
-    margin: 10px auto;
-    padding: 15px 30px;
-    background: #cc0066;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: bold;
-    min-width: 220px;
-    transition: background 0.3s, box-shadow 0.3s;
-    box-shadow: 0 0 10px rgba(204, 0, 102, 0.4);
-}
-.btn:hover {
-    background: #b30059;
-    box-shadow: 0 0 20px rgba(204, 0, 102, 0.8);
-}
-
-.container {
-    text-align: center;
-    margin-top: 80px;
-    padding: 20px;
-    animation: fadeIn 1.2s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+            display: block;
+            margin: 10px auto;
+            padding: 15px 30px;
+            background: #cc0066;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            min-width: 220px;
+            transition: background 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 10px rgba(204, 0, 102, 0.4);
+        }
+        .btn:hover {
+            background: #b30059;
+            box-shadow: 0 0 20px rgba(204, 0, 102, 0.8);
+        }
         .features {
             margin-top: 40px;
             text-align: center;
@@ -84,12 +73,16 @@
             font-size: 0.9em;
             color: #888;
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <img src="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImage.png" alt="Pokebot Icon" class="bot-image">
+    <img src="https://raw.githubusercontent.com/YOUR_USERNAME/pokebot-images/main/GengarIcon.png" alt="Pokebot Icon" class="bot-image">
 
     <h1>🔥 Pokebot — Collect, Battle, Trade!</h1>
     <p>The ultimate Pokémon-inspired Discord bot. Build your card collection, battle friends, trade rare cards, and climb the leaderboards!</p>
@@ -98,6 +91,7 @@
     <a class="btn" href="https://discord.gg/g7AAsmJA" target="_blank">💬 Join Support Server</a>
     <a class="btn" href="https://top.gg/bot/1362516883785515199" target="_blank">✅ Vote Here!</a>
     <a class="btn" href="/login">🗂️ View Your Collection</a>
+
     <div class="features">
         <h2>Features:</h2>
         <ul>
@@ -116,4 +110,3 @@
 
 </body>
 </html>
-
