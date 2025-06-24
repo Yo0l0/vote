@@ -8,8 +8,6 @@ const webhook = new Webhook('252566'); // Must match Top.gg exactly
 
 app.use(express.json());
 
-// Serve static files from public folder
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Webhook vote listener
 app.post('/dblwebhook', webhook.middleware(), (req, res) => {
