@@ -1,10 +1,17 @@
 const express = require('express');
 const { Webhook } = require('@top-gg/sdk');
-const app = express();
 const fs = require('fs');
-app.use(express.json());
-const webhook = new Webhook('252566'); // Must match Top.gg exactly
 const path = require('path');
+
+const app = express();
+const webhook = new Webhook('252566'); // Must match Top.gg exactly
+
+app.use(express.json());
+
+// Serve static files from public folder
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Webhook vote listener
 app.post('/dblwebhook', webhook.middleware(), (req, res) => {
   const userId = req.vote.user;
   console.log('✅ Vote received from', userId);
@@ -17,7 +24,14 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
   data[userId] = { pending: true, timestamp: Date.now() };
   fs.writeFileSync('vote_rewards.json', JSON.stringify(data, null, 2));
 
+  res.status(200).send('Vote recorded');
 });
+
+// Serve homepage
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // Serve Terms of Service
 app.get('/terms-of-service', (req, res) => {
   res.sendFile(path.join(__dirname, 'terms-of-service.html'));
@@ -27,29 +41,32 @@ app.get('/terms-of-service', (req, res) => {
 app.get('/privacy-policy', (req, res) => {
   res.sendFile(path.join(__dirname, 'privacy-policy.html'));
 });
-app.get('/', (req, res) => {
-  res.send('✅ Webhook server running.');
-});
+
+// JSON file for vote rewards
 app.get('/vote_rewards.json', (req, res) => {
   const data = fs.readFileSync('vote_rewards.json', 'utf8');
   res.setHeader('Content-Type', 'application/json');
   res.send(data);
 });
+
+// Clear vote endpoint
 app.post('/clear_vote', (req, res) => {
   const { userId } = req.body;
-  const path = 'vote_rewards.json';
+  const pathFile = 'vote_rewards.json';
 
-  if (fs.existsSync(path)) {
-    const data = JSON.parse(fs.readFileSync(path));
+  if (fs.existsSync(pathFile)) {
+    const data = JSON.parse(fs.readFileSync(pathFile, 'utf8') || '{}');
     if (data[userId]) {
       delete data[userId];
-      fs.writeFileSync(path, JSON.stringify(data, null, 2));
+      fs.writeFileSync(pathFile, JSON.stringify(data, null, 2));
       return res.status(200).send('Vote cleared');
     }
   }
   res.status(404).send('User not found');
 });
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Listening on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
+
