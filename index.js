@@ -95,7 +95,7 @@ app.get('/dashboard', async (req, res) => {
     try {
         const response = await axios.get(githubRawUrl);
         const data = response.data;
-        const collection = data[userId] || [];
+        const collection = (data[userId]?.cards) || [];
 
         let html = `
         <head>
@@ -114,7 +114,7 @@ app.get('/dashboard', async (req, res) => {
             html += `<p>No cards in your collection.</p>`;
         } else {
             collection.forEach(card => {
-                html += `<div class="card">${card.name} (${card.rarity}, ${card.condition})</div>`;
+                html += `<div class="card">${card.name} (${card.rarity}, ${card.set})</div>`;
             });
         }
 
@@ -126,7 +126,6 @@ app.get('/dashboard', async (req, res) => {
         return res.send('<h1>Error loading your collection. Please try again later.</h1><p><a href="/">Back to Homepage</a></p>');
     }
 });
-
 // Clear vote endpoint
 app.post('/clear_vote', (req, res) => {
     const { userId } = req.body;
