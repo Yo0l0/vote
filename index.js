@@ -22,6 +22,17 @@ app.use(session({
     saveUninitialized: false
 }));
 
+app.post('/upload', (req, res) => {
+    if (req.body.secret !== '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') return res.status(403).send('Forbidden');
+
+    fs.writeFileSync('user_inventory.json', req.body.inventory, 'utf8');
+    res.send('✅ File received');
+});
+
+app.get('/user_inventory.json', (req, res) => {
+    res.sendFile(path.join(__dirname, 'user_inventory.json'));
+});
+
 // Webhook vote listener
 app.post('/dblwebhook', webhook.middleware(), (req, res) => {
     const userId = req.vote.user;
