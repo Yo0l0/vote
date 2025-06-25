@@ -112,7 +112,8 @@ app.get('/dashboard', async (req, res) => {
         <head>
             <style>
                 body { font-family: Arial, sans-serif; background: #0d001d; color: white; text-align: center; padding: 50px; }
-                .card { background: #2c003e; margin: 10px auto; padding: 15px; border-radius: 8px; width: 300px; }
+                .card { background: #2c003e; margin: 15px auto; padding: 15px; border-radius: 8px; width: 300px; display: flex; flex-direction: column; align-items: center; }
+                img { width: 150px; height: 150px; object-fit: contain; margin-bottom: 10px; border: 2px solid #00cc99; border-radius: 8px; }
                 a { color: #00cc99; text-decoration: none; }
             </style>
         </head>
@@ -125,7 +126,13 @@ app.get('/dashboard', async (req, res) => {
             html += `<p>No cards in your collection.</p>`;
         } else {
             collection.forEach(card => {
-                html += `<div class="card">${card.name} (${card.rarity}, ${card.set})</div>`;
+                html += `
+                    <div class="card">
+                        <img src="${card.image}" alt="${card.name}">
+                        <strong>${card.name}</strong>
+                        <p>${card.rarity}, ${card.set}</p>
+                    </div>
+                `;
             });
         }
 
@@ -137,6 +144,7 @@ app.get('/dashboard', async (req, res) => {
         return res.send('<h1>Error loading your collection. Please try again later.</h1><p><a href="/">Back to Homepage</a></p>');
     }
 });
+
 // Clear vote endpoint
 app.post('/clear_vote', (req, res) => {
     const { userId } = req.body;
