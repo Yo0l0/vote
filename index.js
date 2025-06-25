@@ -111,15 +111,18 @@ app.get('/dashboard', async (req, res) => {
         let html = `
         <head>
             <style>
-                body { font-family: Arial, sans-serif; background: #0d001d; color: white; text-align: center; padding: 50px; }
-                .card { background: #2c003e; margin: 15px auto; padding: 15px; border-radius: 8px; width: 300px; display: flex; flex-direction: column; align-items: center; }
-                img { width: 150px; height: 150px; object-fit: contain; margin-bottom: 10px; border: 2px solid #00cc99; border-radius: 8px; }
+                body { font-family: Arial, sans-serif; background: #0d001d; color: white; text-align: center; padding: 20px; }
+                .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; justify-items: center; margin-top: 30px; }
+                .card { background: #2c003e; padding: 15px; border-radius: 10px; width: 220px; }
+                img { width: 200px; height: 280px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; }
                 a { color: #00cc99; text-decoration: none; }
+                .grade { color: #ffcc00; font-weight: bold; margin-top: 5px; }
             </style>
         </head>
         <body>
             <h1>Welcome, ${req.session.user.username}</h1>
             <h2>Your Collection:</h2>
+            <div class="grid">
         `;
 
         if (collection.length === 0) {
@@ -131,12 +134,13 @@ app.get('/dashboard', async (req, res) => {
                         <img src="${card.image}" alt="${card.name}">
                         <strong>${card.name}</strong>
                         <p>${card.rarity}, ${card.set}</p>
+                        ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
                     </div>
                 `;
             });
         }
 
-        html += `<p><a href="/">Back to Homepage</a></p></body>`;
+        html += `</div><p><a href="/">Back to Homepage</a></p></body>`;
         res.send(html);
 
     } catch (err) {
@@ -144,6 +148,7 @@ app.get('/dashboard', async (req, res) => {
         return res.send('<h1>Error loading your collection. Please try again later.</h1><p><a href="/">Back to Homepage</a></p>');
     }
 });
+
 
 // Clear vote endpoint
 app.post('/clear_vote', (req, res) => {
