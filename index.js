@@ -101,10 +101,10 @@ app.get('/dashboard', async (req, res) => {
     if (!req.session.user) return res.redirect('/login');
 
     const userId = req.session.user.id;
-    const githubRawUrl = 'https://raw.githubusercontent.com/Yo0l0/vote/main/user_inventory.json';
+    const inventoryUrl = 'https://thepokebot.com/user_inventory.json';
 
     try {
-        const response = await axios.get(githubRawUrl);
+        const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
         const data = response.data;
         const collection = (data[userId]?.cards) || [];
 
@@ -133,7 +133,7 @@ app.get('/dashboard', async (req, res) => {
         res.send(html);
 
     } catch (err) {
-        console.error('Failed to fetch inventory:', err.message);
+        console.error('❌ Failed to fetch inventory:', err.message);
         return res.send('<h1>Error loading your collection. Please try again later.</h1><p><a href="/">Back to Homepage</a></p>');
     }
 });
