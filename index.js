@@ -117,12 +117,24 @@ app.get('/dashboard', async (req, res) => {
                 img { width: 200px; height: 280px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; }
                 a { color: #00cc99; text-decoration: none; }
                 .grade { color: #ffcc00; font-weight: bold; margin-top: 5px; }
+                select { padding: 8px; font-size: 1em; margin-top: 20px; }
             </style>
         </head>
         <body>
             <h1>Welcome, ${req.session.user.username}</h1>
             <h2>Your Collection:</h2>
-            <div class="grid">
+
+            <label for="filter">Filter by Rarity:</label>
+            <select id="filter" onchange="applyFilter()">
+                <option value="all">All</option>
+                <option value="common">Common</option>
+                <option value="uncommon">Uncommon</option>
+                <option value="rare">Rare</option>
+                <option value="promo">Promo</option>
+                <option value="holo">Holo</option>
+            </select>
+
+            <div class="grid" id="cardGrid">
         `;
 
         if (collection.length === 0) {
@@ -130,7 +142,7 @@ app.get('/dashboard', async (req, res) => {
         } else {
             collection.forEach(card => {
                 html += `
-                    <div class="card">
+                    <div class="card" data-rarity="${card.rarity.toLowerCase()}">
                         <img src="${card.image}" alt="${card.name}">
                         <strong>${card.name}</strong>
                         <p>${card.rarity}, ${card.set}</p>
@@ -140,7 +152,26 @@ app.get('/dashboard', async (req, res) => {
             });
         }
 
-        html += `</div><p><a href="/">Back to Homepage</a></p></body>`;
+        html += `
+            </div>
+            <p><a href="/">Back to Homepage</a></p>
+
+            <script>
+                function applyFilter() {
+                    const selected = document.getElementById('filter').value;
+                    const cards = document.querySelectorAll('.card');
+                    cards.forEach(card => {
+                        if (selected === 'all' || card.dataset.rarity === selected) {
+                            card.style.display = '';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                }
+            </script>
+
+        </body>`;
+
         res.send(html);
 
     } catch (err) {
@@ -148,6 +179,7 @@ app.get('/dashboard', async (req, res) => {
         return res.send('<h1>Error loading your collection. Please try again later.</h1><p><a href="/">Back to Homepage</a></p>');
     }
 });
+
 
 
 // Clear vote endpoint
