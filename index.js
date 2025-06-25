@@ -86,39 +86,45 @@ app.get('/callback', async (req, res) => {
 });
 
 // Collection Dashboard
-app.get('/dashboard', (req, res) => {
+app.get('/dashboard', async (req, res) => {
     if (!req.session.user) return res.redirect('/login');
 
     const userId = req.session.user.id;
-    let collection = [];
+    const githubRawUrl = 'https://raw.githubusercontent.com/Yo0l0/vote/main/user_inventory.json';
 
-    if (fs.existsSync('user_inventory.json')) {
-        const data = JSON.parse(fs.readFileSync('user_inventory.json', 'utf8') || '{}');
-        collection = data[userId] || [];
+    try {
+        const response = await axios.get(githubRawUrl);
+        const data = response.data;
+        const collection = data[userId] || [];
+
+        let html = `
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; background: #0d001d; color: white; text-align: center; padding: 50px; }
+                .card { background: #2c003e; margin: 10px auto; padding: 15px; border-radius: 8px; width: 300px; }
+                a { color: #00cc99; text-decoration: none; }
+            </style>
+        </head>
+        <body>
+            <h1>Welcome, ${req.session.user.username}</h1>
+            <h2>Your Collection:</h2>
+        `;
+
+        if (collection.length === 0) {
+            html += `<p>No cards in your collection.</p>`;
+        } else {
+            collection.forEach(card => {
+                html += `<div class="card">${card.name} (${card.rarity}, ${card.condition})</div>`;
+            });
+        }
+
+        html += `<p><a href="/">Back to Homepage</a></p></body>`;
+        res.send(html);
+
+    } catch (err) {
+        console.error('Failed to fetch inventory:', err.message);
+        return res.send('<h1>Error loading your collection. Please try again later.</h1><p><a href="/">Back to Homepage</a></p>');
     }
-
-    let html = `<h1>Welcome, ${req.session.user.username}</h1>`;
-    html += `<h2>Your Collection:</h2>`;
-    
-    if (collection.length === 0) {
-        html += `<p>No cards in your collection.</p>`;
-    } else {
-        html += `<ul>`;
-        collection.forEach(card => {
-            html += `<li>${card.name} (${card.rarity}, ${card.condition})</li>`;
-        });
-        html += `</ul>`;
-    }
-
-    html += `<p><a href="/">Back to Homepage</a></p>`;
-    res.send(html);
-});
-
-// Vote rewards JSON
-app.get('/vote_rewards.json', (req, res) => {
-    const data = fs.readFileSync('vote_rewards.json', 'utf8');
-    res.setHeader('Content-Type', 'application/json');
-    res.send(data);
 });
 
 // Clear vote endpoint
