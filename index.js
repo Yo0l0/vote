@@ -56,36 +56,7 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
 
 // Serve homepage
 app.get('/', (req, res) => {
-    let html = `
-    <head>
-        <style>
-            body { font-family: Arial, sans-serif; background: #0d001d; color: white; text-align: center; padding: 50px; }
-            .btn { background: #cc0066; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-size: 1.2em; margin: 10px; display: inline-block; }
-            .btn:hover { background: #b30059; }
-        </style>
-    </head>
-    <body>
-        <h1>🔥 Pokebot — Collect, Battle, Trade!</h1>
-
-        <a class="btn" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">✨ Invite Pokebot</a>
-        <a class="btn" href="https://discord.gg/g7AAsmJA">💬 Join Support Server</a>
-        <a class="btn" href="https://top.gg/bot/1362516883785515199">✅ Vote Here!</a>
-    `;
-
-    if (req.session.user) {
-        html += `
-            <p>Welcome, ${req.session.user.username}!</p>
-            <a class="btn" href="/dashboard">🗂️ View Your Collection</a>
-            <a class="btn" href="/logout">🚪 Logout</a>
-        `;
-    } else {
-        html += `
-            <a class="btn" href="/login">🔑 Login to View Collection</a>
-        `;
-    }
-
-    html += `</body>`;
-    res.send(html);
+    res.sendFile(path.join(__dirname, 'Public.html'));
 });
 
 app.get('/logout', (req, res) => {
