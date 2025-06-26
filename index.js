@@ -58,16 +58,67 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
 app.get('/', (req, res) => {
     let html = `
     <head>
+        <title>Pokebot - Discord Bot</title>
+        <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
         <style>
-            body { font-family: Arial, sans-serif; background: #0d001d; color: white; text-align: center; padding: 50px; }
-            .btn { background: #cc0066; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-size: 1.2em; margin: 10px; display: inline-block; }
-            .btn:hover { background: #b30059; }
+            body {
+                font-family: Arial, sans-serif;
+                background: linear-gradient(135deg, #2c003e, #0d001d);
+                color: #fff;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+            }
+            .container {
+                text-align: center;
+                margin-top: 80px;
+                padding: 20px;
+                animation: fadeIn 1.2s ease;
+            }
+            .bot-image {
+                width: 150px;
+                height: 150px;
+                border-radius: 50%;
+                border: 3px solid #00cc99;
+                object-fit: cover;
+                margin-bottom: 20px;
+            }
+            h1 { font-size: 2em; margin-bottom: 10px; }
+            p { max-width: 600px; margin: 0 auto 30px; line-height: 1.5; }
+            .btn {
+                display: block;
+                margin: 10px auto;
+                padding: 15px 30px;
+                background: #cc0066;
+                color: #fff;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                min-width: 220px;
+                transition: background 0.3s, box-shadow 0.3s;
+                box-shadow: 0 0 10px rgba(204, 0, 102, 0.4);
+            }
+            .btn:hover {
+                background: #b30059;
+                box-shadow: 0 0 20px rgba(204, 0, 102, 0.8);
+            }
+            .features { margin-top: 40px; text-align: center; }
+            ul { list-style: none; padding: 0; }
+            li { margin: 10px 0; font-size: 1.1em; }
+            .footer { margin-top: auto; padding: 20px; font-size: 0.9em; color: #888; }
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
             .pfp { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; }
             .pfp img { width: 40px; height: 40px; border-radius: 50%; margin-left: 10px; }
         </style>
     </head>
     <body>
+
+    <div class="container">
+        <img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot Icon" class="bot-image">
         <h1>🔥 Pokebot — Collect, Battle, Trade!</h1>
+        <p>The ultimate Pokémon-inspired Discord bot. Build your card collection, battle friends, trade rare cards, and climb the leaderboards!</p>
 
         <a class="btn" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">✨ Invite Pokebot</a>
         <a class="btn" href="https://discord.gg/g7AAsmJA">💬 Join Support Server</a>
@@ -83,15 +134,28 @@ app.get('/', (req, res) => {
             </div>
         `;
     } else {
-        html += `
-            <a class="btn" href="/login">🔑 Login with Discord</a>
-            <a class="btn" href="/login">🗂️ View Your Collection</a>
-        `;
+        html += `<a class="btn" href="/login">🔑 Login to View Collection</a>`;
     }
 
-    html += `</body>`;
+    html += `
+        <div class="features">
+            <h2>Features:</h2>
+            <ul>
+                <li>✅ Card Collecting & Grading</li>
+                <li>✅ Pack Opening from Classic Sets</li>
+                <li>✅ Trading & Marketplace System</li>
+                <li>✅ Competitive Battles & Duels</li>
+                <li>✅ Leaderboards & Achievements</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">© 2024 Pokebot. All rights reserved.</div>
+    </body>`;
+
     res.send(html);
 });
+
 
 app.get('/logout', (req, res) => {
     req.session.destroy(() => {
