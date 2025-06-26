@@ -54,21 +54,30 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
     res.status(200).send('Vote recorded');
 });
 
-app.get('/stats', (req, res) => {
-    let totalCards = 0;
-    let totalUsers = 0;
+app.get('/stats', async (req, res) => {
+    try {
+        const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
 
-    if (fs.existsSync('user_inventory.json')) {
-        const data = JSON.parse(fs.readFileSync('user_inventory.json', 'utf8') || '{}');
-        totalUsers = Object.keys(data).length;
+        const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
+        const data = response.data;
+
+        let totalCards = 0;
+        let totalUsers = 0;
 
         for (const userId in data) {
-            const cards = data[userId]?.cards || [];
-            totalCards += cards.length;
+            const user = data[userId];
+            if (user.cards) {
+                totalCards += user.cards.length;
+                totalUsers += 1;
+            }
         }
-    }
 
-    res.json({ totalCards, totalUsers });
+        res.json({ totalCards, totalUsers });
+
+    } catch (err) {
+        console.error('Failed to load stats:', err.message);
+        res.json({ totalCards: 0, totalUsers: 0 });
+    }
 });
 
 
@@ -231,23 +240,14 @@ app.get('/dashboard', async (req, res) => {
     const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
     const page = parseInt(req.query.page) || 1;
     const perPage = 250;
-    const selectedRarity = req.query.rarity || 'all';
-    const searchTerm = req.query.search?.toLowerCase() || '';
 
     try {
         const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
         const data = response.data;
         const collection = (data[userId]?.cards) || [];
 
-        // Filter before pagination
-        let filteredCollection = collection.filter(card => {
-            const matchesRarity = selectedRarity === 'all' || card.rarity.toLowerCase() === selectedRarity;
-            const matchesSearch = card.name.toLowerCase().includes(searchTerm) || card.code.toLowerCase().includes(searchTerm);
-            return matchesRarity && matchesSearch;
-        });
-
-        const totalPages = Math.ceil(filteredCollection.length / perPage);
-        const pageCards = filteredCollection.slice((page - 1) * perPage, page * perPage);
+        const totalPages = Math.ceil(collection.length / perPage);
+        const pageCards = collection.slice((page - 1) * perPage, page * perPage);
 
         let html = `
         <head>
@@ -273,7 +273,53 @@ app.get('/dashboard', async (req, res) => {
                 select, input[type="text"] { padding: 8px; font-size: 1em; margin: 10px; }
             </style>
         </head>
-        <script>
+        <body>
+            <h1>Welcome, ${req.session.user.username}</h1>
+            <h2>Your Collection:</h2>
+
+<label for="filter">Filter by Rarity:</label>
+<select id="filter" onchange="applyFilters()">
+    <option value="all">All</option>
+    <option value="common">Common</option>
+    <option value="uncommon">Uncommon</option>
+    <option value="rare">Rare</option>
+    <option value="promo">Promo</option>
+    <option value="holo">Holo</option>
+</select>
+
+<input type="text" id="search" placeholder="Search name or code..." oninput="applyFilters()">
+
+<div class="grid">
+`;
+
+        if (pageCards.length === 0) {
+            html += `<p>No cards in your collection.</p>`;
+        } else {
+            pageCards.forEach(card => {
+                html += `
+                <div class="card" data-rarity="${card.rarity.toLowerCase()}" data-name="${card.name.toLowerCase()}" data-code="${card.code.toLowerCase()}">
+                    <img src="${card.image}" alt="${card.name}">
+                    <strong>${card.name}</strong>
+                    <p>${card.rarity}, ${card.set}</p>
+                    <p><small>Code: ${card.code}</small></p>
+                    ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
+                </div>`;
+            });
+        }
+
+        html += `</div>`;
+
+        if (totalPages > 1) {
+            html += `<div class="pagination">`;
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<a href="/dashboard?page=${i}" class="${i === page ? 'active' : ''}">${i}</a>`;
+            }
+            html += `</div>`;
+        }
+
+        html += `<a href="/" style="position: fixed; top: 20px; left: 20px; background: #2c003e; color: #00cc99; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; z-index: 999;">⬅️ Back to Homepage</a>`;
+
+        html += `
 <script>
 function applyFilters() {
     const selected = document.getElementById('filter').value.toLowerCase();
@@ -287,55 +333,7 @@ function applyFilters() {
     });
 }
 </script>
-        <body>
-            <h1>Welcome, ${req.session.user.username}</h1>
-            <h2>Your Collection:</h2>
-
-<label for="filter">Filter by Rarity:</label>
-<select id="filter" onchange="applyFilters()">
-    <option value="all" ${selectedRarity === 'all' ? 'selected' : ''}>All</option>
-    <option value="common" ${selectedRarity === 'common' ? 'selected' : ''}>Common</option>
-    <option value="uncommon" ${selectedRarity === 'uncommon' ? 'selected' : ''}>Uncommon</option>
-    <option value="rare" ${selectedRarity === 'rare' ? 'selected' : ''}>Rare</option>
-    <option value="promo" ${selectedRarity === 'promo' ? 'selected' : ''}>Promo</option>
-    <option value="holo" ${selectedRarity === 'holo' ? 'selected' : ''}>Holo</option>
-</select>
-
-<input type="text" id="search" placeholder="Search name or code..." oninput="applyFilters()">
-
-
-            <div class="grid">
-        `;
-
-        if (pageCards.length === 0) {
-            html += `<p>No cards in your collection.</p>`;
-        } else {
-            pageCards.forEach(card => {
-                html += `
-                <div class="card">
-                    <img src="${card.image}" alt="${card.name}">
-                    <strong>${card.name}</strong>
-                    <p>${card.rarity}, ${card.set}</p>
-                    <p><small>Code: ${card.code}</small></p>
-                    ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
-                </div>`;
-            });
-        }
-
-        html += `</div>`;
-
-        // Pagination links
-        if (totalPages > 1) {
-            html += `<div class="pagination">`;
-            for (let i = 1; i <= totalPages; i++) {
-                html += `<a href="/dashboard?page=${i}&rarity=${selectedRarity}&search=${encodeURIComponent(searchTerm)}" class="${i === page ? 'active' : ''}">${i}</a>`;
-            }
-            html += `</div>`;
-        }
-
-        html += `<a href="/" style="position: fixed; top: 20px; left: 20px; background: #2c003e; color: #00cc99; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; z-index: 999;">⬅️ Back to Homepage</a>`;
-
-        html += `</body>`;
+</body>`;
 
         res.send(html);
 
@@ -344,6 +342,7 @@ function applyFilters() {
         res.send('<h1>Error loading your collection. Please try again later.</h1><p><a href="/">Back to Homepage</a></p>');
     }
 });
+
 
 
 // Clear vote endpoint
