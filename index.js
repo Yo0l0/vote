@@ -140,6 +140,8 @@ app.get('/dashboard', async (req, res) => {
             <input type="text" id="search" placeholder="Search by name or code..." oninput="applyFilters()">
 
             <div class="grid" id="cardGrid">
+            <p><a href="/" style="color:#00cc99; text-decoration:none; background:#2c003e; padding:10px 20px; border-radius:8px; display:inline-block; margin-top:20px;">⬅️ Back to Homepage</a></p>
+
         `;
 
         if (collection.length === 0) {
