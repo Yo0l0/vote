@@ -273,23 +273,36 @@ app.get('/dashboard', async (req, res) => {
                 select, input[type="text"] { padding: 8px; font-size: 1em; margin: 10px; }
             </style>
         </head>
+        <script>
+<script>
+function applyFilters() {
+    const selected = document.getElementById('filter').value.toLowerCase();
+    const search = document.getElementById('search').value.toLowerCase();
+    const cards = document.querySelectorAll('.card');
+
+    cards.forEach(card => {
+        const matchesRarity = selected === 'all' || card.dataset.rarity === selected;
+        const matchesSearch = card.dataset.name.includes(search) || card.dataset.code.includes(search);
+        card.style.display = (matchesRarity && matchesSearch) ? '' : 'none';
+    });
+}
+</script>
         <body>
             <h1>Welcome, ${req.session.user.username}</h1>
             <h2>Your Collection:</h2>
 
-            <form method="get" action="/dashboard">
-                <select name="rarity" onchange="this.form.submit()">
-                    <option value="all" ${selectedRarity === 'all' ? 'selected' : ''}>All</option>
-                    <option value="common" ${selectedRarity === 'common' ? 'selected' : ''}>Common</option>
-                    <option value="uncommon" ${selectedRarity === 'uncommon' ? 'selected' : ''}>Uncommon</option>
-                    <option value="rare" ${selectedRarity === 'rare' ? 'selected' : ''}>Rare</option>
-                    <option value="promo" ${selectedRarity === 'promo' ? 'selected' : ''}>Promo</option>
-                    <option value="holo" ${selectedRarity === 'holo' ? 'selected' : ''}>Holo</option>
-                </select>
+<label for="filter">Filter by Rarity:</label>
+<select id="filter" onchange="applyFilters()">
+    <option value="all" ${selectedRarity === 'all' ? 'selected' : ''}>All</option>
+    <option value="common" ${selectedRarity === 'common' ? 'selected' : ''}>Common</option>
+    <option value="uncommon" ${selectedRarity === 'uncommon' ? 'selected' : ''}>Uncommon</option>
+    <option value="rare" ${selectedRarity === 'rare' ? 'selected' : ''}>Rare</option>
+    <option value="promo" ${selectedRarity === 'promo' ? 'selected' : ''}>Promo</option>
+    <option value="holo" ${selectedRarity === 'holo' ? 'selected' : ''}>Holo</option>
+</select>
 
-                <input type="text" name="search" placeholder="Search name or code..." value="${searchTerm}" oninput="this.form.submit()">
-                <input type="hidden" name="page" value="1">
-            </form>
+<input type="text" id="search" placeholder="Search name or code..." oninput="applyFilters()">
+
 
             <div class="grid">
         `;
