@@ -269,7 +269,7 @@ app.get('/dashboard', async (req, res) => {
     if (!req.session.user) return res.redirect('/login');
 
     const userId = req.session.user.id;
-    const inventoryUrl = 'https://thepokebot.com/user_inventory.json';
+    const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
     const page = parseInt(req.query.page) || 1;
     const perPage = 250;
     const selectedRarity = req.query.rarity || 'all';
