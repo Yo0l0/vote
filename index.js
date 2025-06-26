@@ -272,14 +272,23 @@ app.get('/dashboard', async (req, res) => {
     const inventoryUrl = 'https://thepokebot.com/user_inventory.json';
     const page = parseInt(req.query.page) || 1;
     const perPage = 250;
+    const selectedRarity = req.query.rarity || 'all';
+    const searchTerm = req.query.search?.toLowerCase() || '';
 
     try {
         const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
         const data = response.data;
         const collection = (data[userId]?.cards) || [];
 
-        const totalPages = Math.ceil(collection.length / perPage);
-        const pageCards = collection.slice((page - 1) * perPage, page * perPage);
+        // Filter before pagination
+        let filteredCollection = collection.filter(card => {
+            const matchesRarity = selectedRarity === 'all' || card.rarity.toLowerCase() === selectedRarity;
+            const matchesSearch = card.name.toLowerCase().includes(searchTerm) || card.code.toLowerCase().includes(searchTerm);
+            return matchesRarity && matchesSearch;
+        });
+
+        const totalPages = Math.ceil(filteredCollection.length / perPage);
+        const pageCards = filteredCollection.slice((page - 1) * perPage, page * perPage);
 
         let html = `
         <head>
@@ -300,34 +309,29 @@ app.get('/dashboard', async (req, res) => {
                     border-radius: 5px;
                     text-decoration: none;
                 }
-                .pagination a.active {
-                    background: #b30059;
-                    font-weight: bold;
-                }
-                select, input[type="text"] {
-                    padding: 8px;
-                    font-size: 1em;
-                    margin: 10px;
-                }
+                .pagination a.active { background: #b30059; font-weight: bold; }
+                select, input[type="text"] { padding: 8px; font-size: 1em; margin: 10px; }
             </style>
         </head>
         <body>
             <h1>Welcome, ${req.session.user.username}</h1>
             <h2>Your Collection:</h2>
 
-            <label for="filter">Filter by Rarity:</label>
-            <select id="filter" onchange="applyFilters()">
-                <option value="all">All</option>
-                <option value="common">Common</option>
-                <option value="uncommon">Uncommon</option>
-                <option value="rare">Rare</option>
-                <option value="promo">Promo</option>
-                <option value="holo">Holo</option>
-            </select>
+            <form method="get" action="/dashboard">
+                <select name="rarity" onchange="this.form.submit()">
+                    <option value="all" ${selectedRarity === 'all' ? 'selected' : ''}>All</option>
+                    <option value="common" ${selectedRarity === 'common' ? 'selected' : ''}>Common</option>
+                    <option value="uncommon" ${selectedRarity === 'uncommon' ? 'selected' : ''}>Uncommon</option>
+                    <option value="rare" ${selectedRarity === 'rare' ? 'selected' : ''}>Rare</option>
+                    <option value="promo" ${selectedRarity === 'promo' ? 'selected' : ''}>Promo</option>
+                    <option value="holo" ${selectedRarity === 'holo' ? 'selected' : ''}>Holo</option>
+                </select>
 
-            <input type="text" id="search" placeholder="Search by name or code..." oninput="applyFilters()">
+                <input type="text" name="search" placeholder="Search name or code..." value="${searchTerm}" oninput="this.form.submit()">
+                <input type="hidden" name="page" value="1">
+            </form>
 
-            <div class="grid" id="cardGrid">
+            <div class="grid">
         `;
 
         if (pageCards.length === 0) {
@@ -335,7 +339,7 @@ app.get('/dashboard', async (req, res) => {
         } else {
             pageCards.forEach(card => {
                 html += `
-                <div class="card" data-rarity="${card.rarity.toLowerCase()}" data-name="${card.name.toLowerCase()}" data-code="${card.code.toLowerCase()}">
+                <div class="card">
                     <img src="${card.image}" alt="${card.name}">
                     <strong>${card.name}</strong>
                     <p>${card.rarity}, ${card.set}</p>
@@ -351,40 +355,14 @@ app.get('/dashboard', async (req, res) => {
         if (totalPages > 1) {
             html += `<div class="pagination">`;
             for (let i = 1; i <= totalPages; i++) {
-                html += `<a href="/dashboard?page=${i}" class="${i === page ? 'active' : ''}">${i}</a>`;
+                html += `<a href="/dashboard?page=${i}&rarity=${selectedRarity}&search=${encodeURIComponent(searchTerm)}" class="${i === page ? 'active' : ''}">${i}</a>`;
             }
             html += `</div>`;
         }
 
-        html += `<a href="/" style="
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: #2c003e;
-    color: #00cc99;
-    text-decoration: none;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-weight: bold;
-    z-index: 999;
-">⬅️ Back to Homepage</a>`;
+        html += `<a href="/" style="position: fixed; top: 20px; left: 20px; background: #2c003e; color: #00cc99; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; z-index: 999;">⬅️ Back to Homepage</a>`;
 
-        // Filter Script
-        html += `
-            <script>
-                function applyFilters() {
-                    const selected = document.getElementById('filter').value;
-                    const search = document.getElementById('search').value.toLowerCase();
-                    const cards = document.querySelectorAll('.card');
-
-                    cards.forEach(card => {
-                        const matchesRarity = selected === 'all' || card.dataset.rarity === selected;
-                        const matchesSearch = card.dataset.name.includes(search) || card.dataset.code.includes(search);
-                        card.style.display = (matchesRarity && matchesSearch) ? '' : 'none';
-                    });
-                }
-            </script>
-        </body>`;
+        html += `</body>`;
 
         res.send(html);
 
