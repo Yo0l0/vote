@@ -59,13 +59,17 @@ app.get('/', (req, res) => {
     let html = `
     <head>
         <style>
-            body { font-family: Arial, sans-serif; background: #0d001d; color: white; text-align: center; padding: 100px; }
-            .btn { background: #cc0066; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-size: 1.2em; margin: 20px; display: inline-block; }
+            body { font-family: Arial, sans-serif; background: #0d001d; color: white; text-align: center; padding: 50px; }
+            .btn { background: #cc0066; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-size: 1.2em; margin: 10px; display: inline-block; }
             .btn:hover { background: #b30059; }
         </style>
     </head>
     <body>
         <h1>🔥 Pokebot — Collect, Battle, Trade!</h1>
+
+        <a class="btn" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">✨ Invite Pokebot</a>
+        <a class="btn" href="https://discord.gg/g7AAsmJA">💬 Join Support Server</a>
+        <a class="btn" href="https://top.gg/bot/1362516883785515199">✅ Vote Here!</a>
     `;
 
     if (req.session.user) {
@@ -76,14 +80,14 @@ app.get('/', (req, res) => {
         `;
     } else {
         html += `
-            <p>Login to view your collection:</p>
-            <a class="btn" href="/login">🔑 Login with Discord</a>
+            <a class="btn" href="/login">🔑 Login to View Collection</a>
         `;
     }
 
     html += `</body>`;
     res.send(html);
 });
+
 app.get('/logout', (req, res) => {
     req.session.destroy(() => {
         res.redirect('/');
