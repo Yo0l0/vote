@@ -117,7 +117,7 @@ app.get('/dashboard', async (req, res) => {
                 img { width: 200px; height: 280px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; }
                 a { color: #00cc99; text-decoration: none; }
                 .grade { color: #ffcc00; font-weight: bold; margin-top: 5px; }
-                select { padding: 8px; font-size: 1em; margin-top: 20px; }
+                select, input[type="text"] { padding: 8px; font-size: 1em; margin: 10px; }
             </style>
         </head>
         <body>
@@ -125,7 +125,7 @@ app.get('/dashboard', async (req, res) => {
             <h2>Your Collection:</h2>
 
             <label for="filter">Filter by Rarity:</label>
-            <select id="filter" onchange="applyFilter()">
+            <select id="filter" onchange="applyFilters()">
                 <option value="all">All</option>
                 <option value="common">Common</option>
                 <option value="uncommon">Uncommon</option>
@@ -133,6 +133,8 @@ app.get('/dashboard', async (req, res) => {
                 <option value="promo">Promo</option>
                 <option value="holo">Holo</option>
             </select>
+
+            <input type="text" id="search" placeholder="Search by name or code..." oninput="applyFilters()">
 
             <div class="grid" id="cardGrid">
         `;
@@ -142,10 +144,11 @@ app.get('/dashboard', async (req, res) => {
         } else {
             collection.forEach(card => {
                 html += `
-                    <div class="card" data-rarity="${card.rarity.toLowerCase()}">
+                    <div class="card" data-rarity="${card.rarity.toLowerCase()}" data-name="${card.name.toLowerCase()}" data-code="${card.code.toLowerCase()}">
                         <img src="${card.image}" alt="${card.name}">
                         <strong>${card.name}</strong>
                         <p>${card.rarity}, ${card.set}</p>
+                        <p><small>Code: ${card.code}</small></p>
                         ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
                     </div>
                 `;
@@ -157,15 +160,16 @@ app.get('/dashboard', async (req, res) => {
             <p><a href="/">Back to Homepage</a></p>
 
             <script>
-                function applyFilter() {
+                function applyFilters() {
                     const selected = document.getElementById('filter').value;
+                    const search = document.getElementById('search').value.toLowerCase();
                     const cards = document.querySelectorAll('.card');
+
                     cards.forEach(card => {
-                        if (selected === 'all' || card.dataset.rarity === selected) {
-                            card.style.display = '';
-                        } else {
-                            card.style.display = 'none';
-                        }
+                        const matchesRarity = selected === 'all' || card.dataset.rarity === selected;
+                        const matchesSearch = card.dataset.name.includes(search) || card.dataset.code.includes(search);
+
+                        card.style.display = (matchesRarity && matchesSearch) ? '' : 'none';
                     });
                 }
             </script>
