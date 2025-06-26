@@ -109,28 +109,70 @@ app.get('/', (req, res) => {
             li { margin: 10px 0; font-size: 1.1em; }
             .footer { margin-top: auto; padding: 20px; font-size: 0.9em; color: #888; }
             @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-            .topright { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; cursor: pointer; }
-            .topright img { width: 40px; height: 40px; border-radius: 50%; }
-            .topright span { margin-left: 10px; color: #fff; font-weight: bold; }
+
+            .topright {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                position: fixed;
+            }
+            .topright img {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+            }
+            .dropdown {
+                display: none;
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: #2c003e;
+                border: 1px solid #00cc99;
+                border-radius: 8px;
+                min-width: 120px;
+                z-index: 999;
+                text-align: left;
+            }
+            .dropdown a {
+                display: block;
+                padding: 10px;
+                color: white;
+                text-decoration: none;
+            }
+            .dropdown a:hover {
+                background: #b30059;
+            }
         </style>
     </head>
     <body>
-
-    <div class="topright" onclick="location.href='${req.session.user ? '/logout' : '/login'}'">
     `;
+
+    // Top-right icon area
+    html += `<div class="topright" id="profileBtn">`;
 
     if (req.session.user) {
         html += `<img src="https://cdn.discordapp.com/avatars/${req.session.user.id}/${req.session.user.avatar}.png" alt="PFP">`;
     } else {
-        html += `
-            <img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot">
-            <span>Login</span>
-        `;
+        html += `<img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot">`;
     }
 
     html += `
-    </div>
+        <div class="dropdown" id="dropdownMenu">
+    `;
 
+    if (req.session.user) {
+        html += `<a href="/logout">Logout</a>`;
+    } else {
+        html += `<a href="/login">Login</a>`;
+    }
+
+    html += `
+        </div>
+    </div>
+    
     <div class="container">
         <img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot Icon" class="bot-image">
         <h1>🔥 Pokebot — Collect, Battle, Trade!</h1>
@@ -154,11 +196,26 @@ app.get('/', (req, res) => {
     </div>
 
     <div class="footer">© 2024 Pokebot. All rights reserved.</div>
+
+    <script>
+        const profileBtn = document.getElementById('profileBtn');
+        const dropdown = document.getElementById('dropdownMenu');
+
+        profileBtn.addEventListener('click', () => {
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!profileBtn.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+    </script>
+
     </body>`;
 
     res.send(html);
 });
-
 
 
 app.get('/logout', (req, res) => {
