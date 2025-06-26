@@ -261,26 +261,29 @@ app.get('/dashboard', async (req, res) => {
             <h1>Welcome, ${req.session.user.username}</h1>
             <h2>Your Collection:</h2>
 
-<label for="filter">Filter by Rarity:</label>
-<select id="filter">
-    <option value="all">All</option>
-    <option value="common">Common</option>
-    <option value="uncommon">Uncommon</option>
-    <option value="rare">Rare</option>
-    <option value="promo">Promo</option>
-    <option value="holo">Holo</option>
-</select>
+            <label for="filter">Filter by Rarity:</label>
+            <select id="filter" onchange="applyFilters()">
+                <option value="all">All</option>
+                <option value="common">Common</option>
+                <option value="uncommon">Uncommon</option>
+                <option value="rare">Rare</option>
+                <option value="promo">Promo</option>
+                <option value="holo">Holo</option>
+            </select>
 
-<input type="text" id="search" placeholder="Search name or code...">
+            <input type="text" id="search" placeholder="Search by name or code..." oninput="applyFilters()" autocomplete="off">
 
-<div class="grid" id="cardGrid">`;
+            <div class="grid" id="cardGrid">`;
 
         if (collection.length === 0) {
             html += `<p>No cards in your collection.</p>`;
         } else {
             collection.forEach(card => {
                 html += `
-                <div class="card">
+                <div class="card" 
+                     data-rarity="${card.rarity.toLowerCase()}" 
+                     data-name="${card.name.toLowerCase()}" 
+                     data-code="${card.code.toLowerCase()}">
                     <img src="${card.image}" alt="${card.name}">
                     <strong>${card.name}</strong>
                     <p>${card.rarity}, ${card.set}</p>
@@ -292,43 +295,23 @@ app.get('/dashboard', async (req, res) => {
 
         html += `</div>
 
-<a href="/" style="position: fixed; top: 20px; left: 20px; background: #2c003e; color: #00cc99; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; z-index: 999;">⬅️ Back to Homepage</a>
+        <a href="/" style="position: fixed; top: 20px; left: 20px; background: #2c003e; color: #00cc99; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; z-index: 999;">⬅️ Back to Homepage</a>
 
-<script>
-async function loadCards() {
-    const rarity = document.getElementById('filter').value;
-    const search = document.getElementById('search').value;
+        <script>
+        function applyFilters() {
+            const rarity = document.getElementById('filter').value.toLowerCase();
+            const search = document.getElementById('search').value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
 
-    try {
-        const res = await fetch(\`/api/cards?rarity=\${rarity}&search=\${encodeURIComponent(search)}\`);
-        const data = await res.json();
+            cards.forEach(card => {
+                const matchesRarity = rarity === 'all' || card.dataset.rarity === rarity;
+                const matchesSearch = card.dataset.name.includes(search) || card.dataset.code.includes(search);
 
-        const grid = document.getElementById('cardGrid');
-        grid.innerHTML = '';
-
-        if (data.length === 0) {
-            grid.innerHTML = '<p>No cards found.</p>';
-        } else {
-            data.forEach(card => {
-                grid.innerHTML += \`
-                <div class="card">
-                    <img src="\${card.image}" alt="\${card.name}">
-                    <strong>\${card.name}</strong>
-                    <p>\${card.rarity}, \${card.set}</p>
-                    <p><small>Code: \${card.code}</small></p>
-                    \${card.grade ? \`<div class="grade">Graded: \${card.grade}</div>\` : ''}
-                </div>\`;
+                card.style.display = (matchesRarity && matchesSearch) ? '' : 'none';
             });
         }
-    } catch (err) {
-        console.error('Failed to load cards:', err);
-    }
-}
-
-document.getElementById('filter').addEventListener('change', loadCards);
-document.getElementById('search').addEventListener('input', loadCards);
-</script>
-</body>`;
+        </script>
+        </body>`;
 
         res.send(html);
 
