@@ -111,6 +111,15 @@ app.get('/', (req, res) => {
             @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
             .pfp { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; }
             .pfp img { width: 40px; height: 40px; border-radius: 50%; margin-left: 10px; }
+            .logout-btn {
+                margin-left: 10px;
+                padding: 5px 10px;
+                background: #cc0066;
+                border-radius: 5px;
+                color: white;
+                font-size: 0.9em;
+                text-decoration: none;
+            }
         </style>
     </head>
     <body>
@@ -131,10 +140,16 @@ app.get('/', (req, res) => {
             <div class="pfp">
                 <span>${req.session.user.username}</span>
                 <img src="https://cdn.discordapp.com/avatars/${req.session.user.id}/${req.session.user.avatar}.png" alt="PFP">
+                <a class="logout-btn" href="/logout">Logout</a>
             </div>
         `;
     } else {
-        html += `<a class="btn" href="/login">🔑 Login to View Collection</a>`;
+        html += `
+            <a class="btn" href="/login">🔑 Login to View Collection</a>
+            <div class="pfp">
+                <img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot Icon">
+            </div>
+        `;
     }
 
     html += `
