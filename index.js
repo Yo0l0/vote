@@ -109,20 +109,27 @@ app.get('/', (req, res) => {
             li { margin: 10px 0; font-size: 1.1em; }
             .footer { margin-top: auto; padding: 20px; font-size: 0.9em; color: #888; }
             @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-            .pfp { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; }
-            .pfp img { width: 40px; height: 40px; border-radius: 50%; margin-left: 10px; }
-            .logout-btn {
-                margin-left: 10px;
-                padding: 5px 10px;
-                background: #cc0066;
-                border-radius: 5px;
-                color: white;
-                font-size: 0.9em;
-                text-decoration: none;
-            }
+            .topright { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; cursor: pointer; }
+            .topright img { width: 40px; height: 40px; border-radius: 50%; }
+            .topright span { margin-left: 10px; color: #fff; font-weight: bold; }
         </style>
     </head>
     <body>
+
+    <div class="topright" onclick="location.href='${req.session.user ? '/logout' : '/login'}'">
+    `;
+
+    if (req.session.user) {
+        html += `<img src="https://cdn.discordapp.com/avatars/${req.session.user.id}/${req.session.user.avatar}.png" alt="PFP">`;
+    } else {
+        html += `
+            <img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot">
+            <span>Login</span>
+        `;
+    }
+
+    html += `
+    </div>
 
     <div class="container">
         <img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot Icon" class="bot-image">
@@ -132,27 +139,8 @@ app.get('/', (req, res) => {
         <a class="btn" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">✨ Invite Pokebot</a>
         <a class="btn" href="https://discord.gg/g7AAsmJA">💬 Join Support Server</a>
         <a class="btn" href="https://top.gg/bot/1362516883785515199">✅ Vote Here!</a>
-    `;
+        <a class="btn" href="${req.session.user ? '/dashboard' : '/login'}">🗂️ View Your Collection</a>
 
-    if (req.session.user) {
-        html += `
-            <a class="btn" href="/dashboard">🗂️ View Your Collection</a>
-            <div class="pfp">
-                <span>${req.session.user.username}</span>
-                <img src="https://cdn.discordapp.com/avatars/${req.session.user.id}/${req.session.user.avatar}.png" alt="PFP">
-                <a class="logout-btn" href="/logout">Logout</a>
-            </div>
-        `;
-    } else {
-        html += `
-            <a class="btn" href="/login">🔑 Login to View Collection</a>
-            <div class="pfp">
-                <img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot Icon">
-            </div>
-        `;
-    }
-
-    html += `
         <div class="features">
             <h2>Features:</h2>
             <ul>
@@ -170,6 +158,7 @@ app.get('/', (req, res) => {
 
     res.send(html);
 });
+
 
 
 app.get('/logout', (req, res) => {
