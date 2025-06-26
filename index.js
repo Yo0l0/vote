@@ -290,22 +290,23 @@ app.get('/dashboard', async (req, res) => {
 <input type="text" id="search" placeholder="Search name or code...">
 
 <div class="grid" id="cardGrid"></div>
+
+<a href="/" style="position: fixed; top: 20px; left: 20px; background: #2c003e; color: #00cc99; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; z-index: 999;">⬅️ Back to Homepage</a>
 `;
 
-        if (pageCards.length === 0) {
-            html += `<div class="grid" id="cardGrid"><p>Loading cards...</p></div>`;
-        } else {
-            pageCards.forEach(card => {
-                html += `
-                <div class="card" data-rarity="${card.rarity.toLowerCase()}" data-name="${card.name.toLowerCase()}" data-code="${card.code.toLowerCase()}">
-                    <img src="${card.image}" alt="${card.name}">
-                    <strong>${card.name}</strong>
-                    <p>${card.rarity}, ${card.set}</p>
-                    <p><small>Code: ${card.code}</small></p>
-                    ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
-                </div>`;
-            });
-        }
+if (pageCards.length === 0) {
+} else {
+    pageCards.forEach(card => {
+        html += `
+        <div class="card" data-rarity="${card.rarity.toLowerCase()}" data-name="${card.name.toLowerCase()}" data-code="${card.code.toLowerCase()}">
+            <img src="${card.image}" alt="${card.name}">
+            <strong>${card.name}</strong>
+            <p>${card.rarity}, ${card.set}</p>
+            <p><small>Code: ${card.code}</small></p>
+            ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
+        </div>`;
+    });
+}
 
         html += `</div>`;
 
@@ -352,10 +353,11 @@ async function loadCards() {
     }
 }
 
-document.getElementById('filter').addEventListener('change', loadCards);
-document.getElementById('search').addEventListener('input', loadCards);
-
-window.onload = loadCards;
+window.onload = () => {
+    loadCards();
+    document.getElementById('filter').addEventListener('change', loadCards);
+    document.getElementById('search').addEventListener('input', loadCards);
+};
 </script>
 </body>`;
 
