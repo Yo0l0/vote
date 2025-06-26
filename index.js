@@ -278,7 +278,7 @@ app.get('/dashboard', async (req, res) => {
             <h2>Your Collection:</h2>
 
 <label for="filter">Filter by Rarity:</label>
-<select id="filter" onchange="applyFilters()">
+<select id="filter">
     <option value="all">All</option>
     <option value="common">Common</option>
     <option value="uncommon">Uncommon</option>
@@ -287,13 +287,13 @@ app.get('/dashboard', async (req, res) => {
     <option value="holo">Holo</option>
 </select>
 
-<input type="text" id="search" placeholder="Search name or code..." oninput="applyFilters()">
+<input type="text" id="search" placeholder="Search name or code...">
 
-<div class="grid">
+<div class="grid" id="cardGrid"></div>
 `;
 
         if (pageCards.length === 0) {
-            html += `<p>No cards in your collection.</p>`;
+            html += `<div class="grid" id="cardGrid"><p>Loading cards...</p></div>`;
         } else {
             pageCards.forEach(card => {
                 html += `
@@ -321,17 +321,41 @@ app.get('/dashboard', async (req, res) => {
 
         html += `
 <script>
-function applyFilters() {
-    const selected = document.getElementById('filter').value.toLowerCase();
-    const search = document.getElementById('search').value.toLowerCase();
-    const cards = document.querySelectorAll('.card');
+async function loadCards() {
+    const rarity = document.getElementById('filter').value;
+    const search = document.getElementById('search').value;
 
-    cards.forEach(card => {
-        const matchesRarity = selected === 'all' || card.dataset.rarity === selected;
-        const matchesSearch = card.dataset.name.includes(search) || card.dataset.code.includes(search);
-        card.style.display = (matchesRarity && matchesSearch) ? '' : 'none';
-    });
+    try {
+        const res = await fetch(`/api/cards?rarity=${rarity}&search=${encodeURIComponent(search)}`);
+        const data = await res.json();
+
+        const grid = document.getElementById('cardGrid');
+        grid.innerHTML = '';
+
+        if (data.length === 0) {
+            grid.innerHTML = '<p>No cards found.</p>';
+        } else {
+            data.forEach(card => {
+                grid.innerHTML += `
+                    <div class="card">
+                        <img src="${card.image}" alt="${card.name}">
+                        <strong>${card.name}</strong>
+                        <p>${card.rarity}, ${card.set}</p>
+                        <p><small>Code: ${card.code}</small></p>
+                        ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
+                    </div>
+                `;
+            });
+        }
+    } catch (err) {
+        console.error('Failed to load cards:', err);
+    }
 }
+
+document.getElementById('filter').addEventListener('change', loadCards);
+document.getElementById('search').addEventListener('input', loadCards);
+
+window.onload = loadCards;
 </script>
 </body>`;
 
@@ -341,8 +365,34 @@ function applyFilters() {
         console.error('❌ Failed to fetch inventory:', err.message);
         res.send('<h1>Error loading your collection. Please try again later.</h1><p><a href="/">Back to Homepage</a></p>');
     }
+    
 });
 
+
+app.get('/api/cards', async (req, res) => {
+    if (!req.session.user) return res.status(403).json([]);
+
+    const userId = req.session.user.id;
+    const rarity = req.query.rarity || 'all';
+    const search = req.query.search?.toLowerCase() || '';
+
+    try {
+        const response = await axios.get('https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json');
+        const data = response.data;
+        const collection = (data[userId]?.cards) || [];
+
+        const filtered = collection.filter(card => {
+            const matchesRarity = rarity === 'all' || card.rarity.toLowerCase() === rarity;
+            const matchesSearch = card.name.toLowerCase().includes(search) || card.code.toLowerCase().includes(search);
+            return matchesRarity && matchesSearch;
+        });
+
+        res.json(filtered);
+    } catch (err) {
+        console.error('Failed to fetch cards:', err.message);
+        res.status(500).json([]);
+    }
+});
 
 
 // Clear vote endpoint
