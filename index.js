@@ -277,9 +277,9 @@ app.get('/dashboard', async (req, res) => {
         <h1>Welcome, ${req.session.user.username}</h1>
         <h2>Your Collection</h2>
 
-        <form method="GET" action="/dashboard">
+        <form method="GET" action="/dashboard" id="filterForm">
             <label>Filter by Rarity:</label>
-            <select name="rarity" onchange="this.form.submit()">
+            <select name="rarity" id="filterSelect">
                 <option value="all"${selectedRarity === 'all' ? ' selected' : ''}>All</option>
                 <option value="common"${selectedRarity === 'common' ? ' selected' : ''}>Common</option>
                 <option value="uncommon"${selectedRarity === 'uncommon' ? ' selected' : ''}>Uncommon</option>
@@ -288,39 +288,7 @@ app.get('/dashboard', async (req, res) => {
                 <option value="holo"${selectedRarity === 'holo' ? ' selected' : ''}>Holo</option>
             </select>
 
-<input type="text" id="searchInput" name="search" placeholder="Search name or code..." value="${searchTerm}" autocomplete="off">
-<script>
-let searchTimeout;
-
-// Preserve focus and cursor position
-const searchInput = document.getElementById('searchInput');
-
-searchInput.addEventListener('input', () => {
-    clearTimeout(searchTimeout);
-    const cursorPos = searchInput.selectionStart;
-
-    searchTimeout = setTimeout(() => {
-        const params = new URLSearchParams(window.location.search);
-        params.set('search', searchInput.value);
-        params.set('rarity', document.getElementById('filter').value);
-
-        // Keep cursor position by delaying focus restore slightly
-        window.location.href = `/dashboard?${params.toString()}#restore-focus-${cursorPos}`;
-    }, 500);
-});
-
-// Restore focus after reload
-window.onload = () => {
-    const hash = window.location.hash;
-    if (hash.startsWith("#restore-focus-")) {
-        searchInput.focus();
-        const pos = parseInt(hash.replace("#restore-focus-", ""), 10);
-        searchInput.setSelectionRange(pos, pos);
-        // Clean URL hash
-        history.replaceState(null, null, window.location.pathname + window.location.search);
-    }
-};
-</script>
+            <input type="text" id="searchInput" name="search" placeholder="Search name or code..." value="${searchTerm}" autocomplete="off">
             ${searchTerm.length === 0 ? `<input type="hidden" name="page" value="${page}">` : ''}
         </form>
 
@@ -352,7 +320,42 @@ window.onload = () => {
         }
 
         html += `<a href="/" style="position: fixed; top: 20px; left: 20px; background:#2c003e; color:#00cc99; padding:10px; border-radius:8px;">⬅️ Back</a>`;
-        html += `</body>`;
+
+        // Add JS for delayed reload and focus restore
+        html += `
+<script>
+const filterSelect = document.getElementById('filterSelect');
+const searchInput = document.getElementById('searchInput');
+const form = document.getElementById('filterForm');
+let typingTimer;
+
+filterSelect.addEventListener('change', () => {
+    form.submit();
+});
+
+searchInput.addEventListener('input', () => {
+    clearTimeout(typingTimer);
+    const cursorPos = searchInput.selectionStart;
+
+    typingTimer = setTimeout(() => {
+        const params = new URLSearchParams(window.location.search);
+        params.set('search', searchInput.value);
+        params.set('rarity', filterSelect.value);
+        window.location.href = \`/dashboard?\${params.toString()}#cursor-\${cursorPos}\`;
+    }, 500);
+});
+
+window.onload = () => {
+    const hash = window.location.hash;
+    if (hash.startsWith("#cursor-")) {
+        searchInput.focus();
+        const pos = parseInt(hash.replace("#cursor-", ""), 10);
+        searchInput.setSelectionRange(pos, pos);
+        history.replaceState(null, null, window.location.pathname + window.location.search);
+    }
+};
+</script>
+</body>`;
 
         res.send(html);
 
@@ -361,6 +364,7 @@ window.onload = () => {
         res.send('<h1>Error loading your collection. Please try again later.</h1><a href="/">Back</a>');
     }
 });
+
 
 
 
