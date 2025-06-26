@@ -270,11 +270,16 @@ app.get('/dashboard', async (req, res) => {
 
     const userId = req.session.user.id;
     const inventoryUrl = 'https://thepokebot.com/user_inventory.json';
+    const page = parseInt(req.query.page) || 1;
+    const perPage = 250;
 
     try {
         const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
         const data = response.data;
         const collection = (data[userId]?.cards) || [];
+
+        const totalPages = Math.ceil(collection.length / perPage);
+        const pageCards = collection.slice((page - 1) * perPage, page * perPage);
 
         let html = `
         <head>
@@ -285,72 +290,60 @@ app.get('/dashboard', async (req, res) => {
                 img { width: 200px; height: 280px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; }
                 a { color: #00cc99; text-decoration: none; }
                 .grade { color: #ffcc00; font-weight: bold; margin-top: 5px; }
-                select, input[type="text"] { padding: 8px; font-size: 1em; margin: 10px; }
+                .pagination { margin-top: 30px; }
+                .pagination a {
+                    display: inline-block;
+                    margin: 0 5px;
+                    padding: 8px 15px;
+                    background: #cc0066;
+                    color: white;
+                    border-radius: 5px;
+                    text-decoration: none;
+                }
+                .pagination a.active {
+                    background: #b30059;
+                    font-weight: bold;
+                }
             </style>
         </head>
         <body>
             <h1>Welcome, ${req.session.user.username}</h1>
             <h2>Your Collection:</h2>
-
-            <label for="filter">Filter by Rarity:</label>
-            <select id="filter" onchange="applyFilters()">
-                <option value="all">All</option>
-                <option value="common">Common</option>
-                <option value="uncommon">Uncommon</option>
-                <option value="rare">Rare</option>
-                <option value="promo">Promo</option>
-                <option value="holo">Holo</option>
-            </select>
-
-            <input type="text" id="search" placeholder="Search by name or code..." oninput="applyFilters()">
-
-            <div class="grid" id="cardGrid">
-            <p><a href="/" style="color:#00cc99; text-decoration:none; background:#2c003e; padding:10px 20px; border-radius:8px; display:inline-block; margin-top:20px;">⬅️ Back to Homepage</a></p>
-
+            <div class="grid">
         `;
 
-        if (collection.length === 0) {
+        if (pageCards.length === 0) {
             html += `<p>No cards in your collection.</p>`;
         } else {
-            collection.forEach(card => {
+            pageCards.forEach(card => {
                 html += `
-                    <div class="card" data-rarity="${card.rarity.toLowerCase()}" data-name="${card.name.toLowerCase()}" data-code="${card.code.toLowerCase()}">
-                        <img src="${card.image}" alt="${card.name}">
-                        <strong>${card.name}</strong>
-                        <p>${card.rarity}, ${card.set}</p>
-                        <p><small>Code: ${card.code}</small></p>
-                        ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
-                    </div>
-                `;
+                <div class="card">
+                    <img src="${card.image}" alt="${card.name}">
+                    <strong>${card.name}</strong>
+                    <p>${card.rarity}, ${card.set}</p>
+                    <p><small>Code: ${card.code}</small></p>
+                    ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
+                </div>`;
             });
         }
 
-        html += `
-            </div>
-            <p><a href="/">Back to Homepage</a></p>
+        html += `</div>`;
 
-            <script>
-                function applyFilters() {
-                    const selected = document.getElementById('filter').value;
-                    const search = document.getElementById('search').value.toLowerCase();
-                    const cards = document.querySelectorAll('.card');
+        // Pagination links
+        if (totalPages > 1) {
+            html += `<div class="pagination">`;
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<a href="/dashboard?page=${i}" class="${i === page ? 'active' : ''}">${i}</a>`;
+            }
+            html += `</div>`;
+        }
 
-                    cards.forEach(card => {
-                        const matchesRarity = selected === 'all' || card.dataset.rarity === selected;
-                        const matchesSearch = card.dataset.name.includes(search) || card.dataset.code.includes(search);
-
-                        card.style.display = (matchesRarity && matchesSearch) ? '' : 'none';
-                    });
-                }
-            </script>
-
-        </body>`;
-
+        html += `<p><a href="/">⬅️ Back to Homepage</a></p></body>`;
         res.send(html);
 
     } catch (err) {
         console.error('❌ Failed to fetch inventory:', err.message);
-        return res.send('<h1>Error loading your collection. Please try again later.</h1><p><a href="/">Back to Homepage</a></p>');
+        res.send('<h1>Error loading your collection. Please try again later.</h1><p><a href="/">Back to Homepage</a></p>');
     }
 });
 
