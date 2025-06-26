@@ -356,7 +356,18 @@ app.get('/dashboard', async (req, res) => {
             html += `</div>`;
         }
 
-        html += `<p><a href="/">⬅️ Back to Homepage</a></p>`;
+        html += `<a href="/" style="
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: #2c003e;
+    color: #00cc99;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    z-index: 999;
+">⬅️ Back to Homepage</a>`;
 
         // Filter Script
         html += `
