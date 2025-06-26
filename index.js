@@ -54,6 +54,24 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
     res.status(200).send('Vote recorded');
 });
 
+app.get('/stats', (req, res) => {
+    let totalCards = 0;
+    let totalUsers = 0;
+
+    if (fs.existsSync('user_inventory.json')) {
+        const data = JSON.parse(fs.readFileSync('user_inventory.json', 'utf8') || '{}');
+        totalUsers = Object.keys(data).length;
+
+        for (const userId in data) {
+            const cards = data[userId]?.cards || [];
+            totalCards += cards.length;
+        }
+    }
+
+    res.json({ totalCards, totalUsers });
+});
+
+
 // Serve homepage
 app.get('/', (req, res) => {
     let totalCards = 0;
@@ -122,11 +140,11 @@ app.get('/', (req, res) => {
             </ul>
         </div>
 
-        <div class="stats">
-            <h2>📊 Pokebot Stats:</h2>
-            <p>📦 Total Cards Dropped: <strong>${totalCards}</strong></p>
-            <p>👥 Total Users with Collections: <strong>${totalUsers}</strong></p>
-        </div>
+<div class="stats">
+    <h2>📊 Pokebot Stats:</h2>
+    <p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
+    <p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
+</div>
     </div>
 
     <div class="footer">© 2024 Pokebot. All rights reserved.</div>
@@ -139,6 +157,26 @@ app.get('/', (req, res) => {
     </script>
 
     </body>
+    <script>
+    async function updateStats() {
+        try {
+            const res = await fetch('/stats');
+            const data = await res.json();
+            document.getElementById('cardCount').innerText = data.totalCards;
+            document.getElementById('userCount').innerText = data.totalUsers;
+        } catch (err) {
+            console.error('Failed to load stats:', err);
+        }
+    }
+
+    updateStats();
+    setInterval(updateStats, 5000); // Update every 5 seconds
+
+    const profileBtn = document.getElementById('profileBtn');
+    const dropdown = document.getElementById('dropdownMenu');
+    profileBtn.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; });
+    window.addEventListener('click', (e) => { if (!profileBtn.contains(e.target)) dropdown.style.display = 'none'; });
+</script>
     `;
 
     res.send(html);
