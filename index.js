@@ -288,7 +288,17 @@ app.get('/dashboard', async (req, res) => {
                 <option value="holo"${selectedRarity === 'holo' ? ' selected' : ''}>Holo</option>
             </select>
 
-            <input type="text" name="search" placeholder="Search name or code..." value="${searchTerm}" oninput="this.form.submit()" autocomplete="off">
+<input type="text" id="searchInput" name="search" placeholder="Search name or code..." value="${searchTerm}" autocomplete="off">
+<script>
+let searchTimeout;
+
+document.getElementById('searchInput').addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        document.forms[0].submit();
+    }, 500); 
+});
+</script>
             ${searchTerm.length === 0 ? `<input type="hidden" name="page" value="${page}">` : ''}
         </form>
 
