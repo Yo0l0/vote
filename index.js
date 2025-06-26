@@ -294,33 +294,6 @@ app.get('/dashboard', async (req, res) => {
 <a href="/" style="position: fixed; top: 20px; left: 20px; background: #2c003e; color: #00cc99; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; z-index: 999;">⬅️ Back to Homepage</a>
 `;
 
-if (pageCards.length === 0) {
-} else {
-    pageCards.forEach(card => {
-        html += `
-        <div class="card" data-rarity="${card.rarity.toLowerCase()}" data-name="${card.name.toLowerCase()}" data-code="${card.code.toLowerCase()}">
-            <img src="${card.image}" alt="${card.name}">
-            <strong>${card.name}</strong>
-            <p>${card.rarity}, ${card.set}</p>
-            <p><small>Code: ${card.code}</small></p>
-            ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
-        </div>`;
-    });
-}
-
-        html += `</div>`;
-
-        if (totalPages > 1) {
-            html += `<div class="pagination">`;
-            for (let i = 1; i <= totalPages; i++) {
-                html += `<a href="/dashboard?page=${i}" class="${i === page ? 'active' : ''}">${i}</a>`;
-            }
-            html += `</div>`;
-        }
-
-        html += `<a href="/" style="position: fixed; top: 20px; left: 20px; background: #2c003e; color: #00cc99; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; z-index: 999;">⬅️ Back to Homepage</a>`;
-
-        html += `
 <script>
 async function loadCards() {
     const rarity = document.getElementById('filter').value;
