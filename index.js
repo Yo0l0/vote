@@ -233,6 +233,9 @@ app.get('/callback', async (req, res) => {
 });
 
 // Collection Dashboard
+app.get('/dashboard', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login');
+
     const userId = req.session.user.id;
     const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
 
