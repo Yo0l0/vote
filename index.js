@@ -56,7 +56,38 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
 
 // Serve homepage
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'Public.html'));
+    let html = `
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; background: #0d001d; color: white; text-align: center; padding: 100px; }
+            .btn { background: #cc0066; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-size: 1.2em; margin: 20px; display: inline-block; }
+            .btn:hover { background: #b30059; }
+        </style>
+    </head>
+    <body>
+        <h1>🔥 Pokebot — Collect, Battle, Trade!</h1>
+    `;
+
+    if (req.session.user) {
+        html += `
+            <p>Welcome, ${req.session.user.username}!</p>
+            <a class="btn" href="/dashboard">🗂️ View Your Collection</a>
+            <a class="btn" href="/logout">🚪 Logout</a>
+        `;
+    } else {
+        html += `
+            <p>Login to view your collection:</p>
+            <a class="btn" href="/login">🔑 Login with Discord</a>
+        `;
+    }
+
+    html += `</body>`;
+    res.send(html);
+});
+app.get('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/');
+    });
 });
 
 // Terms and Privacy
