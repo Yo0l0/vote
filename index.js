@@ -292,12 +292,34 @@ app.get('/dashboard', async (req, res) => {
 <script>
 let searchTimeout;
 
-document.getElementById('searchInput').addEventListener('input', () => {
+// Preserve focus and cursor position
+const searchInput = document.getElementById('searchInput');
+
+searchInput.addEventListener('input', () => {
     clearTimeout(searchTimeout);
+    const cursorPos = searchInput.selectionStart;
+
     searchTimeout = setTimeout(() => {
-        document.forms[0].submit();
-    }, 500); 
+        const params = new URLSearchParams(window.location.search);
+        params.set('search', searchInput.value);
+        params.set('rarity', document.getElementById('filter').value);
+
+        // Keep cursor position by delaying focus restore slightly
+        window.location.href = `/dashboard?${params.toString()}#restore-focus-${cursorPos}`;
+    }, 500);
 });
+
+// Restore focus after reload
+window.onload = () => {
+    const hash = window.location.hash;
+    if (hash.startsWith("#restore-focus-")) {
+        searchInput.focus();
+        const pos = parseInt(hash.replace("#restore-focus-", ""), 10);
+        searchInput.setSelectionRange(pos, pos);
+        // Clean URL hash
+        history.replaceState(null, null, window.location.pathname + window.location.search);
+    }
+};
 </script>
             ${searchTerm.length === 0 ? `<input type="hidden" name="page" value="${page}">` : ''}
         </form>
