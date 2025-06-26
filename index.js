@@ -238,16 +238,11 @@ app.get('/dashboard', async (req, res) => {
 
     const userId = req.session.user.id;
     const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
-    const page = parseInt(req.query.page) || 1;
-    const perPage = 250;
 
     try {
         const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
         const data = response.data;
         const collection = (data[userId]?.cards) || [];
-
-        const totalPages = Math.ceil(collection.length / perPage);
-        const pageCards = collection.slice((page - 1) * perPage, page * perPage);
 
         let html = `
         <head>
@@ -259,17 +254,6 @@ app.get('/dashboard', async (req, res) => {
                 img { width: 200px; height: 280px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; }
                 a { color: #00cc99; text-decoration: none; }
                 .grade { color: #ffcc00; font-weight: bold; margin-top: 5px; }
-                .pagination { margin-top: 30px; }
-                .pagination a {
-                    display: inline-block;
-                    margin: 0 5px;
-                    padding: 8px 15px;
-                    background: #cc0066;
-                    color: white;
-                    border-radius: 5px;
-                    text-decoration: none;
-                }
-                .pagination a.active { background: #b30059; font-weight: bold; }
                 select, input[type="text"] { padding: 8px; font-size: 1em; margin: 10px; }
             </style>
         </head>
@@ -289,11 +273,27 @@ app.get('/dashboard', async (req, res) => {
 
 <input type="text" id="search" placeholder="Search name or code...">
 
-<div class="grid" id="cardGrid"></div>
+<div class="grid" id="cardGrid">`;
+
+        if (collection.length === 0) {
+            html += `<p>No cards in your collection.</p>`;
+        } else {
+            collection.forEach(card => {
+                html += `
+                <div class="card">
+                    <img src="${card.image}" alt="${card.name}">
+                    <strong>${card.name}</strong>
+                    <p>${card.rarity}, ${card.set}</p>
+                    <p><small>Code: ${card.code}</small></p>
+                    ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
+                </div>`;
+            });
+        }
+
+        html += `</div>
 
 <a href="/" style="position: fixed; top: 20px; left: 20px; background: #2c003e; color: #00cc99; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; z-index: 999;">⬅️ Back to Homepage</a>
-`;
-html += `
+
 <script>
 async function loadCards() {
     const rarity = document.getElementById('filter').value;
@@ -311,14 +311,13 @@ async function loadCards() {
         } else {
             data.forEach(card => {
                 grid.innerHTML += \`
-                    <div class="card">
-                        <img src="\${card.image}" alt="\${card.name}">
-                        <strong>\${card.name}</strong>
-                        <p>\${card.rarity}, \${card.set}</p>
-                        <p><small>Code: \${card.code}</small></p>
-                        \${card.grade ? \`<div class="grade">Graded: \${card.grade}</div>\` : ''}
-                    </div>
-                \`;
+                <div class="card">
+                    <img src="\${card.image}" alt="\${card.name}">
+                    <strong>\${card.name}</strong>
+                    <p>\${card.rarity}, \${card.set}</p>
+                    <p><small>Code: \${card.code}</small></p>
+                    \${card.grade ? \`<div class="grade">Graded: \${card.grade}</div>\` : ''}
+                </div>\`;
             });
         }
     } catch (err) {
@@ -326,11 +325,8 @@ async function loadCards() {
     }
 }
 
-window.onload = () => {
-    loadCards();
-    document.getElementById('filter').addEventListener('change', loadCards);
-    document.getElementById('search').addEventListener('input', loadCards);
-};
+document.getElementById('filter').addEventListener('change', loadCards);
+document.getElementById('search').addEventListener('input', loadCards);
 </script>
 </body>`;
 
@@ -340,8 +336,8 @@ window.onload = () => {
         console.error('❌ Failed to fetch inventory:', err.message);
         res.send('<h1>Error loading your collection. Please try again later.</h1><p><a href="/">Back to Homepage</a></p>');
     }
-    
 });
+
 
 
 app.get('/api/cards', async (req, res) => {
