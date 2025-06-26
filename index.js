@@ -17,9 +17,14 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 app.use(session({
-    secret: 'adf32rfdfdswf', // Replace with your own random secret
+    secret: 'your-secret-key-here',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week session
+        sameSite: 'lax',
+        secure: false // set to true if forcing HTTPS only
+    }
 }));
 
 app.post('/upload', (req, res) => {
@@ -73,19 +78,17 @@ app.get('/callback', async (req, res) => {
     if (!code) return res.send('Missing code');
 
     try {
-        const params = new URLSearchParams();
-        params.append('client_id', CLIENT_ID);
-        params.append('client_secret', CLIENT_SECRET);
-        params.append('grant_type', 'authorization_code');
-        params.append('code', code);
-        params.append('redirect_uri', REDIRECT_URI);
-        params.append('scope', 'identify');
-
-        const tokenRes = await axios.post('https://discord.com/api/oauth2/token', params);
-        const token = tokenRes.data.access_token;
+        const tokenRes = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
+            grant_type: 'authorization_code',
+            code,
+            redirect_uri: REDIRECT_URI,
+            scope: 'identify'
+        }));
 
         const userRes = await axios.get('https://discord.com/api/users/@me', {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${tokenRes.data.access_token}` }
         });
 
         req.session.user = userRes.data;
