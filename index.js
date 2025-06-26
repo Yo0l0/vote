@@ -56,7 +56,41 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
 
 // Serve homepage
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'Public.html'));
+    let html = `
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; background: #0d001d; color: white; text-align: center; padding: 50px; }
+            .btn { background: #cc0066; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-size: 1.2em; margin: 10px; display: inline-block; }
+            .btn:hover { background: #b30059; }
+            .pfp { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; }
+            .pfp img { width: 40px; height: 40px; border-radius: 50%; margin-left: 10px; }
+        </style>
+    </head>
+    <body>
+        <h1>🔥 Pokebot — Collect, Battle, Trade!</h1>
+
+        <a class="btn" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">✨ Invite Pokebot</a>
+        <a class="btn" href="https://discord.gg/g7AAsmJA">💬 Join Support Server</a>
+        <a class="btn" href="https://top.gg/bot/1362516883785515199">✅ Vote Here!</a>
+    `;
+
+    if (req.session.user) {
+        html += `
+            <a class="btn" href="/dashboard">🗂️ View Your Collection</a>
+            <div class="pfp">
+                <span>${req.session.user.username}</span>
+                <img src="https://cdn.discordapp.com/avatars/${req.session.user.id}/${req.session.user.avatar}.png" alt="PFP">
+            </div>
+        `;
+    } else {
+        html += `
+            <a class="btn" href="/login">🔑 Login with Discord</a>
+            <a class="btn" href="/login">🗂️ View Your Collection</a>
+        `;
+    }
+
+    html += `</body>`;
+    res.send(html);
 });
 
 app.get('/logout', (req, res) => {
