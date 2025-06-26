@@ -293,14 +293,14 @@ app.get('/dashboard', async (req, res) => {
 
 <a href="/" style="position: fixed; top: 20px; left: 20px; background: #2c003e; color: #00cc99; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; z-index: 999;">⬅️ Back to Homepage</a>
 `;
-
+html += `
 <script>
 async function loadCards() {
     const rarity = document.getElementById('filter').value;
     const search = document.getElementById('search').value;
 
     try {
-        const res = await fetch(`/api/cards?rarity=${rarity}&search=${encodeURIComponent(search)}`);
+        const res = await fetch(\`/api/cards?rarity=\${rarity}&search=\${encodeURIComponent(search)}\`);
         const data = await res.json();
 
         const grid = document.getElementById('cardGrid');
@@ -310,15 +310,15 @@ async function loadCards() {
             grid.innerHTML = '<p>No cards found.</p>';
         } else {
             data.forEach(card => {
-                grid.innerHTML += `
+                grid.innerHTML += \`
                     <div class="card">
-                        <img src="${card.image}" alt="${card.name}">
-                        <strong>${card.name}</strong>
-                        <p>${card.rarity}, ${card.set}</p>
-                        <p><small>Code: ${card.code}</small></p>
-                        ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
+                        <img src="\${card.image}" alt="\${card.name}">
+                        <strong>\${card.name}</strong>
+                        <p>\${card.rarity}, \${card.set}</p>
+                        <p><small>Code: \${card.code}</small></p>
+                        \${card.grade ? \`<div class="grade">Graded: \${card.grade}</div>\` : ''}
                     </div>
-                `;
+                \`;
             });
         }
     } catch (err) {
