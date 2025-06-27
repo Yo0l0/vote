@@ -242,6 +242,7 @@ app.get('/dashboard', async (req, res) => {
 
     let html = `
     <head>
+        <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
         <style>
             body { background: #0d001d; color: white; font-family: Arial; text-align: center; padding: 20px; }
             .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 30px; }
