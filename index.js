@@ -240,6 +240,8 @@ app.get('/dashboard', async (req, res) => {
     const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
 
     const selectedRarity = req.query.rarity?.toLowerCase() || 'all';
+    const selectedGrade = req.query.grade || 'all';
+    const selectedCondition = req.query.condition || 'all';
     const searchTerm = req.query.search?.toLowerCase() || '';
     const page = parseInt(req.query.page) || 1;
     const perPage = 100;
@@ -251,13 +253,14 @@ app.get('/dashboard', async (req, res) => {
 
         const filtered = collection.filter(card => {
             const matchesRarity = selectedRarity === 'all' || card.rarity.toLowerCase() === selectedRarity;
+            const matchesGrade = selectedGrade === 'all' || String(card.grade || '') === selectedGrade;
+            const matchesCondition = selectedCondition === 'all' || (card.condition || '').toLowerCase() === selectedCondition.toLowerCase();
             const matchesSearch = card.name.toLowerCase().includes(searchTerm) || card.code.toLowerCase().includes(searchTerm);
-            return matchesRarity && matchesSearch;
+            return matchesRarity && matchesGrade && matchesCondition && matchesSearch;
         });
 
         const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
         const showAll = searchTerm.length > 0;
-
         const displayCards = showAll ? filtered : filtered.slice((page - 1) * perPage, page * perPage);
 
         let html = `
@@ -271,6 +274,8 @@ app.get('/dashboard', async (req, res) => {
             .grade { color: #ffcc00; font-weight: bold; }
             .pagination a { margin: 5px; padding: 8px 15px; background: #cc0066; color: white; border-radius: 5px; text-decoration: none; }
             .pagination a.active { background: #b30059; }
+            .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; background: #2c003e; padding: 15px; border-radius: 10px; margin-top: 20px; }
+            .filter-container select, .filter-container input[type="text"] { padding: 8px; border-radius: 5px; background: #0d001d; color: white; border: none; }
         </style>
         </head>
         <body>
@@ -278,19 +283,60 @@ app.get('/dashboard', async (req, res) => {
         <h2>Your Collection</h2>
 
         <form method="GET" action="/dashboard" id="filterForm">
-            <label>Filter by Rarity:</label>
-            <select name="rarity" id="filterSelect">
-                <option value="all"${selectedRarity === 'all' ? ' selected' : ''}>All</option>
-                <option value="common"${selectedRarity === 'common' ? ' selected' : ''}>Common</option>
-                <option value="uncommon"${selectedRarity === 'uncommon' ? ' selected' : ''}>Uncommon</option>
-                <option value="rare"${selectedRarity === 'rare' ? ' selected' : ''}>Rare</option>
-                <option value="promo"${selectedRarity === 'promo' ? ' selected' : ''}>Promo</option>
-                <option value="holo"${selectedRarity === 'holo' ? ' selected' : ''}>Holo</option>
-            </select>
+        <div class="filter-container">
+            
+            <div>
+                <label>Rarity:</label>
+                <select name="rarity" onchange="this.form.submit()">
+                    <option value="all"${selectedRarity === 'all' ? ' selected' : ''}>All</option>
+                    <option value="common"${selectedRarity === 'common' ? ' selected' : ''}>Common</option>
+                    <option value="uncommon"${selectedRarity === 'uncommon' ? ' selected' : ''}>Uncommon</option>
+                    <option value="rare"${selectedRarity === 'rare' ? ' selected' : ''}>Rare</option>
+                    <option value="promo"${selectedRarity === 'promo' ? ' selected' : ''}>Promo</option>
+                    <option value="holo"${selectedRarity === 'holo' ? ' selected' : ''}>Holo</option>
+                </select>
+            </div>
 
-            <input type="text" id="searchInput" name="search" placeholder="Search name or code..." value="${searchTerm}" autocomplete="off">
+            <div>
+                <label>Grade:</label>
+                <select name="grade" onchange="this.form.submit()">
+                    <option value="all"${selectedGrade === 'all' ? ' selected' : ''}>All</option>
+                    ${[...Array(11).keys()].slice(1).map(g => `
+                        <option value="${g}"${selectedGrade == g ? ' selected' : ''}>${g}</option>
+                    `).join('')}
+                </select>
+            </div>
+
+            <div>
+                <label>Condition:</label>
+                <select name="condition" onchange="this.form.submit()">
+                    <option value="all"${selectedCondition === 'all' ? ' selected' : ''}>All</option>
+                    <option value="Mint"${selectedCondition === 'Mint' ? ' selected' : ''}>Mint</option>
+                    <option value="Near Mint"${selectedCondition === 'Near Mint' ? ' selected' : ''}>Near Mint</option>
+                    <option value="Good"${selectedCondition === 'Good' ? ' selected' : ''}>Good</option>
+                    <option value="Played"${selectedCondition === 'Played' ? ' selected' : ''}>Played</option>
+                    <option value="Damaged"${selectedCondition === 'Damaged' ? ' selected' : ''}>Damaged</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Search:</label>
+                <input type="text" name="search" placeholder="Search name or code..." value="${searchTerm}" oninput="delayedSearch()" autocomplete="off">
+            </div>
+            
             ${searchTerm.length === 0 ? `<input type="hidden" name="page" value="${page}">` : ''}
+        </div>
         </form>
+
+        <script>
+            let searchTimeout;
+            function delayedSearch() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    document.getElementById('filterForm').submit();
+                }, 600);
+            }
+        </script>
 
         <div class="grid">`;
 
@@ -298,15 +344,15 @@ app.get('/dashboard', async (req, res) => {
             html += `<p>No matching cards found.</p>`;
         } else {
             displayCards.forEach(card => {
-            html += `
-            <div class="card">
-                <img src="${card.image}" alt="${card.name}">
-                <strong>${card.name}</strong>
-                <p>${card.rarity}, ${card.set}</p>
-                <p><small>Code: ${card.code}</small></p>
-                <p><small>Condition: ${card.condition || 'Unknown'}</small></p>
-                ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
-            </div>`;
+                html += `
+                <div class="card">
+                    <img src="${card.image}" alt="${card.name}">
+                    <strong>${card.name}</strong>
+                    <p>${card.rarity}, ${card.set}</p>
+                    <p><small>Code: ${card.code}</small></p>
+                    <p><small>Condition: ${card.condition || 'Unknown'}</small></p>
+                    ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
+                </div>`;
             });
         }
 
@@ -315,48 +361,13 @@ app.get('/dashboard', async (req, res) => {
         if (totalPages > 1 && searchTerm.length === 0) {
             html += `<div class="pagination">`;
             for (let i = 1; i <= totalPages; i++) {
-                html += `<a href="/dashboard?rarity=${selectedRarity}&search=${encodeURIComponent(searchTerm)}&page=${i}" class="${i === page ? 'active' : ''}">${i}</a>`;
+                html += `<a href="/dashboard?rarity=${selectedRarity}&grade=${selectedGrade}&condition=${selectedCondition}&search=${encodeURIComponent(searchTerm)}&page=${i}" class="${i === page ? 'active' : ''}">${i}</a>`;
             }
             html += `</div>`;
         }
 
         html += `<a href="/" style="position: fixed; top: 20px; left: 20px; background:#2c003e; color:#00cc99; padding:10px; border-radius:8px;">⬅️ Back</a>`;
-
-        // Add JS for delayed reload and focus restore
-        html += `
-<script>
-const filterSelect = document.getElementById('filterSelect');
-const searchInput = document.getElementById('searchInput');
-const form = document.getElementById('filterForm');
-let typingTimer;
-
-filterSelect.addEventListener('change', () => {
-    form.submit();
-});
-
-searchInput.addEventListener('input', () => {
-    clearTimeout(typingTimer);
-    const cursorPos = searchInput.selectionStart;
-
-    typingTimer = setTimeout(() => {
-        const params = new URLSearchParams(window.location.search);
-        params.set('search', searchInput.value);
-        params.set('rarity', filterSelect.value);
-        window.location.href = \`/dashboard?\${params.toString()}#cursor-\${cursorPos}\`;
-    }, 500);
-});
-
-window.onload = () => {
-    const hash = window.location.hash;
-    if (hash.startsWith("#cursor-")) {
-        searchInput.focus();
-        const pos = parseInt(hash.replace("#cursor-", ""), 10);
-        searchInput.setSelectionRange(pos, pos);
-        history.replaceState(null, null, window.location.pathname + window.location.search);
-    }
-};
-</script>
-</body>`;
+        html += `</body>`;
 
         res.send(html);
 
@@ -365,6 +376,7 @@ window.onload = () => {
         res.send('<h1>Error loading your collection. Please try again later.</h1><a href="/">Back</a>');
     }
 });
+
 
 
 
@@ -381,11 +393,13 @@ app.get('/api/cards', async (req, res) => {
         const data = response.data;
         const collection = (data[userId]?.cards) || [];
 
-        const filtered = collection.filter(card => {
-            const matchesRarity = rarity === 'all' || card.rarity.toLowerCase() === rarity;
-            const matchesSearch = card.name.toLowerCase().includes(search) || card.code.toLowerCase().includes(search);
-            return matchesRarity && matchesSearch;
-        });
+    const filtered = collection.filter(card => {
+        const matchesRarity = selectedRarity === 'all' || card.rarity.toLowerCase() === selectedRarity;
+        const matchesGrade = selectedGrade === 'all' || String(card.grade) === selectedGrade;
+        const matchesCondition = selectedCondition === 'all' || card.condition === selectedCondition;
+        const matchesSearch = card.name.toLowerCase().includes(searchTerm) || card.code.toLowerCase().includes(searchTerm);
+        return matchesRarity && matchesGrade && matchesCondition && matchesSearch;
+    });
 
         res.json(filtered);
     } catch (err) {
