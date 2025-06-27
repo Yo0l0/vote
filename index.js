@@ -249,8 +249,31 @@ app.get('/dashboard', async (req, res) => {
             img { width: 200px; height: 280px; border-radius: 8px; }
             a { color: #00cc99; text-decoration: none; }
             .grade { color: #ffcc00; font-weight: bold; }
-            .pagination button { margin: 3px; padding: 8px 15px; background: #cc0066; color: white; border: none; border-radius: 5px; cursor: pointer; }
-            .pagination button.active { background: #b30059; font-weight: bold; }
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 20px;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pagination button {
+    padding: 8px 12px;
+    background: #cc0066;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    min-width: 35px;
+}
+
+.pagination button.active {
+    background: #b30059;
+    font-weight: bold;
+}
             .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; background: #2c003e; padding: 15px; border-radius: 10px; margin-top: 20px; }
             .filter-container select, .filter-container input[type="text"] { padding: 8px; border-radius: 5px; background: #0d001d; color: white; border: none; }
         </style>
