@@ -255,20 +255,21 @@ app.get('/dashboard', async (req, res) => {
     justify-content: center;
     gap: 6px;
     margin-top: 20px;
-    max-width: 95%;
+    flex-wrap: wrap;
+    max-width: 90%;
     margin-left: auto;
     margin-right: auto;
 }
 
 .pagination button {
     padding: 8px 14px;
-    background: #1a1a2e;
-    color: white;
+    min-width: 38px;
+    background: #2c003e;
+    color: #00cc99;
     border: 1px solid #00cc99;
     border-radius: 50px;
     cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-    min-width: 38px;
+    transition: all 0.3s ease;
     font-weight: bold;
 }
 
