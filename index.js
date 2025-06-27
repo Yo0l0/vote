@@ -433,7 +433,7 @@ app.get('/api/cards', async (req, res) => {
     const condition = req.query.condition || 'all';
     const search = req.query.search?.toLowerCase() || '';
     const page = parseInt(req.query.page) || 1;
-    const perPage = 500;
+    const perPage = 250;
 
     const collection = (cachedInventory[userId]?.cards) || [];
 
