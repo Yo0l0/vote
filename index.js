@@ -254,32 +254,28 @@ app.get('/dashboard', async (req, res) => {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     margin-top: 20px;
-    flex-wrap: wrap;
-    max-width: 90%;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .pagination button {
-    margin: 4px;
-    padding: 8px 15px;
+    padding: 10px 16px;
+    min-width: 40px;
     background: #2c003e;
     color: #00cc99;
-    border: 2px solid #00cc99;
-    border-radius: 8px;
+    border: 1px solid #00cc99;
+    border-radius: 50px;
     cursor: pointer;
-    font-weight: bold;
     transition: all 0.3s ease;
-    min-width: 40px;
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(0, 204, 153, 0.3);
 }
 
 .pagination button:hover {
     background: #00cc99;
     color: #0d001d;
     transform: scale(1.05);
-    box-shadow: 0 0 10px #00cc99;
+    box-shadow: 0 0 15px rgba(0, 204, 153, 0.7);
 }
 
 .pagination button.active {
@@ -287,8 +283,9 @@ app.get('/dashboard', async (req, res) => {
     color: #0d001d;
     border-color: #00cc99;
     transform: scale(1.1);
-    box-shadow: 0 0 15px #00cc99;
+    box-shadow: 0 0 20px rgba(0, 204, 153, 0.9);
 }
+
 
             .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; background: #2c003e; padding: 15px; border-radius: 10px; margin-top: 20px; }
             .filter-container select, .filter-container input[type="text"] { padding: 8px; border-radius: 5px; background: #0d001d; color: white; border: none; }
@@ -376,11 +373,16 @@ app.get('/dashboard', async (req, res) => {
                     });
                 }
 
-                const pagination = document.getElementById('pagination');
-                pagination.innerHTML = '';
-                for (let i = 1; i <= data.totalPages; i++) {
-                    pagination.innerHTML += \`<button onclick="loadCards(\${i})" class="\${i === page ? 'active' : ''}">\${i}</button>\`;
-                }
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+        
+        for (let i = 1; i <= data.totalPages; i++) {
+            const btn = document.createElement('button');
+            btn.textContent = i;
+            if (i === page) btn.classList.add('active');
+            btn.onclick = () => loadCards(i);
+            pagination.appendChild(btn);
+        }
             })
             .catch(err => console.error('Failed to load cards:', err));
     }
@@ -431,7 +433,7 @@ app.get('/api/cards', async (req, res) => {
     const condition = req.query.condition || 'all';
     const search = req.query.search?.toLowerCase() || '';
     const page = parseInt(req.query.page) || 1;
-    const perPage = 100;
+    const perPage = 500;
 
     const collection = (cachedInventory[userId]?.cards) || [];
 
