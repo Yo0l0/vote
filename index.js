@@ -298,14 +298,15 @@ app.get('/dashboard', async (req, res) => {
             html += `<p>No matching cards found.</p>`;
         } else {
             displayCards.forEach(card => {
-                html += `
-                <div class="card">
-                    <img src="${card.image}" alt="${card.name}">
-                    <strong>${card.name}</strong>
-                    <p>${card.rarity}, ${card.set}</p>
-                    <p><small>Code: ${card.code}</small></p>
-                    ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
-                </div>`;
+            html += `
+            <div class="card">
+                <img src="${card.image}" alt="${card.name}">
+                <strong>${card.name}</strong>
+                <p>${card.rarity}, ${card.set}</p>
+                <p><small>Code: ${card.code}</small></p>
+                <p><small>Condition: ${card.condition || 'Unknown'}</small></p>
+                ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
+            </div>`;
             });
         }
 
