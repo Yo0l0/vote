@@ -311,6 +311,7 @@ app.get('/dashboard', async (req, res) => {
                 <label>Condition:</label>
                 <select name="condition" onchange="this.form.submit()">
                     <option value="all"${selectedCondition === 'all' ? ' selected' : ''}>All</option>
+                    <option value="Pristine"${selectedCondition === 'Pristine' ? ' selected' : ''}>Pristine</option>
                     <option value="Mint"${selectedCondition === 'Mint' ? ' selected' : ''}>Mint</option>
                     <option value="Near Mint"${selectedCondition === 'Near Mint' ? ' selected' : ''}>Near Mint</option>
                     <option value="Good"${selectedCondition === 'Good' ? ' selected' : ''}>Good</option>
