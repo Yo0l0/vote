@@ -262,21 +262,23 @@ app.get('/dashboard', async (req, res) => {
 }
 
 .pagination button {
-    padding: 8px 14px;
-    min-width: 38px;
+    margin: 4px;
+    padding: 8px 15px;
     background: #2c003e;
     color: #00cc99;
-    border: 1px solid #00cc99;
-    border-radius: 50px;
+    border: 2px solid #00cc99;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease;
     font-weight: bold;
+    transition: all 0.3s ease;
+    min-width: 40px;
 }
 
 .pagination button:hover {
     background: #00cc99;
     color: #0d001d;
     transform: scale(1.05);
+    box-shadow: 0 0 10px #00cc99;
 }
 
 .pagination button.active {
@@ -284,6 +286,7 @@ app.get('/dashboard', async (req, res) => {
     color: #0d001d;
     border-color: #00cc99;
     transform: scale(1.1);
+    box-shadow: 0 0 15px #00cc99;
 }
 
             .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; background: #2c003e; padding: 15px; border-radius: 10px; margin-top: 20px; }
