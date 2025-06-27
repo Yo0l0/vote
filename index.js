@@ -12,7 +12,9 @@ const webhook = new Webhook('252566'); // Your Top.gg webhook secret
 const CLIENT_ID = '1362516883785515199';
 const CLIENT_SECRET = 'eXuBq95536h177-RfcgvBOybWouxwK5k';
 const REDIRECT_URI = 'https://thepokebot.com/callback'; // Example: https://thepokebot.com/callback
-
+let cachedInventory = null;
+let lastFetch = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 app.use(express.json());
 app.use(express.static(__dirname));
 
@@ -237,34 +239,9 @@ app.get('/dashboard', async (req, res) => {
     if (!req.session.user) return res.redirect('/login');
 
     const userId = req.session.user.id;
-    const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
 
-    const selectedRarity = req.query.rarity?.toLowerCase() || 'all';
-    const selectedGrade = req.query.grade || 'all';
-    const selectedCondition = req.query.condition || 'all';
-    const searchTerm = req.query.search?.toLowerCase() || '';
-    const page = parseInt(req.query.page) || 1;
-    const perPage = 500;
-
-    try {
-        const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
-        const data = response.data;
-        const collection = (data[userId]?.cards) || [];
-
-        const filtered = collection.filter(card => {
-            const matchesRarity = selectedRarity === 'all' || card.rarity.toLowerCase() === selectedRarity;
-            const matchesGrade = selectedGrade === 'all' || String(card.grade || '') === selectedGrade;
-            const matchesCondition = selectedCondition === 'all' || (card.condition || '').toLowerCase() === selectedCondition.toLowerCase();
-            const matchesSearch = card.name.toLowerCase().includes(searchTerm) || card.code.toLowerCase().includes(searchTerm);
-            return matchesRarity && matchesGrade && matchesCondition && matchesSearch;
-        });
-
-        const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
-        const showAll = searchTerm.length > 0;
-        const displayCards = showAll ? filtered : filtered.slice((page - 1) * perPage, page * perPage);
-
-        let html = `
-        <head>
+    let html = `
+    <head>
         <style>
             body { background: #0d001d; color: white; font-family: Arial; text-align: center; padding: 20px; }
             .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 30px; }
@@ -272,111 +249,123 @@ app.get('/dashboard', async (req, res) => {
             img { width: 200px; height: 280px; border-radius: 8px; }
             a { color: #00cc99; text-decoration: none; }
             .grade { color: #ffcc00; font-weight: bold; }
-            .pagination a { margin: 5px; padding: 8px 15px; background: #cc0066; color: white; border-radius: 5px; text-decoration: none; }
-            .pagination a.active { background: #b30059; }
+            .pagination button { margin: 3px; padding: 8px 15px; background: #cc0066; color: white; border: none; border-radius: 5px; cursor: pointer; }
+            .pagination button.active { background: #b30059; font-weight: bold; }
             .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; background: #2c003e; padding: 15px; border-radius: 10px; margin-top: 20px; }
             .filter-container select, .filter-container input[type="text"] { padding: 8px; border-radius: 5px; background: #0d001d; color: white; border: none; }
         </style>
-        </head>
-        <body>
-        <h1>Welcome, ${req.session.user.username}</h1>
-        <h2>Your Collection</h2>
+    </head>
+    <body>
+    <h1>Welcome, ${req.session.user.username}</h1>
+    <h2>Your Collection</h2>
 
-        <form method="GET" action="/dashboard" id="filterForm">
-        <div class="filter-container">
-            
-            <div>
-                <label>Rarity:</label>
-                <select name="rarity" onchange="this.form.submit()">
-                    <option value="all"${selectedRarity === 'all' ? ' selected' : ''}>All</option>
-                    <option value="common"${selectedRarity === 'common' ? ' selected' : ''}>Common</option>
-                    <option value="uncommon"${selectedRarity === 'uncommon' ? ' selected' : ''}>Uncommon</option>
-                    <option value="rare"${selectedRarity === 'rare' ? ' selected' : ''}>Rare</option>
-                    <option value="promo"${selectedRarity === 'promo' ? ' selected' : ''}>Promo</option>
-                    <option value="holo"${selectedRarity === 'holo' ? ' selected' : ''}>Holo</option>
-                </select>
-            </div>
-
-            <div>
-                <label>Grade:</label>
-                <select name="grade" onchange="this.form.submit()">
-                    <option value="all"${selectedGrade === 'all' ? ' selected' : ''}>All</option>
-                    ${[...Array(11).keys()].slice(1).map(g => `
-                        <option value="${g}"${selectedGrade == g ? ' selected' : ''}>${g}</option>
-                    `).join('')}
-                </select>
-            </div>
-
-            <div>
-                <label>Condition:</label>
-                <select name="condition" onchange="this.form.submit()">
-                    <option value="all"${selectedCondition === 'all' ? ' selected' : ''}>All</option>
-                    <option value="Pristine"${selectedCondition === 'Pristine' ? ' selected' : ''}>Pristine</option>
-                    <option value="Mint"${selectedCondition === 'Mint' ? ' selected' : ''}>Mint</option>
-                    <option value="Near Mint"${selectedCondition === 'Near Mint' ? ' selected' : ''}>Near Mint</option>
-                    <option value="Good"${selectedCondition === 'Good' ? ' selected' : ''}>Good</option>
-                    <option value="Played"${selectedCondition === 'Played' ? ' selected' : ''}>Played</option>
-                    <option value="Damaged"${selectedCondition === 'Damaged' ? ' selected' : ''}>Damaged</option>
-                </select>
-            </div>
-
-            <div>
-                <label>Search:</label>
-                <input type="text" name="search" placeholder="Search name or code..." value="${searchTerm}" oninput="delayedSearch()" autocomplete="off">
-            </div>
-            
-            ${searchTerm.length === 0 ? `<input type="hidden" name="page" value="${page}">` : ''}
+    <div class="filter-container">
+        <div>
+            <label>Rarity:</label>
+            <select id="filterRarity">
+                <option value="all">All</option>
+                <option value="common">Common</option>
+                <option value="uncommon">Uncommon</option>
+                <option value="rare">Rare</option>
+                <option value="promo">Promo</option>
+                <option value="holo">Holo</option>
+            </select>
         </div>
-        </form>
 
-        <script>
-            let searchTimeout;
-            function delayedSearch() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    document.getElementById('filterForm').submit();
-                }, 600);
-            }
-        </script>
+        <div>
+            <label>Grade:</label>
+            <select id="filterGrade">
+                <option value="all">All</option>
+                ${[...Array(11).keys()].slice(1).map(g => `<option value="${g}">${g}</option>`).join('')}
+            </select>
+        </div>
 
-        <div class="grid">`;
+        <div>
+            <label>Condition:</label>
+            <select id="filterCondition">
+                <option value="all">All</option>
+                <option value="Pristine">Pristine</option>
+                <option value="Mint">Mint</option>
+                <option value="Near Mint">Near Mint</option>
+                <option value="Good">Good</option>
+                <option value="Played">Played</option>
+                <option value="Damaged">Damaged</option>
+            </select>
+        </div>
 
-        if (displayCards.length === 0) {
-            html += `<p>No matching cards found.</p>`;
-        } else {
-            displayCards.forEach(card => {
-                html += `
-                <div class="card">
-                    <img src="${card.image}" alt="${card.name}">
-                    <strong>${card.name}</strong>
-                    <p>${card.rarity}, ${card.set}</p>
-                    <p><small>Code: ${card.code}</small></p>
-                    <p><small>Condition: ${card.condition || 'Unknown'}</small></p>
-                    ${card.grade ? `<div class="grade">Graded: ${card.grade}</div>` : ''}
-                </div>`;
-            });
-        }
+        <div>
+            <label>Search:</label>
+            <input type="text" id="searchInput" placeholder="Search name or code..." autocomplete="off">
+        </div>
+    </div>
 
-        html += `</div>`;
+    <div class="grid" id="cardGrid"></div>
+    <div id="pagination" style="margin-top: 20px;"></div>
 
-        if (totalPages > 1 && searchTerm.length === 0) {
-            html += `<div class="pagination">`;
-            for (let i = 1; i <= totalPages; i++) {
-                html += `<a href="/dashboard?rarity=${selectedRarity}&grade=${selectedGrade}&condition=${selectedCondition}&search=${encodeURIComponent(searchTerm)}&page=${i}" class="${i === page ? 'active' : ''}">${i}</a>`;
-            }
-            html += `</div>`;
-        }
+    <a href="/" style="position: fixed; top: 20px; left: 20px; background:#2c003e; color:#00cc99; padding:10px; border-radius:8px;">⬅️ Back</a>
 
-        html += `<a href="/" style="position: fixed; top: 20px; left: 20px; background:#2c003e; color:#00cc99; padding:10px; border-radius:8px;">⬅️ Back</a>`;
-        html += `</body>`;
+    <script>
+    let currentPage = 1;
+    let searchTimeout;
 
-        res.send(html);
+    function loadCards(page = 1) {
+        currentPage = page;
+        const rarity = document.getElementById('filterRarity').value;
+        const grade = document.getElementById('filterGrade').value;
+        const condition = document.getElementById('filterCondition').value;
+        const search = document.getElementById('searchInput').value;
 
-    } catch (err) {
-        console.error('❌ Failed to fetch inventory:', err.message);
-        res.send('<h1>Error loading your collection. Please try again later.</h1><a href="/">Back</a>');
+        fetch(\`/api/cards?rarity=\${rarity}&grade=\${grade}&condition=\${condition}&search=\${encodeURIComponent(search)}&page=\${page}\`)
+            .then(res => res.json())
+            .then(data => {
+                const grid = document.getElementById('cardGrid');
+                grid.innerHTML = '';
+
+                if (data.cards.length === 0) {
+                    grid.innerHTML = '<p>No matching cards found.</p>';
+                } else {
+                    data.cards.forEach(card => {
+                        grid.innerHTML += \`
+                        <div class="card">
+                            <img src="\${card.image}" alt="\${card.name}">
+                            <strong>\${card.name}</strong>
+                            <p>\${card.rarity}, \${card.set}</p>
+                            <p><small>Code: \${card.code}</small></p>
+                            <p><small>Condition: \${card.condition || 'Unknown'}</small></p>
+                            \${card.grade ? \`<div class="grade">Graded: \${card.grade}</div>\` : ''}
+                        </div>\`;
+                    });
+                }
+
+                const pagination = document.getElementById('pagination');
+                pagination.innerHTML = '';
+                for (let i = 1; i <= data.totalPages; i++) {
+                    pagination.innerHTML += \`<button onclick="loadCards(\${i})" class="\${i === page ? 'active' : ''}">\${i}</button>\`;
+                }
+            })
+            .catch(err => console.error('Failed to load cards:', err));
     }
+
+    function delayedSearch() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            loadCards(1);
+        }, 500);
+    }
+
+    window.onload = () => {
+        loadCards(1);
+        document.getElementById('filterRarity').addEventListener('change', () => loadCards(1));
+        document.getElementById('filterGrade').addEventListener('change', () => loadCards(1));
+        document.getElementById('filterCondition').addEventListener('change', () => loadCards(1));
+        document.getElementById('searchInput').addEventListener('input', delayedSearch);
+    };
+    </script>
+    </body>`;
+
+    res.send(html);
 });
+
 
 
 
@@ -385,28 +374,40 @@ app.get('/dashboard', async (req, res) => {
 app.get('/api/cards', async (req, res) => {
     if (!req.session.user) return res.status(403).json([]);
 
+    const now = Date.now();
+    if (!cachedInventory || now - lastFetch > CACHE_DURATION) {
+        try {
+            const response = await axios.get('https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json');
+            cachedInventory = response.data;
+            lastFetch = now;
+        } catch (err) {
+            console.error('Failed to fetch inventory:', err.message);
+            return res.status(500).json([]);
+        }
+    }
+
     const userId = req.session.user.id;
     const rarity = req.query.rarity || 'all';
+    const grade = req.query.grade || 'all';
+    const condition = req.query.condition || 'all';
     const search = req.query.search?.toLowerCase() || '';
+    const page = parseInt(req.query.page) || 1;
+    const perPage = 100;
 
-    try {
-        const response = await axios.get('https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json');
-        const data = response.data;
-        const collection = (data[userId]?.cards) || [];
+    const collection = (cachedInventory[userId]?.cards) || [];
 
     const filtered = collection.filter(card => {
-        const matchesRarity = selectedRarity === 'all' || card.rarity.toLowerCase() === selectedRarity;
-        const matchesGrade = selectedGrade === 'all' || String(card.grade) === selectedGrade;
-        const matchesCondition = selectedCondition === 'all' || card.condition === selectedCondition;
-        const matchesSearch = card.name.toLowerCase().includes(searchTerm) || card.code.toLowerCase().includes(searchTerm);
-        return matchesRarity && matchesGrade && matchesCondition && matchesSearch;
+        const matchesRarity = rarity === 'all' || card.rarity.toLowerCase() === rarity;
+        const matchesSearch = card.name.toLowerCase().includes(search) || card.code.toLowerCase().includes(search);
+        const matchesGrade = grade === 'all' || String(card.grade || '') === grade;
+        const matchesCondition = condition === 'all' || (card.condition?.toLowerCase() || '') === condition.toLowerCase();
+        return matchesRarity && matchesSearch && matchesGrade && matchesCondition;
     });
 
-        res.json(filtered);
-    } catch (err) {
-        console.error('Failed to fetch cards:', err.message);
-        res.status(500).json([]);
-    }
+    const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+    const pageCards = filtered.slice((page - 1) * perPage, page * perPage);
+
+    res.json({ cards: pageCards, totalPages });
 });
 
 
