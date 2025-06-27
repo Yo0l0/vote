@@ -156,6 +156,9 @@ let html = `
         <p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
         <p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
     </div>
+    <a href="https://top.gg/bot/1362516883785515199">
+  <img src="https://top.gg/api/widget/1362516883785515199.svg">
+</a>
 </div>
 
 <div class="footer">© 2024 Pokebot. All rights reserved.</div>
