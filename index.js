@@ -244,7 +244,7 @@ app.get('/dashboard', async (req, res) => {
     const selectedCondition = req.query.condition || 'all';
     const searchTerm = req.query.search?.toLowerCase() || '';
     const page = parseInt(req.query.page) || 1;
-    const perPage = 100;
+    const perPage = 500;
 
     try {
         const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
