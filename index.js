@@ -253,27 +253,38 @@ app.get('/dashboard', async (req, res) => {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 5px;
+    gap: 6px;
     margin-top: 20px;
-    max-width: 90%;
+    max-width: 95%;
     margin-left: auto;
     margin-right: auto;
 }
 
 .pagination button {
-    padding: 8px 12px;
-    background: #cc0066;
+    padding: 8px 14px;
+    background: #1a1a2e;
     color: white;
-    border: none;
-    border-radius: 5px;
+    border: 1px solid #00cc99;
+    border-radius: 50px;
     cursor: pointer;
-    min-width: 35px;
+    transition: background 0.3s, transform 0.2s;
+    min-width: 38px;
+    font-weight: bold;
+}
+
+.pagination button:hover {
+    background: #00cc99;
+    color: #0d001d;
+    transform: scale(1.05);
 }
 
 .pagination button.active {
-    background: #b30059;
-    font-weight: bold;
+    background: #00cc99;
+    color: #0d001d;
+    border-color: #00cc99;
+    transform: scale(1.1);
 }
+
             .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; background: #2c003e; padding: 15px; border-radius: 10px; margin-top: 20px; }
             .filter-container select, .filter-container input[type="text"] { padding: 8px; border-radius: 5px; background: #0d001d; color: white; border: none; }
         </style>
