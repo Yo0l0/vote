@@ -133,7 +133,7 @@ app.get('/', (req, res) => {
         }
     }
 
-let html = `
+    let html = `
 <head>
     <title>Pokebot - Discord Bot</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
@@ -187,24 +187,24 @@ let html = `
         </ul>
     </div>
 
-<div class="stats">
-    <h2>📊 Pokebot Stats:</h2>
-<p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
-<p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
-<p>📈 Daily Avg Cards Dropped: <strong id="dailyAvg">Loading...</strong></p>
-<p>🎯 Cards Dropped Today: <strong id="droppedToday">Loading...</strong></p>
+    <div class="stats">
+        <h2>📊 Pokebot Stats:</h2>
+        <p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
+        <p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
+        <p>📈 Daily Avg Cards Dropped: <strong id="dailyAvg">Loading...</strong></p>
+        <p>🎯 Cards Dropped Today: <strong id="droppedToday">Loading...</strong></p>
 
-<h3>📆 Weekly Averages:</h3>
-<ul id="weeklyAvgList"></ul>
-</div>
+        <h3>📆 Weekly Averages:</h3>
+        <ul id="weeklyAvgList"></ul>
+    </div>
 
-<div class="footer">© 2024 Pokebot. All rights reserved.</div>
+    <div class="footer">© 2024 Pokebot. All rights reserved.</div>
 
 <script>
-    const profileBtn = document.getElementById('profileBtn');
-    const dropdown = document.getElementById('dropdownMenu');
-    profileBtn.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; });
-    window.addEventListener('click', (e) => { if (!profileBtn.contains(e.target)) dropdown.style.display = 'none'; });
+const profileBtn = document.getElementById('profileBtn');
+const dropdown = document.getElementById('dropdownMenu');
+profileBtn.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; });
+window.addEventListener('click', (e) => { if (!profileBtn.contains(e.target)) dropdown.style.display = 'none'; });
 
 async function updateStats() {
     try {
@@ -220,7 +220,7 @@ async function updateStats() {
         weeklyList.innerHTML = '';
 
         for (const day in data.weeklyAvg) {
-            weeklyList.innerHTML += `<li>${day}: ${data.weeklyAvg[day]} per day</li>`;
+            weeklyList.innerHTML += \`<li>\${day}: \${data.weeklyAvg[day]} per day</li>\`;
         }
 
     } catch (err) {
@@ -228,14 +228,13 @@ async function updateStats() {
     }
 }
 
-    updateStats();
-    setInterval(updateStats, 5000);
+updateStats();
+setInterval(updateStats, 5000);
 </script>
 
 </body>`;
 
-
-res.send(html);
+    res.send(html);
 });
 
 
