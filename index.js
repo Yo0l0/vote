@@ -59,21 +59,20 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
 app.get('/stats', async (req, res) => {
     try {
         const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
-        const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
+        const response = await axios.get(inventoryUrl);
         const data = response.data;
 
         let totalCards = 0;
         let totalUsers = 0;
         let droppedToday = 0;
 
-        const BOT_START_DATE = new Date('2024-04-20'); // Set your real start date
+        const BOT_START_DATE = new Date('2024-04-20');
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
-        const dayCounts = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 }; // Sunday = 0
+        const dayCounts = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
         const weekdayTotals = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
 
-        // Count total occurrences of each weekday
         const iterDate = new Date(BOT_START_DATE);
         while (iterDate <= now) {
             const weekday = iterDate.getDay();
@@ -117,6 +116,7 @@ app.get('/stats', async (req, res) => {
         res.json({ totalCards: 0, totalUsers: 0, dailyAvg: 0, droppedToday: 0, weeklyAvg: {} });
     }
 });
+
 
 
 // Serve homepage
@@ -189,13 +189,13 @@ let html = `
 
 <div class="stats">
     <h2>📊 Pokebot Stats:</h2>
-    <p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
-    <p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
-    <p>📈 Daily Avg Cards Dropped: <strong id="dailyAvg">Loading...</strong></p>
-    <p>🎯 Cards Dropped Today: <strong id="droppedToday">Loading...</strong></p>
+<p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
+<p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
+<p>📈 Daily Avg Cards Dropped: <strong id="dailyAvg">Loading...</strong></p>
+<p>🎯 Cards Dropped Today: <strong id="droppedToday">Loading...</strong></p>
 
-    <h3>📆 Weekly Averages:</h3>
-    <ul id="weeklyAvgList"></ul>
+<h3>📆 Weekly Averages:</h3>
+<ul id="weeklyAvgList"></ul>
 </div>
 
 <div class="footer">© 2024 Pokebot. All rights reserved.</div>
