@@ -66,7 +66,7 @@ app.get('/stats', async (req, res) => {
         let totalUsers = 0;
         let droppedToday = 0;
 
-        const BOT_START_DATE = new Date('2024-04-20');
+        const BOT_START_DATE = new Date('2024-05-28');
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
