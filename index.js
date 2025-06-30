@@ -65,12 +65,11 @@ app.get('/stats', async (req, res) => {
         let totalCards = 0;
         let totalUsers = 0;
         let droppedToday = 0;
-        const packTimestamps = new Set();
 
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
-        const dropCountsByDay = {}; // { "YYYY-MM-DD": count }
+        const dropCountsByDay = {}; // { "YYYY-MM-DD": cardCount }
 
         for (const userId in data) {
             const user = data[userId];
@@ -80,8 +79,6 @@ app.get('/stats', async (req, res) => {
 
                 user.cards.forEach(card => {
                     if (card.obtainedAt) {
-                        packTimestamps.add(card.obtainedAt); // Packs based on unique timestamp
-
                         const date = new Date(card.obtainedAt);
                         const dayStr = date.toISOString().split('T')[0];
 
@@ -93,44 +90,43 @@ app.get('/stats', async (req, res) => {
             }
         }
 
-        const totalPacks = packTimestamps.size;
-
-        // Calculate weekly averages
+        // Calculate pack stats
         const sortedDays = Object.keys(dropCountsByDay).sort();
         const lastWeek = [];
         const thisWeek = [];
 
-        const currentDayOfWeek = now.getDay(); // 0 = Sunday
-        const todayStr = now.toISOString().split('T')[0];
+        // Week starts Monday, adjust so Monday = 0
+        let jsDay = now.getDay();
+        if (jsDay === 0) jsDay = 7; // Treat Sunday as day 7
+        const currentMonday = new Date(todayStart);
+        currentMonday.setDate(currentMonday.getDate() - (jsDay - 1));
 
-        const lastWeekStart = new Date(todayStart);
-        lastWeekStart.setDate(lastWeekStart.getDate() - currentDayOfWeek - 7); 
+        const lastWeekStart = new Date(currentMonday);
+        lastWeekStart.setDate(lastWeekStart.getDate() - 7);
 
-        const lastWeekEnd = new Date(todayStart);
-        lastWeekEnd.setDate(lastWeekEnd.getDate() - currentDayOfWeek); 
+        const lastWeekEnd = new Date(currentMonday);
+        lastWeekEnd.setDate(lastWeekEnd.getDate() - 1);
 
-        const thisWeekStart = new Date(todayStart);
-        thisWeekStart.setDate(thisWeekStart.getDate() - currentDayOfWeek); 
+        sortedDays.forEach(dayStr => {
+            const dayTime = new Date(dayStr).getTime();
 
-        sortedDays.forEach(day => {
-            const dayTime = new Date(day).getTime();
-
-            if (dayTime >= lastWeekStart.getTime() && dayTime < lastWeekEnd.getTime()) {
-                lastWeek.push(dropCountsByDay[day]);
+            if (dayTime >= lastWeekStart.getTime() && dayTime <= lastWeekEnd.getTime()) {
+                lastWeek.push(dropCountsByDay[dayStr]);
             }
-
-            if (dayTime >= thisWeekStart.getTime() && dayTime <= todayStart) {
-                thisWeek.push(dropCountsByDay[day]);
+            if (dayTime >= currentMonday.getTime() && dayTime <= todayStart) {
+                thisWeek.push(dropCountsByDay[dayStr]);
             }
         });
 
-        const lastWeekAvg = lastWeek.length ? Math.round(lastWeek.reduce((a, b) => a + b, 0) / lastWeek.length) : 0;
-        const thisWeekAvg = thisWeek.length ? Math.round(thisWeek.reduce((a, b) => a + b, 0) / thisWeek.length) : 0;
+        const lastWeekPacks = lastWeek.reduce((a, b) => a + b, 0) / 5;
+        const thisWeekPacks = thisWeek.reduce((a, b) => a + b, 0) / 5;
+
+        const lastWeekAvg = lastWeek.length ? Math.round(lastWeekPacks / lastWeek.length) : 0;
+        const thisWeekAvg = thisWeek.length ? Math.round(thisWeekPacks / thisWeek.length) : 0;
 
         res.json({
             totalCards,
             totalUsers,
-            totalPacks,
             droppedToday,
             lastWeekAvg,
             thisWeekAvg
@@ -141,7 +137,6 @@ app.get('/stats', async (req, res) => {
         res.json({
             totalCards: 0,
             totalUsers: 0,
-            totalPacks: 0,
             droppedToday: 0,
             lastWeekAvg: 0,
             thisWeekAvg: 0
