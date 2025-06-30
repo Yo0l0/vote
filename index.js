@@ -59,26 +59,18 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
 app.get('/stats', async (req, res) => {
     try {
         const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
-        const response = await axios.get(inventoryUrl);
+        const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
         const data = response.data;
 
         let totalCards = 0;
         let totalUsers = 0;
         let droppedToday = 0;
+        const packTimestamps = new Set();
 
-        const BOT_START_DATE = new Date('2024-05-28');
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
-        const dayCounts = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
-        const weekdayTotals = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
-
-        const iterDate = new Date(BOT_START_DATE);
-        while (iterDate <= now) {
-            const weekday = iterDate.getDay();
-            dayCounts[weekday]++;
-            iterDate.setDate(iterDate.getDate() + 1);
-        }
+        const dropCountsByDay = {}; // { "YYYY-MM-DD": count }
 
         for (const userId in data) {
             const user = data[userId];
@@ -88,34 +80,75 @@ app.get('/stats', async (req, res) => {
 
                 user.cards.forEach(card => {
                     if (card.obtainedAt) {
-                        const day = new Date(card.obtainedAt).getDay();
-                        weekdayTotals[day]++;
+                        packTimestamps.add(card.obtainedAt); // Packs based on unique timestamp
+
+                        const date = new Date(card.obtainedAt);
+                        const dayStr = date.toISOString().split('T')[0];
+
+                        dropCountsByDay[dayStr] = (dropCountsByDay[dayStr] || 0) + 1;
+
                         if (card.obtainedAt >= todayStart) droppedToday++;
                     }
                 });
             }
         }
 
-        const daysRunning = Math.max(1, Math.floor((now - BOT_START_DATE) / (1000 * 60 * 60 * 24)));
-        const dailyAvg = Math.round(totalCards / daysRunning);
+        const totalPacks = packTimestamps.size;
 
-        const weeklyAvg = {
-            Sunday: dayCounts[0] ? Math.round(weekdayTotals[0] / dayCounts[0]) : 0,
-            Monday: dayCounts[1] ? Math.round(weekdayTotals[1] / dayCounts[1]) : 0,
-            Tuesday: dayCounts[2] ? Math.round(weekdayTotals[2] / dayCounts[2]) : 0,
-            Wednesday: dayCounts[3] ? Math.round(weekdayTotals[3] / dayCounts[3]) : 0,
-            Thursday: dayCounts[4] ? Math.round(weekdayTotals[4] / dayCounts[4]) : 0,
-            Friday: dayCounts[5] ? Math.round(weekdayTotals[5] / dayCounts[5]) : 0,
-            Saturday: dayCounts[6] ? Math.round(weekdayTotals[6] / dayCounts[6]) : 0
-        };
+        // Calculate weekly averages
+        const sortedDays = Object.keys(dropCountsByDay).sort();
+        const lastWeek = [];
+        const thisWeek = [];
 
-        res.json({ totalCards, totalUsers, dailyAvg, droppedToday, weeklyAvg });
+        const currentDayOfWeek = now.getDay(); // 0 = Sunday
+        const todayStr = now.toISOString().split('T')[0];
+
+        const lastWeekStart = new Date(todayStart);
+        lastWeekStart.setDate(lastWeekStart.getDate() - currentDayOfWeek - 7); 
+
+        const lastWeekEnd = new Date(todayStart);
+        lastWeekEnd.setDate(lastWeekEnd.getDate() - currentDayOfWeek); 
+
+        const thisWeekStart = new Date(todayStart);
+        thisWeekStart.setDate(thisWeekStart.getDate() - currentDayOfWeek); 
+
+        sortedDays.forEach(day => {
+            const dayTime = new Date(day).getTime();
+
+            if (dayTime >= lastWeekStart.getTime() && dayTime < lastWeekEnd.getTime()) {
+                lastWeek.push(dropCountsByDay[day]);
+            }
+
+            if (dayTime >= thisWeekStart.getTime() && dayTime <= todayStart) {
+                thisWeek.push(dropCountsByDay[day]);
+            }
+        });
+
+        const lastWeekAvg = lastWeek.length ? Math.round(lastWeek.reduce((a, b) => a + b, 0) / lastWeek.length) : 0;
+        const thisWeekAvg = thisWeek.length ? Math.round(thisWeek.reduce((a, b) => a + b, 0) / thisWeek.length) : 0;
+
+        res.json({
+            totalCards,
+            totalUsers,
+            totalPacks,
+            droppedToday,
+            lastWeekAvg,
+            thisWeekAvg
+        });
 
     } catch (err) {
         console.error('Failed to load stats:', err.message);
-        res.json({ totalCards: 0, totalUsers: 0, dailyAvg: 0, droppedToday: 0, weeklyAvg: {} });
+        res.json({
+            totalCards: 0,
+            totalUsers: 0,
+            totalPacks: 0,
+            droppedToday: 0,
+            lastWeekAvg: 0,
+            thisWeekAvg: 0
+        });
     }
 });
+
 
 
 
@@ -191,11 +224,11 @@ app.get('/', (req, res) => {
         <h2>📊 Pokebot Stats:</h2>
         <p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
         <p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
-        <p>📈 Daily Avg Cards Dropped: <strong id="dailyAvg">Loading...</strong></p>
-        <p>🎯 Cards Dropped Today: <strong id="droppedToday">Loading...</strong></p>
+<p>🎁 Total Packs Opened: <strong id="totalPacks">Loading...</strong></p>
+<p>🎯 Cards Dropped Today: <strong id="droppedToday">Loading...</strong></p>
+<p>📆 Last Week Avg Drops Per Day: <strong id="lastWeekAvg">Loading...</strong></p>
+<p>📆 This Week Avg Drops Per Day: <strong id="thisWeekAvg">Loading...</strong></p>
 
-        <h3>📆 Weekly Averages:</h3>
-        <ul id="weeklyAvgList"></ul>
     </div>
 
     <div class="footer">© 2024 Pokebot. All rights reserved.</div>
@@ -213,11 +246,10 @@ async function updateStats() {
 
         document.getElementById('cardCount').innerText = data.totalCards;
         document.getElementById('userCount').innerText = data.totalUsers;
-        document.getElementById('dailyAvg').innerText = data.dailyAvg;
-        document.getElementById('droppedToday').innerText = data.droppedToday;
-
-        const weeklyList = document.getElementById('weeklyAvgList');
-        weeklyList.innerHTML = '';
+document.getElementById('totalPacks').innerText = data.totalPacks;
+document.getElementById('droppedToday').innerText = data.droppedToday;
+document.getElementById('lastWeekAvg').innerText = data.lastWeekAvg;
+document.getElementById('thisWeekAvg').innerText = data.thisWeekAvg;
 
         for (const day in data.weeklyAvg) {
             weeklyList.innerHTML += \`<li>\${day}: \${data.weeklyAvg[day]} per day</li>\`;
