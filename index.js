@@ -59,26 +59,62 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
 app.get('/stats', async (req, res) => {
     try {
         const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
-
         const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
         const data = response.data;
 
         let totalCards = 0;
         let totalUsers = 0;
+        let droppedToday = 0;
+
+        const BOT_START_DATE = new Date('2024-06-01'); // Set your real start date
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+        const dayCounts = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 }; // Sunday = 0
+        const weekdayTotals = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+
+        // Count total occurrences of each weekday
+        const iterDate = new Date(BOT_START_DATE);
+        while (iterDate <= now) {
+            const weekday = iterDate.getDay();
+            dayCounts[weekday]++;
+            iterDate.setDate(iterDate.getDate() + 1);
+        }
 
         for (const userId in data) {
             const user = data[userId];
             if (user.cards) {
                 totalCards += user.cards.length;
                 totalUsers += 1;
+
+                user.cards.forEach(card => {
+                    if (card.obtainedAt) {
+                        const day = new Date(card.obtainedAt).getDay();
+                        weekdayTotals[day]++;
+                        if (card.obtainedAt >= todayStart) droppedToday++;
+                    }
+                });
             }
         }
 
-        res.json({ totalCards, totalUsers });
+        const daysRunning = Math.max(1, Math.floor((now - BOT_START_DATE) / (1000 * 60 * 60 * 24)));
+        const dailyAvg = Math.round(totalCards / daysRunning);
+
+        const weeklyAvg = {
+            Sunday: dayCounts[0] ? Math.round(weekdayTotals[0] / dayCounts[0]) : 0,
+            Monday: dayCounts[1] ? Math.round(weekdayTotals[1] / dayCounts[1]) : 0,
+            Tuesday: dayCounts[2] ? Math.round(weekdayTotals[2] / dayCounts[2]) : 0,
+            Wednesday: dayCounts[3] ? Math.round(weekdayTotals[3] / dayCounts[3]) : 0,
+            Thursday: dayCounts[4] ? Math.round(weekdayTotals[4] / dayCounts[4]) : 0,
+            Friday: dayCounts[5] ? Math.round(weekdayTotals[5] / dayCounts[5]) : 0,
+            Saturday: dayCounts[6] ? Math.round(weekdayTotals[6] / dayCounts[6]) : 0
+        };
+
+        res.json({ totalCards, totalUsers, dailyAvg, droppedToday, weeklyAvg });
 
     } catch (err) {
         console.error('Failed to load stats:', err.message);
-        res.json({ totalCards: 0, totalUsers: 0 });
+        res.json({ totalCards: 0, totalUsers: 0, dailyAvg: 0, droppedToday: 0, weeklyAvg: {} });
     }
 });
 
@@ -151,14 +187,15 @@ let html = `
         </ul>
     </div>
 
-    <div class="stats">
-        <h2>📊 Pokebot Stats:</h2>
-        <p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
-        <p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
-    </div>
-    <a href="https://top.gg/bot/1362516883785515199">
-  <img src="https://top.gg/api/widget/1362516883785515199.svg">
-</a>
+<div class="stats">
+    <h2>📊 Pokebot Stats:</h2>
+    <p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
+    <p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
+    <p>📈 Daily Avg Cards Dropped: <strong id="dailyAvg">Loading...</strong></p>
+    <p>🎯 Cards Dropped Today: <strong id="droppedToday">Loading...</strong></p>
+
+    <h3>📆 Weekly Averages:</h3>
+    <ul id="weeklyAvgList"></ul>
 </div>
 
 <div class="footer">© 2024 Pokebot. All rights reserved.</div>
@@ -169,16 +206,27 @@ let html = `
     profileBtn.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; });
     window.addEventListener('click', (e) => { if (!profileBtn.contains(e.target)) dropdown.style.display = 'none'; });
 
-    async function updateStats() {
-        try {
-            const res = await fetch('/stats');
-            const data = await res.json();
-            document.getElementById('cardCount').innerText = data.totalCards;
-            document.getElementById('userCount').innerText = data.totalUsers;
-        } catch (err) {
-            console.error('Failed to load stats:', err);
+async function updateStats() {
+    try {
+        const res = await fetch('/stats');
+        const data = await res.json();
+
+        document.getElementById('cardCount').innerText = data.totalCards;
+        document.getElementById('userCount').innerText = data.totalUsers;
+        document.getElementById('dailyAvg').innerText = data.dailyAvg;
+        document.getElementById('droppedToday').innerText = data.droppedToday;
+
+        const weeklyList = document.getElementById('weeklyAvgList');
+        weeklyList.innerHTML = '';
+
+        for (const day in data.weeklyAvg) {
+            weeklyList.innerHTML += `<li>${day}: ${data.weeklyAvg[day]} per day</li>`;
         }
+
+    } catch (err) {
+        console.error('Failed to load stats:', err);
     }
+}
 
     updateStats();
     setInterval(updateStats, 5000);
