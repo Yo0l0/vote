@@ -66,6 +66,13 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
     res.status(200).send('Vote recorded');
 });
 
+app.get('/vote_rewards.json', (req, res) => {
+    if (fs.existsSync('vote_rewards.json')) {
+        res.sendFile(path.join(__dirname, 'vote_rewards.json'));
+    } else {
+        res.status(404).send('File not found');
+    }
+});
 app.get('/stats', async (req, res) => {
     try {
         const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
