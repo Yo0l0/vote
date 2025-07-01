@@ -44,36 +44,6 @@ app.get('/user_inventory.json', (req, res) => {
 
 
 
-    res.send(`
-        <html>
-        <head>
-            <title>Pokebot FAQ</title>
-            <style>
-                body { background: #0d001d; color: #fff; font-family: Arial; text-align: center; padding: 20px; }
-                a { color: #00cc99; text-decoration: none; margin-top: 20px; display: inline-block; }
-            </style>
-<script type="text/javascript">
-function googleTranslateElementInit() {
-    new google.translate.TranslateElement({
-        pageLanguage: 'en',
-        includedLanguages: 'en,es,fr,de,it,pt',
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-    }, 'google_translate_element');
-}
-</script>
-
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-            
-        </head>
-        
-        <body>
-            ${faqText}
-        </body>
-        </html>
-    `);
-});
-
-
 
 // Webhook vote listener
 app.post('/dblwebhook', webhook.middleware(), (req, res) => {
