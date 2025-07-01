@@ -312,21 +312,46 @@ profileBtn.addEventListener('click', () => { dropdown.style.display = dropdown.s
 window.addEventListener('click', (e) => { if (!profileBtn.contains(e.target)) dropdown.style.display = 'none'; });
 
 
-function animateCount(id, end) {
-    const el = document.getElementById(id);
-    let start = 0;
-    const step = Math.ceil(end / 100); // Tune this for speed
+async function updateStats() {
+    try {
+        const res = await fetch('/stats');
+        const data = await res.json();
 
-    const counter = setInterval(() => {
-        start += step;
-        if (start >= end) {
-            el.innerText = end;
-            clearInterval(counter);
-        } else {
-            el.innerText = start;
+        if (data.totalCards !== previousCounts.cardCount) {
+            animateCount('cardCount', previousCounts.cardCount, data.totalCards);
+            previousCounts.cardCount = data.totalCards;
         }
-    }, 15); // Lower = faster animation
+
+        if (data.totalUsers !== previousCounts.userCount) {
+            animateCount('userCount', previousCounts.userCount, data.totalUsers);
+            previousCounts.userCount = data.totalUsers;
+        }
+
+        if (data.totalPacks !== previousCounts.totalPacks) {
+            animateCount('totalPacks', previousCounts.totalPacks, data.totalPacks);
+            previousCounts.totalPacks = data.totalPacks;
+        }
+
+        if (data.droppedToday !== previousCounts.droppedToday) {
+            animateCount('droppedToday', previousCounts.droppedToday, data.droppedToday);
+            previousCounts.droppedToday = data.droppedToday;
+        }
+
+        if (data.lastWeekAvg !== previousCounts.lastWeekAvg) {
+            animateCount('lastWeekAvg', previousCounts.lastWeekAvg, data.lastWeekAvg);
+            previousCounts.lastWeekAvg = data.lastWeekAvg;
+        }
+
+        if (data.thisWeekAvg !== previousCounts.thisWeekAvg) {
+            animateCount('thisWeekAvg', previousCounts.thisWeekAvg, data.thisWeekAvg);
+            previousCounts.thisWeekAvg = data.thisWeekAvg;
+        }
+
+    } catch (err) {
+        console.error('Failed to load stats:', err);
+    }
 }
+
 async function updateStats() {
     try {
         const res = await fetch('/stats');
