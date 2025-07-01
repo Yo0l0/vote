@@ -85,7 +85,20 @@ app.get('/faq', (req, res) => {
                 body { background: #0d001d; color: #fff; font-family: Arial; text-align: center; padding: 20px; }
                 a { color: #00cc99; text-decoration: none; margin-top: 20px; display: inline-block; }
             </style>
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    includedLanguages: 'en,es,fr,de,it,pt', // You can add more language codes
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+  }, 'google_translate_element');
+}
+</script>
+
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+            
         </head>
+        
         <body>
             ${faqText}
         </body>
@@ -263,14 +276,8 @@ app.get('/', (req, res) => {
     <a class="btn" href="https://discord.gg/g7AAsmJA">💬 Support Server</a>
     <a class="btn" href="https://top.gg/bot/1362516883785515199">✅ Vote Here!</a>
     <a class="btn" href="${req.session.user ? '/dashboard' : '/login'}">🗂️ View Your Collection</a>
-    <div style="margin-top: 20px;">
-<label for="langSelect">🌐 Language:</label>
-<select id="langSelect" style="padding: 5px; border-radius: 5px;">
-    <option value="en">English</option>
-    <option value="es">Español</option>
-    <option value="fr">Français</option>
-</select>
-</div>
+   
+<div id="google_translate_element" style="margin-top: 20px;"></div>
 <div style="margin-top: 10px;">
     <a class="btn" href="https://thepokebot.com/faq" target="_blank">❓ FAQ / Help</a>
 </div>
@@ -328,18 +335,7 @@ document.getElementById('thisWeekAvg').innerText = data.thisWeekAvg;
 updateStats();
 setInterval(updateStats, 5000);
 
-document.getElementById('langSelect').addEventListener('change', function() {
-    const selected = this.value;
-    
-    // Example: Redirect to language-specific FAQ (expand this as needed)
-    if (selected === 'es') {
-        window.location.href = 'https://thepokebot.com/faq?lang=es';
-    } else if (selected === 'fr') {
-        window.location.href = 'https://thepokebot.com/faq?lang=fr';
-    } else {
-        window.location.href = 'https://thepokebot.com/faq';
-    }
-});
+
 
 const langSelect = document.getElementById('langSelect');
 
