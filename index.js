@@ -18,7 +18,9 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+app.get('/public', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public.html'));
+});
 app.use(session({
     secret: 'your-secret-key-here',
     resave: false,
