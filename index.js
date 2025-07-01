@@ -306,6 +306,14 @@ app.get('/', (req, res) => {
     <div class="footer">© 2024 Pokebot. All rights reserved.</div>
 
 <script>
+const previousCounts = {
+    cardCount: 0,
+    userCount: 0,
+    totalPacks: 0,
+    droppedToday: 0,
+    lastWeekAvg: 0,
+    thisWeekAvg: 0
+};
 function animateCount(id, start, end) {
     const el = document.getElementById(id);
     const step = Math.ceil((end - start) / 100) || 1;
