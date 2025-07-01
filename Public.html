@@ -1,113 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Pokebot - Discord Bot</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
+    <title>Pokebot FAQ</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #2c003e, #0d001d);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .container {
-            text-align: center;
-            margin-top: 80px;
-            padding: 20px;
-            animation: fadeIn 1.2s ease;
-        }
-        .bot-image {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 3px solid #00cc99;
-            object-fit: cover;
-            margin-bottom: 20px;
-        }
-        h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        p {
-            max-width: 600px;
-            margin: 0 auto 30px;
-            line-height: 1.5;
-        }
-        .btn {
-            display: block;
-            margin: 10px auto;
-            padding: 15px 30px;
-            background: #cc0066;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            min-width: 220px;
-            transition: background 0.3s, box-shadow 0.3s;
-            box-shadow: 0 0 10px rgba(204, 0, 102, 0.4);
-        }
-        .btn:hover {
-            background: #b30059;
-            box-shadow: 0 0 20px rgba(204, 0, 102, 0.8);
-        }
-        .features {
-            margin-top: 40px;
-            text-align: center;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            margin: 10px 0;
-            font-size: 1.1em;
-        }
-        .footer {
-            margin-top: auto;
-            padding: 20px;
-            font-size: 0.9em;
-            color: #888;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        body { background: #0d001d; color: #fff; font-family: Arial; text-align: center; padding: 20px; }
+        h1 { color: #00cc99; }
+        h2 { color: #ff33a8; margin-top: 30px; }
+        ul { text-align: left; max-width: 600px; margin: 0 auto; }
+        li { margin: 8px 0; }
+        a { color: #00cc99; text-decoration: none; display: inline-block; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot Icon" class="bot-image">
+    <h1>❓ Pokebot FAQ</h1>
+    <p>Here you'll find answers to common questions and available commands!</p>
 
-    <h1>🔥 Pokebot TEST— Collect, Battle, Trade!</h1>
-    <p>The ultimate Pokémon-inspired Discord bot. Build your card collection, battle friends, trade rare cards, and climb the leaderboards!</p>
+    <h2>🎮 Available Commands:</h2>
+    <ul>
+        <li><b>/openpack</b> — Open a random Pokémon pack</li>
+        <li><b>/packs [set]</b> — Open a pack from a specific set</li>
+        <li><b>/buypack</b> — Buy a Pokémon pack (40 coins)</li>
+        <li><b>/mysterybox</b> — Open a mystery box for random prizes</li>
+        <li><b>/grade [code]</b> — Submit a card for grading</li>
+        <li><b>/checkgrade [code]</b> — Check grading status</li>
+        <li><b>/fuse [code1] [code2] [code3]</b> — Fuse 3 identical cards for a better condition</li>
+        <li><b>/swapcodes [code1] [code2]</b> — Swap codes between your cards</li>
+    </ul>
 
-<a class="btn" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">✨ Invite Pokebot</a>
-<a class="btn" href="https://discord.gg/g7AAsmJA">💬 Join Support Server</a>
-<a class="btn" href="https://top.gg/bot/1362516883785515199">✅ Vote Here!</a>
-<a class="btn" href="/login">🔑 Login to View Collection</a>
+    <h2>🎒 Inventory & Shop:</h2>
+    <ul>
+        <li><b>/inventory</b> — View or filter your cards</li>
+        <li><b>/find [name]</b> — Find cards by name</li>
+        <li><b>/search [code]</b> — Search for a card by its code</li>
+        <li><b>/sell</b> — Sell cards using filters</li>
+        <li><b>/items</b> — View your items</li>
+        <li><b>/itemshop</b> — View the item shop</li>
+        <li><b>/buyitem [item]</b> — Buy an item from the shop</li>
+    </ul>
 
-    <div class="features">
-        <h2>Features:</h2>
-        <ul>
-            <li>✅ Card Collecting & Grading</li>
-            <li>✅ Pack Opening from Classic Sets</li>
-            <li>✅ Trading & Marketplace System</li>
-            <li>✅ Competitive Battles & Duels</li>
-            <li>✅ Leaderboards & Achievements</li>
-        </ul>
-    </div>
-</div>
+    <h2>💰 Economy:</h2>
+    <ul>
+        <li><b>/balance</b> — Check your coin balance</li>
+        <li><b>/daily</b> — Claim daily reward</li>
+        <li><b>/give</b> — Gift coins, cards, or tokens to others</li>
+        <li><b>/vote</b> — Claim 50 coins for voting</li>
+    </ul>
 
-<div class="footer">
-    © 2024 Pokebot. All rights reserved.
-</div>
+    <h2>🏆 Leaderboards & Stats:</h2>
+    <ul>
+        <li><b>/leaderboard</b> — View top players</li>
+        <li><b>/collection</b> — See how many cards you own per set</li>
+        <li><b>/missing [set]</b> — See which cards you're missing</li>
+        <li><b>/quiz</b> — Answer quiz questions for coins & Aura</li>
+        <li><b>/quizstats</b> — View your quiz performance</li>
+        <li><b>/cardtrend [name]</b> — Show card market trend</li>
+        <li><b>/cooldowns</b> — Check your cooldowns</li>
+    </ul>
+
+    <h2>⚔️ Battles & Duels:</h2>
+    <ul>
+        <li><b>/duel [opponent]</b> — Challenge another player to a card duel</li>
+        <li><b>/deck</b> — Manage your 5-card battle deck</li>
+        <li><b>/duelprofile</b> — View duel stats & most-used card</li>
+    </ul>
+
+    <h2>🌍 Exploration:</h2>
+    <ul>
+        <li><b>/journey</b> — Start your Pokémon world journey (BETA)</li>
+    </ul>
+
+    <h2>💸 Marketplace:</h2>
+    <ul>
+        <li><b>/shop list [code] [price]</b> — List a card for sale</li>
+        <li><b>/shop browse</b> — Browse player listings</li>
+        <li><b>/shop remove [code]</b> — Remove your listed card</li>
+    </ul>
+
+    <h2>⚙️ Utilities:</h2>
+    <ul>
+        <li><b>/setchannel [channel]</b> — Set drop channel for holo events</li>
+        <li><b>/help</b> — Show all available commands</li>
+        <li><b>/upcoming</b> — View upcoming card set releases</li>
+    </ul>
+
+    <a href="/">⬅️ Back to Home</a>
 
 </body>
 </html>
