@@ -16,7 +16,8 @@ let cachedInventory = null;
 let lastFetch = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use(session({
     secret: 'your-secret-key-here',
@@ -41,41 +42,7 @@ app.get('/user_inventory.json', (req, res) => {
 });
 
 
-app.get('/faq', (req, res) => {
-    const lang = req.query.lang || 'en'; // Default to English
-    let faqText = '';
 
-    if (lang === 'es') {
-        faqText = `
-            <h1>❓ Preguntas Frecuentes</h1>
-            <p>¡Aquí encontrarás respuestas a las preguntas comunes sobre Pokebot!</p>
-            <ul>
-                <li>¿Cómo colecciono cartas? — Usa /packs en Discord.</li>
-                <li>¿Cómo lucho? — Usa /duel para empezar un duelo.</li>
-            </ul>
-            <a href="/">⬅️ Volver a Inicio</a>
-        `;
-    } else if (lang === 'fr') {
-        faqText = `
-            <h1>❓ FAQ</h1>
-            <p>Trouvez ici des réponses aux questions fréquentes sur Pokebot !</p>
-            <ul>
-                <li>Comment collectionner des cartes ? — Utilisez /packs sur Discord.</li>
-                <li>Comment combattre ? — Utilisez /duel pour commencer un duel.</li>
-            </ul>
-            <a href="/">⬅️ Retour à l'accueil</a>
-        `;
-    } else {
-        faqText = `
-            <h1>❓ FAQ</h1>
-            <p>Here you'll find answers to common Pokebot questions!</p>
-            <ul>
-                <li>How do I collect cards? — Use /packs in Discord.</li>
-                <li>How do I battle? — Use /duel to start a duel.</li>
-            </ul>
-            <a href="/">⬅️ Back to Home</a>
-        `;
-    }
 
     res.send(`
         <html>
