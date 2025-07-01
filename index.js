@@ -311,17 +311,33 @@ const dropdown = document.getElementById('dropdownMenu');
 profileBtn.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; });
 window.addEventListener('click', (e) => { if (!profileBtn.contains(e.target)) dropdown.style.display = 'none'; });
 
+
+function animateCount(id, end) {
+    const el = document.getElementById(id);
+    let start = 0;
+    const step = Math.ceil(end / 100); // Tune this for speed
+
+    const counter = setInterval(() => {
+        start += step;
+        if (start >= end) {
+            el.innerText = end;
+            clearInterval(counter);
+        } else {
+            el.innerText = start;
+        }
+    }, 15); // Lower = faster animation
+}
 async function updateStats() {
     try {
         const res = await fetch('/stats');
         const data = await res.json();
 
-        document.getElementById('cardCount').innerText = data.totalCards;
-        document.getElementById('userCount').innerText = data.totalUsers;
-document.getElementById('totalPacks').innerText = data.totalPacks;
-document.getElementById('droppedToday').innerText = data.droppedToday;
-document.getElementById('lastWeekAvg').innerText = data.lastWeekAvg;
-document.getElementById('thisWeekAvg').innerText = data.thisWeekAvg;
+animateCount('cardCount', data.totalCards);
+animateCount('userCount', data.totalUsers);
+animateCount('totalPacks', data.totalPacks);
+animateCount('droppedToday', data.droppedToday);
+animateCount('lastWeekAvg', data.lastWeekAvg);
+animateCount('thisWeekAvg', data.thisWeekAvg);
 
         for (const day in data.weeklyAvg) {
             weeklyList.innerHTML += \`<li>\${day}: \${data.weeklyAvg[day]} per day</li>\`;
