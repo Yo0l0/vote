@@ -306,6 +306,21 @@ app.get('/', (req, res) => {
     <div class="footer">© 2024 Pokebot. All rights reserved.</div>
 
 <script>
+function animateCount(id, start, end) {
+    const el = document.getElementById(id);
+    const step = Math.ceil((end - start) / 100) || 1;
+    let current = start;
+
+    const counter = setInterval(() => {
+        current += step;
+        if (current >= end) {
+            el.innerText = end;
+            clearInterval(counter);
+        } else {
+            el.innerText = current;
+        }
+    }, 15);
+}
 const profileBtn = document.getElementById('profileBtn');
 const dropdown = document.getElementById('dropdownMenu');
 profileBtn.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; });
@@ -345,27 +360,6 @@ async function updateStats() {
         if (data.thisWeekAvg !== previousCounts.thisWeekAvg) {
             animateCount('thisWeekAvg', previousCounts.thisWeekAvg, data.thisWeekAvg);
             previousCounts.thisWeekAvg = data.thisWeekAvg;
-        }
-
-    } catch (err) {
-        console.error('Failed to load stats:', err);
-    }
-}
-
-async function updateStats() {
-    try {
-        const res = await fetch('/stats');
-        const data = await res.json();
-
-animateCount('cardCount', data.totalCards);
-animateCount('userCount', data.totalUsers);
-animateCount('totalPacks', data.totalPacks);
-animateCount('droppedToday', data.droppedToday);
-animateCount('lastWeekAvg', data.lastWeekAvg);
-animateCount('thisWeekAvg', data.thisWeekAvg);
-
-        for (const day in data.weeklyAvg) {
-            weeklyList.innerHTML += \`<li>\${day}: \${data.weeklyAvg[day]} per day</li>\`;
         }
 
     } catch (err) {
