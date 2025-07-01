@@ -87,11 +87,11 @@ app.get('/faq', (req, res) => {
             </style>
 <script type="text/javascript">
 function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'en',
-    includedLanguages: 'en,es,fr,de,it,pt', // You can add more language codes
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-  }, 'google_translate_element');
+    new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,es,fr,de,it,pt',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
 }
 </script>
 
@@ -380,7 +380,6 @@ setInterval(updateStats, 5000);
 
 
 
-const langSelect = document.getElementById('langSelect');
 
 // Load saved language
 const savedLang = localStorage.getItem('preferredLang') || 'en';
