@@ -23,7 +23,7 @@ app.get('/faq', (req, res) => {
 });
 
 
-});
+
 app.use(session({
     secret: 'your-secret-key-here',
     resave: false,
