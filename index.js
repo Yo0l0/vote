@@ -208,7 +208,17 @@ app.get('/', (req, res) => {
     <a class="btn" href="https://discord.gg/g7AAsmJA">💬 Support Server</a>
     <a class="btn" href="https://top.gg/bot/1362516883785515199">✅ Vote Here!</a>
     <a class="btn" href="${req.session.user ? '/dashboard' : '/login'}">🗂️ View Your Collection</a>
-
+    <div style="margin-top: 20px;">
+<label for="langSelect">🌐 Language:</label>
+<select id="langSelect" style="padding: 5px; border-radius: 5px;">
+    <option value="en">English</option>
+    <option value="es">Español</option>
+    <option value="fr">Français</option>
+</select>
+</div>
+<div style="margin-top: 10px;">
+    <a class="btn" href="https://thepokebot.com/faq" target="_blank">❓ FAQ / Help</a>
+</div>
     <div class="features">
         <h2>Features:</h2>
         <ul>
@@ -262,7 +272,33 @@ document.getElementById('thisWeekAvg').innerText = data.thisWeekAvg;
 
 updateStats();
 setInterval(updateStats, 5000);
+
+document.getElementById('langSelect').addEventListener('change', function() {
+    const selected = this.value;
+    
+    // Example: Redirect to language-specific FAQ (expand this as needed)
+    if (selected === 'es') {
+        window.location.href = 'https://thepokebot.com/faq?lang=es';
+    } else if (selected === 'fr') {
+        window.location.href = 'https://thepokebot.com/faq?lang=fr';
+    } else {
+        window.location.href = 'https://thepokebot.com/faq';
+    }
+});
+
+const langSelect = document.getElementById('langSelect');
+
+// Load saved language
+const savedLang = localStorage.getItem('preferredLang') || 'en';
+langSelect.value = savedLang;
+
+// Change handler
+langSelect.addEventListener('change', function() {
+    localStorage.setItem('preferredLang', this.value);
+    alert('Language preference saved! (Full translations coming soon)');
+});
 </script>
+
 
 </body>`;
 
