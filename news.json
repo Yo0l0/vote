@@ -2,6 +2,10 @@
   {
     "title": "Gambling Cooldown",
     "date": "2026-02-24",
-    "body": "Fixed cooldown system.\n\n❌ Old:\nWin: 2 mins\nLose: 2 mins\nJackpot: 4 mins\n\n✅ New:\nWin: 10 seconds\nLose: 5 seconds\nJackpot: 20 seconds"
+    "sections": [
+      "Fixed cooldown system",
+      "❌ Old: Win 2 mins | Lose 2 mins | Jackpot 4 mins",
+      "✅ New: Win 10s | Lose 5s | Jackpot 20s"
+    ]
   }
 ]
