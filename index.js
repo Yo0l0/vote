@@ -418,8 +418,8 @@ let html = `
             <div class="news-item">
               <div class="date">\${item.date || ''}</div>
               <div class="title">\${item.title || ''}</div>
-              <div class="body">\${item.body || ''}</div>
-            </div>\`
+<div class="body">\${(item.body ?? item.text ?? item.description ?? item.message ?? 'No details provided.')}</div>
+</div>\`
           ).join('');
         } catch (e) {
           console.error('Failed to load news:', e);
