@@ -196,32 +196,113 @@ app.get('/', (req, res) => {
         }
     }
 
-    let html = `
+let html = `
 <head>
-    <title>Pokebot - Discord Bot</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
-    <style>
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #2c003e, #0d001d); color: #fff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; }
-        .container { text-align: center; margin-top: 80px; padding: 20px; animation: fadeIn 1.2s ease; }
-        .bot-image { width: 150px; height: 150px; border-radius: 50%; border: 3px solid #00cc99; object-fit: cover; margin-bottom: 20px; }
-        h1 { font-size: 2em; margin-bottom: 10px; }
-        p { max-width: 600px; margin: 0 auto 30px; line-height: 1.5; }
-        .btn { display: block; margin: 10px auto; padding: 15px 30px; background: #cc0066; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; min-width: 220px; transition: background 0.3s, box-shadow 0.3s; box-shadow: 0 0 10px rgba(204, 0, 102, 0.4); }
-        .btn:hover { background: #b30059; box-shadow: 0 0 20px rgba(204, 0, 102, 0.8); }
-        .features, .stats { margin-top: 40px; text-align: center; }
-        ul { list-style: none; padding: 0; }
-        li { margin: 10px 0; font-size: 1.1em; }
-        .footer { margin-top: auto; padding: 20px; font-size: 0.9em; color: #888; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .topright { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; cursor: pointer; position: fixed; }
-        .topright img { width: 40px; height: 40px; border-radius: 50%; }
-        .dropdown { display: none; position: absolute; top: 60px; right: 0; background: #2c003e; border: 1px solid #00cc99; border-radius: 8px; min-width: 120px; z-index: 999; text-align: left; }
-        .dropdown a { display: block; padding: 10px; color: white; text-decoration: none; }
-        .dropdown a:hover { background: #b30059; }
-    </style>
+  <title>Pokebot - Discord Bot</title>
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #2c003e, #0d001d);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container { text-align: center; margin-top: 80px; padding: 20px; animation: fadeIn 1.2s ease; }
+    .bot-image { width: 150px; height: 150px; border-radius: 50%; border: 3px solid #00cc99; object-fit: cover; margin-bottom: 20px; }
+    h1 { font-size: 2em; margin-bottom: 10px; }
+    p { max-width: 600px; margin: 0 auto 30px; line-height: 1.5; }
+
+    .btn {
+      display: block;
+      margin: 10px auto;
+      padding: 15px 30px;
+      background: #cc0066;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      min-width: 220px;
+      transition: background 0.3s, box-shadow 0.3s;
+      box-shadow: 0 0 10px rgba(204, 0, 102, 0.4);
+    }
+    .btn:hover { background: #b30059; box-shadow: 0 0 20px rgba(204, 0, 102, 0.8); }
+
+    .features, .stats { margin-top: 40px; text-align: center; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 10px 0; font-size: 1.1em; }
+    .footer { margin-top: auto; padding: 20px; font-size: 0.9em; color: #888; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .topright { position: fixed; top: 20px; right: 20px; display: flex; align-items: center; cursor: pointer; }
+    .topright img { width: 40px; height: 40px; border-radius: 50%; }
+    .dropdown { display: none; position: absolute; top: 60px; right: 0; background: #2c003e; border: 1px solid #00cc99; border-radius: 8px; min-width: 120px; z-index: 999; text-align: left; }
+    .dropdown a { display: block; padding: 10px; color: white; text-decoration: none; }
+    .dropdown a:hover { background: #b30059; }
+
+    /* ✅ NEWS PANEL */
+    .news-panel {
+      position: fixed;
+      left: 20px;
+      top: 120px;
+      width: 280px;
+      background: #2c003e;
+      border: 1px solid #00cc99;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 0 12px rgba(0, 204, 153, 0.25);
+      z-index: 9999;
+      text-align: left;
+    }
+
+    .news-panel h3 {
+      margin: 0 0 10px 0;
+      color: #00cc99;
+      font-size: 1.1em;
+    }
+
+    .news-item {
+      padding: 10px;
+      border-radius: 10px;
+      background: #0d001d;
+      margin-bottom: 10px;
+    }
+
+    .news-item .date { font-size: 0.85em; color: #aaa; margin-bottom: 6px; }
+    .news-item .title { font-weight: bold; margin-bottom: 6px; }
+    .news-item .body { font-size: 0.95em; color: #ddd; line-height: 1.3; }
+
+    @media (max-width: 900px) {
+      .news-panel {
+        position: static;
+        width: auto;
+        margin: 20px auto 0;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
+  <!-- ✅ NEWS PANEL HTML -->
+  <div class="news-panel">
+    <h3>📰 News</h3>
+    <div id="newsItems">
+      <div class="news-item">
+        <div class="date">Loading…</div>
+        <div class="title">Fetching updates</div>
+        <div class="body">If this stays forever, /api/news isn’t working.</div>
+      </div>
+    </div>
+  </div>
 <div class="topright" id="profileBtn">
     ${req.session.user ? `<img src="https://cdn.discordapp.com/avatars/${req.session.user.id}/${req.session.user.avatar}.png" alt="PFP">` : `<img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot">`}
     <div class="dropdown" id="dropdownMenu">
