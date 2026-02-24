@@ -303,14 +303,18 @@ let html = `
       </div>
     </div>
   </div>
-<div class="topright" id="profileBtn">
-    ${req.session.user ? `<img src="https://cdn.discordapp.com/avatars/${req.session.user.id}/${req.session.user.avatar}.png" alt="PFP">` : `<img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot">`}
-    <div class="dropdown" id="dropdownMenu">
-        ${req.session.user ? `<a href="/logout">Logout</a>` : `<a href="/login">Login</a>`}
-    </div>
-</div>
 
-<div class="container">
+  <div class="topright" id="profileBtn">
+    ${req.session.user
+      ? `<img src="https://cdn.discordapp.com/avatars/${req.session.user.id}/${req.session.user.avatar}.png" alt="PFP">`
+      : `<img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot">`
+    }
+    <div class="dropdown" id="dropdownMenu">
+      ${req.session.user ? `<a href="/logout">Logout</a>` : `<a href="/login">Login</a>`}
+    </div>
+  </div>
+
+  <div class="container">
     <img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot Icon" class="bot-image">
     <h1>🔥 Pokebot — Collect, Battle, Trade!</h1>
     <p>The ultimate Pokémon-inspired Discord bot. Build your card collection, battle friends, trade rare cards, and climb the leaderboards!</p>
@@ -319,92 +323,99 @@ let html = `
     <a class="btn" href="https://discord.gg/g7AAsmJA">💬 Support Server</a>
     <a class="btn" href="https://top.gg/bot/1362516883785515199">✅ Vote Here!</a>
     <a class="btn" href="${req.session.user ? '/dashboard' : '/login'}">🗂️ View Your Collection</a>
-   
-<div id="google_translate_element" style="margin-top: 20px;"></div>
-<div style="margin-top: 10px;">
-    <a class="btn" href="https://thepokebot.com/faq" target="_blank">❓ FAQ / Help</a>
-</div>
+
+    <div style="margin-top: 10px;">
+      <a class="btn" href="https://thepokebot.com/faq" target="_blank">❓ FAQ / Help</a>
+    </div>
+
     <div class="features">
-        <h2>Features:</h2>
-        <ul>
-            <li>✅ Card Collecting & Grading</li>
-            <li>✅ Pack Opening from Classic Sets</li>
-            <li>✅ Trading & Marketplace System</li>
-            <li>✅ Competitive Battles & Duels</li>
-            <li>✅ Leaderboards & Achievements</li>
-        </ul>
+      <h2>Features:</h2>
+      <ul>
+        <li>✅ Card Collecting & Grading</li>
+        <li>✅ Pack Opening from Classic Sets</li>
+        <li>✅ Trading & Marketplace System</li>
+        <li>✅ Competitive Battles & Duels</li>
+        <li>✅ Leaderboards & Achievements</li>
+      </ul>
     </div>
 
     <div class="stats">
-        <h2>📊 Pokebot Stats:</h2>
-        <p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
-        <p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
-<p>🎁 Total Packs Opened: <strong id="totalPacks">Loading...</strong></p>
-<p>🎯 Cards Dropped Today: <strong id="droppedToday">Loading...</strong></p>
-<p>📆 Last Week Avg Drops Per Day: <strong id="lastWeekAvg">Loading...</strong></p>
-<p>📆 This Week Avg Drops Per Day: <strong id="thisWeekAvg">Loading...</strong></p>
-
+      <h2>📊 Pokebot Stats:</h2>
+      <p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
+      <p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
+      <p>🎁 Total Packs Opened: <strong id="totalPacks">Loading...</strong></p>
+      <p>🎯 Cards Dropped Today: <strong id="droppedToday">Loading...</strong></p>
+      <p>📆 Last Week Avg Drops Per Day: <strong id="lastWeekAvg">Loading...</strong></p>
+      <p>📆 This Week Avg Drops Per Day: <strong id="thisWeekAvg">Loading...</strong></p>
     </div>
 
     <div class="footer">© 2024 Pokebot. All rights reserved.</div>
 
-<script>
-const previousCounts = {
-    cardCount: 0,
-    userCount: 0,
-    totalPacks: 0,
-    droppedToday: 0,
-    lastWeekAvg: 0,
-    thisWeekAvg: 0
-};
-function animateCount(id, start, end) {
-    const el = document.getElementById(id);
-    const step = Math.ceil((end - start) / 100) || 1;
-    let current = start;
+    <script>
+      const previousCounts = {
+        cardCount: 0,
+        userCount: 0,
+        totalPacks: 0,
+        droppedToday: 0,
+        lastWeekAvg: 0,
+        thisWeekAvg: 0
+      };
 
-    const counter = setInterval(() => {
-        current += step;
-        if (current >= end) {
+      function animateCount(id, start, end) {
+        const el = document.getElementById(id);
+        const step = Math.ceil((end - start) / 100) || 1;
+        let current = start;
+
+        const counter = setInterval(() => {
+          current += step;
+          if (current >= end) {
             el.innerText = end;
             clearInterval(counter);
-        } else {
+          } else {
             el.innerText = current;
+          }
+        }, 15);
+      }
+
+      const profileBtn = document.getElementById('profileBtn');
+      const dropdown = document.getElementById('dropdownMenu');
+      profileBtn.addEventListener('click', () => {
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      });
+      window.addEventListener('click', (e) => {
+        if (!profileBtn.contains(e.target)) dropdown.style.display = 'none';
+      });
+
+      // ✅ NEWS LOADER (NO nested script tags)
+      async function loadNews() {
+        try {
+          const res = await fetch('/api/news', { cache: 'no-store' });
+          const news = await res.json();
+
+          const container = document.getElementById('newsItems');
+          if (!container) return;
+
+          if (!news.length) {
+            container.innerHTML = '<p style="color:#aaa;margin:0;">No updates yet.</p>';
+            return;
+          }
+
+          container.innerHTML = news.slice(0, 5).map(item => \`
+            <div class="news-item">
+              <div class="date">\${item.date || ''}</div>
+              <div class="title">\${item.title || ''}</div>
+              <div class="body">\${item.body || ''}</div>
+            </div>\`
+          ).join('');
+        } catch (e) {
+          console.error('Failed to load news:', e);
+          const container = document.getElementById('newsItems');
+          if (container) container.innerHTML = '<p style="color:#aaa;margin:0;">Failed to load updates.</p>';
         }
-    }, 15);
-}
-const profileBtn = document.getElementById('profileBtn');
-const dropdown = document.getElementById('dropdownMenu');
-profileBtn.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; });
-window.addEventListener('click', (e) => { if (!profileBtn.contains(e.target)) dropdown.style.display = 'none'; });
+      }
 
-<script>
-async function loadNews() {
-  try {
-    const res = await fetch('/api/news');
-    const news = await res.json();
+      loadNews();
 
-    const container = document.getElementById('newsItems');
-    if (!news.length) {
-      container.innerHTML = '<p style="color:#aaa;">No updates yet.</p>';
-      return;
-    }
-
-    container.innerHTML = news.slice(0, 5).map(item => `
-      <div class="news-item">
-        <div class="date">${item.date}</div>
-        <div class="title">${item.title}</div>
-        <div class="body">${item.body}</div>
-      </div>
-    `).join('');
-  } catch (e) {
-    console.error('Failed to load news:', e);
-    document.getElementById('newsItems').innerHTML =
-      '<p style="color:#aaa;">Failed to load updates.</p>';
-  }
-}
-
-loadNews();
-</script>
 async function updateStats() {
     try {
         const res = await fetch('/stats');
