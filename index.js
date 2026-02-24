@@ -256,7 +256,7 @@ let html = `
   left: 30px;
   top: 120px;
 
-  width: 390px;              /* ⬅️ wider */
+  width: 1000px;              /* ⬅️ wider */
   padding: 20px;             /* ⬅️ more spacing */
 
   background: #2c003e;
