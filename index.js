@@ -251,19 +251,22 @@ let html = `
     .dropdown a:hover { background: #b30059; }
 
     /* ✅ NEWS PANEL */
-    .news-panel {
-      position: fixed;
-      left: 20px;
-      top: 120px;
-      width: 280px;
-      background: #2c003e;
-      border: 1px solid #00cc99;
-      border-radius: 12px;
-      padding: 14px;
-      box-shadow: 0 0 12px rgba(0, 204, 153, 0.25);
-      z-index: 9999;
-      text-align: left;
-    }
+.news-panel {
+  position: fixed;
+  left: 30px;
+  top: 120px;
+
+  width: 390px;              /* ⬅️ wider */
+  padding: 20px;             /* ⬅️ more spacing */
+
+  background: #2c003e;
+  border: 2px solid #00cc99; /* ⬅️ stronger border */
+  border-radius: 16px;
+
+  box-shadow: 0 0 20px rgba(0, 204, 153, 0.35);
+  z-index: 9999;
+  text-align: left;
+}
 
     .news-panel h3 {
       margin: 0 0 10px 0;
