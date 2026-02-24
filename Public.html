@@ -4,6 +4,57 @@
     <meta charset="UTF-8">
     <title>Pokebot FAQ</title>
     <style>
+        .news-panel {
+  position: fixed;
+  left: 20px;
+  top: 100px;
+  width: 260px;
+  background: #2c003e;
+  border: 1px solid #00cc99;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 0 12px rgba(0, 204, 153, 0.25);
+  z-index: 50;
+}
+
+.news-panel h3 {
+  margin: 0 0 10px 0;
+  color: #00cc99;
+  font-size: 1.1em;
+}
+
+.news-item {
+  padding: 10px;
+  border-radius: 10px;
+  background: #0d001d;
+  margin-bottom: 10px;
+}
+
+.news-item .date {
+  font-size: 0.85em;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+
+.news-item .title {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.news-item .body {
+  font-size: 0.95em;
+  color: #ddd;
+  line-height: 1.3;
+}
+
+/* Mobile: make it normal flow instead of fixed */
+@media (max-width: 900px) {
+  .news-panel {
+    position: static;
+    width: auto;
+    margin: 20px auto 0;
+  }
+}
         body { background: #0d001d; color: #fff; font-family: Arial; text-align: center; padding: 20px; }
         h1 { color: #00cc99; }
         h2 { color: #ff33a8; margin-top: 30px; }
@@ -13,7 +64,10 @@
     </style>
 </head>
 <body>
-
+<div class="news-panel">
+  <h3>📰 News</h3>
+  <div id="newsItems">Loading updates...</div>
+</div>
     <h1>❓ Pokebot FAQ</h1>
     <p>Here you'll find answers to common questions and available commands!</p>
 
