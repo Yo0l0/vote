@@ -286,9 +286,13 @@ let html = `
 }
 
 .news-item .body {
-  font-size: 1em;     /* ⬅️ bigger body text */
+  font-size: 1em;
   line-height: 1.5;
+  color: #ddd;
+  white-space: pre-line; /* ✅ SHOW \n LINE BREAKS */
 }
+.news-item .title { margin-top: 4px; font-weight: 700; }
+.news-item .body { margin-top: 8px; }
 
     @media (max-width: 900px) {
       .news-panel {
