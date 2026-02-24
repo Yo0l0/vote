@@ -256,7 +256,7 @@ let html = `
   left: 30px;
   top: 120px;
 
-  width: 1000px;              /* ⬅️ wider */
+  width: 360px;              /* ⬅️ wider */
   padding: 20px;             /* ⬅️ more spacing */
 
   background: #2c003e;
@@ -268,22 +268,27 @@ let html = `
   text-align: left;
 }
 
-    .news-panel h3 {
-      margin: 0 0 10px 0;
-      color: #00cc99;
-      font-size: 1.1em;
-    }
+.news-panel h3 {
+  font-size: 1.3em;   /* ⬅️ bigger title */
+}
 
-    .news-item {
-      padding: 10px;
-      border-radius: 10px;
-      background: #0d001d;
-      margin-bottom: 10px;
-    }
+.news-item {
+  padding: 14px;
+  margin-bottom: 14px;
+}
 
-    .news-item .date { font-size: 0.85em; color: #aaa; margin-bottom: 6px; }
-    .news-item .title { font-weight: bold; margin-bottom: 6px; }
-    .news-item .body { font-size: 0.95em; color: #ddd; line-height: 1.3; }
+.news-item .date {
+  font-size: 0.9em;
+}
+
+.news-item .title {
+  font-size: 1.05em;  /* ⬅️ more readable */
+}
+
+.news-item .body {
+  font-size: 1em;     /* ⬅️ bigger body text */
+  line-height: 1.5;
+}
 
     @media (max-width: 900px) {
       .news-panel {
