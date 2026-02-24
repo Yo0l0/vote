@@ -73,6 +73,19 @@ app.get('/vote_rewards.json', (req, res) => {
         res.status(404).send('File not found');
     }
 });
+app.get('/api/news', (req, res) => {
+  try {
+    const filePath = path.join(__dirname, 'news.json');
+    if (!fs.existsSync(filePath)) return res.json([]);
+
+    const raw = fs.readFileSync(filePath, 'utf8').trim();
+    const news = raw ? JSON.parse(raw) : [];
+    res.json(news);
+  } catch (e) {
+    console.error('Failed to load news:', e);
+    res.json([]);
+  }
+});
 app.get('/stats', async (req, res) => {
     try {
         const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
