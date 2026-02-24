@@ -197,6 +197,8 @@ app.get('/', (req, res) => {
     }
 
 let html = `
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <title>Pokebot - Discord Bot</title>
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
@@ -465,8 +467,9 @@ setInterval(updateStats, 5000);
 
 </script>
 
-
-</body>`;
+</div>
+</body>
+</html>`;
 
     res.send(html);
 });
