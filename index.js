@@ -296,7 +296,34 @@ const dropdown = document.getElementById('dropdownMenu');
 profileBtn.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; });
 window.addEventListener('click', (e) => { if (!profileBtn.contains(e.target)) dropdown.style.display = 'none'; });
 
+<script>
+async function loadNews() {
+  try {
+    const res = await fetch('/api/news');
+    const news = await res.json();
 
+    const container = document.getElementById('newsItems');
+    if (!news.length) {
+      container.innerHTML = '<p style="color:#aaa;">No updates yet.</p>';
+      return;
+    }
+
+    container.innerHTML = news.slice(0, 5).map(item => `
+      <div class="news-item">
+        <div class="date">${item.date}</div>
+        <div class="title">${item.title}</div>
+        <div class="body">${item.body}</div>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error('Failed to load news:', e);
+    document.getElementById('newsItems').innerHTML =
+      '<p style="color:#aaa;">Failed to load updates.</p>';
+  }
+}
+
+loadNews();
+</script>
 async function updateStats() {
     try {
         const res = await fetch('/stats');
