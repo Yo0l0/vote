@@ -1,7 +1,9 @@
 [
   {
-    "title": "Website Updates",
+    "title": "Gambling Cooldown",
     "date": "2026-02-24",
-    "body": "News panel added to the homepage."
+    "body": "Fixed Cooldown."
+    "body": "**Old**- Win✅:2 mins, Lose❌:2 mins, 🎉Jackpot: 4min"
+    "body": "**New**- Win✅: 10 seconds, Loss❌ → 5 seconds,  🎉 Jackpot → 20 seconds"
   }
 ]
