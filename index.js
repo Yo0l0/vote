@@ -370,15 +370,7 @@ setInterval(updateStats, 5000);
 
 
 
-// Load saved language
-const savedLang = localStorage.getItem('preferredLang') || 'en';
-langSelect.value = savedLang;
 
-// Change handler
-langSelect.addEventListener('change', function() {
-    localStorage.setItem('preferredLang', this.value);
-    alert('Language preference saved! (Full translations coming soon)');
-});
 </script>
 
 
