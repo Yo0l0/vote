@@ -1,11 +1,7 @@
 [
   {
-    "title": "Slots cooldown update",
+    "title": "Website Updates",
     "date": "2026-02-24",
-    "body": "Slots now has faster cooldowns: lose 5s, win 10s, jackpot 20s."
-  },
-  {
-    "title": "Website dashboard filters improved",
-    "date": "2026-02-20",
-    "body": "Added better rarity/grade/condition filtering and smoother pagination."
+    "body": "News panel added to the homepage."
   }
+]
