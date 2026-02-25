@@ -4,7 +4,7 @@
     "date": "2026-02-24",
     "body": [
       "Fixed cooldown system",
-      "❌ Old: Win 2 mins | Lose 2 mins | Jackpot 4 mins",
+      "❌ Old: Win 2 mins | Lose 2 mins | Jackpot 4 mins"\
       "✅ New: Win 10s | Lose 5s | Jackpot 20s"
     ]
   },
