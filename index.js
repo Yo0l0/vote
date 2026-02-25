@@ -401,32 +401,45 @@ let html = `
       });
 
       // ✅ NEWS LOADER (NO nested script tags)
-      async function loadNews() {
-        try {
-          const res = await fetch('/api/news', { cache: 'no-store' });
-          const news = await res.json();
+async function loadNews() {
+  const container = document.getElementById('newsItems');
+  if (!container) return;
 
-          const container = document.getElementById('newsItems');
-          if (!container) return;
+  try {
+    const res = await fetch('/api/news', { cache: 'no-store' });
 
-          if (!news.length) {
-            container.innerHTML = '<p style="color:#aaa;margin:0;">No updates yet.</p>';
-            return;
-          }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-          container.innerHTML = news.slice(0, 5).map(item => \`
-            <div class="news-item">
-              <div class="date">\${item.date || ''}</div>
-              <div class="title">\${item.title || ''}</div>
-<div class="body">\${(item.body ?? item.text ?? item.description ?? item.message ?? 'No details provided.')}</div>
-</div>\`
-          ).join('');
-        } catch (e) {
-          console.error('Failed to load news:', e);
-          const container = document.getElementById('newsItems');
-          if (container) container.innerHTML = '<p style="color:#aaa;margin:0;">Failed to load updates.</p>';
-        }
-      }
+    const data = await res.json();
+
+    // ✅ Accept either: [...] OR { news: [...] } OR { items: [...] }
+    const news = Array.isArray(data) ? data : (data.news ?? data.items ?? []);
+
+    if (!news.length) {
+      container.innerHTML = '<p style="color:#aaa;margin:0;">No updates yet.</p>';
+      return;
+    }
+
+    container.innerHTML = news.slice(0, 5).map(item => {
+      const body = item.body ?? item.text ?? item.description ?? item.message ?? '';
+
+      // ✅ If body is an array, show each line
+      const bodyHtml = Array.isArray(body) ? body.join('<br>') : String(body);
+
+      return `
+        <div class="news-item">
+          <div class="date">${item.date ?? ''}</div>
+          <div class="title">${item.title ?? ''}</div>
+          <div class="body">${bodyHtml}</div>
+        </div>
+      `;
+    }).join('');
+
+  } catch (e) {
+    console.error('Failed to load news:', e);
+    container.innerHTML = '<p style="color:#aaa;margin:0;">Failed to load updates.</p>';
+  }
+}
 
       loadNews();
 
