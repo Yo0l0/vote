@@ -406,7 +406,7 @@ async function loadNews() {
   if (!container) return;
 
   try {
-    const res = await fetch('/api/news', { cache: 'no-store' });
+    const res = await fetch('./news.json', { cache: 'no-store' });
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
