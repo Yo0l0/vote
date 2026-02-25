@@ -406,33 +406,30 @@ async function loadNews() {
 
   try {
     const res = await fetch('/api/news', { cache: 'no-store' });
-
     if (!res.ok) throw new Error('HTTP ' + res.status);
 
     const data = await res.json();
-
-    // ✅ Accept either: [...] OR { news: [...] } OR { items: [...] }
-    const news = Array.isArray(data) ? data : (data.news ?? data.items ?? []);
+    const news = Array.isArray(data) ? data : (data.news || data.items || []);
 
     if (!news.length) {
       container.innerHTML = '<p style="color:#aaa;margin:0;">No updates yet.</p>';
       return;
     }
 
-    container.innerHTML = news.slice(0, 5).map(item => {
-      const body = item.body ?? item.text ?? item.description ?? item.message ?? '';
-
-      // ✅ If body is an array, show each line
+    let html = '';
+    news.slice(0, 5).forEach(item => {
+      const body = (item.body ?? item.text ?? item.description ?? item.message ?? '');
       const bodyHtml = Array.isArray(body) ? body.join('<br>') : String(body);
 
-      return `
-        <div class="news-item">
-          <div class="date">${item.date ?? ''}</div>
-          <div class="title">${item.title ?? ''}</div>
-          <div class="body">${bodyHtml}</div>
-        </div>
-      `;
-    }).join('');
+      html +=
+        '<div class="news-item">' +
+          '<div class="date">' + (item.date || '') + '</div>' +
+          '<div class="title">' + (item.title || '') + '</div>' +
+          '<div class="body">' + bodyHtml + '</div>' +
+        '</div>';
+    });
+
+    container.innerHTML = html;
 
   } catch (e) {
     console.error('Failed to load news:', e);
@@ -440,7 +437,7 @@ async function loadNews() {
   }
 }
 
-      loadNews();
+loadNews();
 
 async function updateStats() {
     try {
