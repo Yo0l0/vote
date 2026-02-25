@@ -80,10 +80,10 @@ app.get('/api/news', (req, res) => {
     const news = JSON.parse(raw);
 
     res.json(news);
-  } catch (err) {
-    console.error('NEWS API ERROR:', err);
-    res.json([]); // fallback
-  }
+  }catch (err) {
+  console.error('NEWS API ERROR:', err);
+  res.status(500).json({ error: err.message });
+}
 });
 app.get('/stats', async (req, res) => {
     try {
