@@ -75,15 +75,14 @@ app.get('/vote_rewards.json', (req, res) => {
 });
 app.get('/api/news', (req, res) => {
   try {
-    const filePath = path.join(__dirname, 'news.json');
-    if (!fs.existsSync(filePath)) return res.json([]);
+    const filePath = path.join(__dirname, 'news.json'); // ✅ always correct
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const news = JSON.parse(raw);
 
-    const raw = fs.readFileSync(filePath, 'utf8').trim();
-    const news = raw ? JSON.parse(raw) : [];
     res.json(news);
-  } catch (e) {
-    console.error('Failed to load news:', e);
-    res.json([]);
+  } catch (err) {
+    console.error('NEWS API ERROR:', err);
+    res.json([]); // fallback
   }
 });
 app.get('/stats', async (req, res) => {
