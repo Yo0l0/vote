@@ -625,6 +625,7 @@ app.get('/dashboard', async (req, res) => {
                 <option value="rare">Rare</option>
                 <option value="promo">Promo</option>
                 <option value="holo">Holo</option>
+                <option value="SIR">SIR</option>
             </select>
         </div>
 
