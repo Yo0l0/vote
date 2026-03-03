@@ -512,34 +512,46 @@ app.get('/privacy-policy', (req, res) => {
 
 // Discord Login
 app.get('/login', (req, res) => {
-    const redirect = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=identify`;
-    res.redirect(redirect);
+  const redirect = `https://discord.com/oauth2/authorize` +
+    `?client_id=${CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+    `&response_type=code` +
+    `&scope=identify`;
+
+  res.redirect(redirect);
 });
 
 app.get('/callback', async (req, res) => {
-    const code = req.query.code;
-    if (!code) return res.send('Missing code');
+  const code = req.query.code;
+  if (!code) return res.status(400).send('Missing code');
 
-    try {
-        const tokenRes = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
-            client_id: CLIENT_ID,
-            client_secret: CLIENT_SECRET,
-            grant_type: 'authorization_code',
-            code,
-            redirect_uri: REDIRECT_URI,
-            scope: 'identify'
-        }));
+  try {
+    const params = new URLSearchParams();
+    params.append('client_id', CLIENT_ID);
+    params.append('client_secret', CLIENT_SECRET);
+    params.append('grant_type', 'authorization_code');
+    params.append('code', code);
+    params.append('redirect_uri', REDIRECT_URI);
 
-        const userRes = await axios.get('https://discord.com/api/users/@me', {
-            headers: { Authorization: `Bearer ${tokenRes.data.access_token}` }
-        });
+    const tokenRes = await axios.post(
+      'https://discord.com/api/oauth2/token',
+      params.toString(),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
 
-        req.session.user = userRes.data;
-        res.redirect('/dashboard');
-    } catch (err) {
-        console.error(err);
-        res.send('Login error');
-    }
+    const userRes = await axios.get('https://discord.com/api/users/@me', {
+      headers: { Authorization: `Bearer ${tokenRes.data.access_token}` }
+    });
+
+    req.session.user = userRes.data;
+    return res.redirect('/dashboard');
+
+  } catch (err) {
+    // IMPORTANT: log the real discord error
+    console.error('OAuth error status:', err?.response?.status);
+    console.error('OAuth error data:', err?.response?.data || err.message);
+    return res.status(500).send('Login error');
+  }
 });
 
 // Collection Dashboard
