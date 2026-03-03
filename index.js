@@ -759,8 +759,8 @@ app.get('/api/cards', async (req, res) => {
     const collection = (cachedInventory[userId]?.cards) || [];
 
     const filtered = collection.filter(card => {
-        const matchesRarity = rarity === 'all' || card.rarity.toLowerCase() === rarity;
-        const matchesSearch = card.name.toLowerCase().includes(search) || card.code.toLowerCase().includes(search);
+const matchesRarity =
+  rarity === 'all' || String(card.rarity || '').trim().toLowerCase() === String(rarity).trim().toLowerCase();        const matchesSearch = card.name.toLowerCase().includes(search) || card.code.toLowerCase().includes(search);
         const matchesGrade = grade === 'all' || String(card.grade || '') === grade;
         const matchesCondition = condition === 'all' || (card.condition?.toLowerCase() || '') === condition.toLowerCase();
         return matchesRarity && matchesSearch && matchesGrade && matchesCondition;
