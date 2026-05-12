@@ -333,7 +333,7 @@ let html = `
     <p>The ultimate Pokémon-inspired Discord bot. Build your card collection, battle friends, trade rare cards, and climb the leaderboards!</p>
 
     <a class="btn" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">✨ Invite Pokebot</a>
-    <a class="btn" href="https://discord.gg/g7AAsmJA">💬 Support Server</a>
+    <a class="btn" href="https://discord.gg/zj9Sxz3reR">💬 Support Server</a>
     <a class="btn" href="https://top.gg/bot/1362516883785515199">✅ Vote Here!</a>
     <a class="btn" href="${req.session.user ? '/dashboard' : '/login'}">🗂️ View Your Collection</a>
 
