@@ -17,34 +17,32 @@ let inventoryCache    = null;
 let inventoryFetchedAt = 0;
 let statsCache        = null;
 let statsFetchedAt    = 0;
-const INVENTORY_TTL = 5 * 60 * 1000; // 5 min
+const INVENTORY_TTL = 2 * 60 * 1000; // 2 min
 const STATS_TTL     = 3 * 60 * 1000; // 3 min
-const INVENTORY_URL = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
+const LOCAL_INVENTORY = path.join(__dirname, 'user_inventory.json');
 
-async function getInventory() {
+// Reads from local disk — the bot uploads via POST /upload, no GitHub needed
+function getInventory() {
   const now = Date.now();
   if (inventoryCache && now - inventoryFetchedAt < INVENTORY_TTL) return inventoryCache;
   try {
-    const res = await axios.get(INVENTORY_URL, {
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity,
-      timeout: 15000
-    });
-    inventoryCache    = res.data;
+    if (!fs.existsSync(LOCAL_INVENTORY)) return inventoryCache || {};
+    const raw = fs.readFileSync(LOCAL_INVENTORY, 'utf8');
+    inventoryCache    = JSON.parse(raw);
     inventoryFetchedAt = now;
     return inventoryCache;
   } catch (err) {
-    console.error('Failed to fetch inventory:', err.message);
+    console.error('Failed to read local inventory:', err.message);
     return inventoryCache || {};
   }
 }
 
-async function getStats() {
+function getStats() {
   const now = Date.now();
   if (statsCache && now - statsFetchedAt < STATS_TTL) return statsCache;
 
   try {
-    const data = await getInventory();
+    const data = getInventory();
     let totalCards = 0, totalUsers = 0, droppedToday = 0;
     const packTimestamps   = new Set();
     const dropCountsByDay  = {};
@@ -166,9 +164,9 @@ app.get('/api/news', (req, res) => {
 });
 
 // ── Stats API ─────────────────────────────────────────────────────────────
-app.get('/stats', async (req, res) => {
+app.get('/stats', (req, res) => {
   try {
-    const data = await getStats();
+    const data = getStats();
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -233,10 +231,10 @@ app.get('/logout', (req, res) => {
 });
 
 // ── Cards API (paginated, filtered) ──────────────────────────────────────
-app.get('/api/cards', async (req, res) => {
+app.get('/api/cards', (req, res) => {
   if (!req.session.user) return res.status(403).json({ cards: [], totalPages: 0 });
   try {
-    const data      = await getInventory();
+    const data      = getInventory();
     const userId    = req.session.user.id;
     const rarity    = req.query.rarity    || 'all';
     const grade     = req.query.grade     || 'all';
