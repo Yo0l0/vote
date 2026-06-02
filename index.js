@@ -6,790 +6,775 @@ const session = require('express-session');
 const axios = require('axios');
 
 const app = express();
-const webhook = new Webhook('252566'); // Your Top.gg webhook secret
+const webhook = new Webhook('252566');
 
-// Replace with your actual bot values:
-const CLIENT_ID = '1362516883785515199';
+const CLIENT_ID     = '1362516883785515199';
 const CLIENT_SECRET = 'eXuBq95536h177-RfcgvBOybWouxwK5k';
-const REDIRECT_URI = 'https://thepokebot.com/callback'; // Example: https://thepokebot.com/callback
-let cachedInventory = null;
-let lastFetch = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-app.use(express.json({ limit: '10mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+const REDIRECT_URI  = 'https://thepokebot.com/callback';
 
-app.get('/faq', (req, res) => {
-    res.sendFile(path.join(__dirname, 'Public.html'));
-});
+// ── In-memory caches ──────────────────────────────────────────────────────
+let inventoryCache    = null;
+let inventoryFetchedAt = 0;
+let statsCache        = null;
+let statsFetchedAt    = 0;
+const INVENTORY_TTL = 5 * 60 * 1000; // 5 min
+const STATS_TTL     = 3 * 60 * 1000; // 3 min
+const INVENTORY_URL = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
 
-
-
-app.use(session({
-    secret: 'your-secret-key-here',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week session
-        sameSite: 'lax',
-        secure: false // set to true if forcing HTTPS only
-    }
-}));
-
-app.post('/upload', (req, res) => {
-    if (req.body.secret !== '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') return res.status(403).send('Forbidden');
-
-    fs.writeFileSync('user_inventory.json', req.body.inventory, 'utf8');
-    res.send('✅ File received');
-});
-
-app.get('/user_inventory.json', (req, res) => {
-    res.sendFile(path.join(__dirname, 'user_inventory.json'));
-});
-
-
-
-
-
-// Webhook vote listener
-app.post('/dblwebhook', webhook.middleware(), (req, res) => {
-    const userId = req.vote.user;
-    console.log('✅ Vote received from', userId);
-
-    let data = {};
-    if (fs.existsSync('vote_rewards.json')) {
-        data = JSON.parse(fs.readFileSync('vote_rewards.json', 'utf8') || '{}');
-    }
-
-    data[userId] = { pending: true, timestamp: Date.now() };
-    fs.writeFileSync('vote_rewards.json', JSON.stringify(data, null, 2));
-
-    res.status(200).send('Vote recorded');
-});
-
-app.get('/vote_rewards.json', (req, res) => {
-    if (fs.existsSync('vote_rewards.json')) {
-        res.sendFile(path.join(__dirname, 'vote_rewards.json'));
-    } else {
-        res.status(404).send('File not found');
-    }
-});
-app.get('/api/news', (req, res) => {
+async function getInventory() {
+  const now = Date.now();
+  if (inventoryCache && now - inventoryFetchedAt < INVENTORY_TTL) return inventoryCache;
   try {
-    const filePath = path.join(__dirname, 'news.json'); // ✅ always correct
-    const raw = fs.readFileSync(filePath, 'utf8');
-    const news = JSON.parse(raw);
-
-    res.json(news);
-  }catch (err) {
-  console.error('NEWS API ERROR:', err);
-  res.status(500).json({ error: err.message });
-}
-});
-app.get('/stats', async (req, res) => {
-    try {
-        const inventoryUrl = 'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
-        const response = await axios.get(inventoryUrl, { maxContentLength: Infinity, maxBodyLength: Infinity });
-        const data = response.data;
-
-        let totalCards = 0;
-        let totalUsers = 0;
-        let droppedToday = 0;
-        const packTimestamps = new Set();
-
-        const now = new Date();
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-
-        const dropCountsByDay = {}; // { "YYYY-MM-DD": count }
-
-        for (const userId in data) {
-            const user = data[userId];
-            if (user.cards) {
-                totalCards += user.cards.length;
-                totalUsers += 1;
-
-                user.cards.forEach(card => {
-                    if (card.obtainedAt) {
-                        packTimestamps.add(card.obtainedAt); // Packs based on unique timestamp
-
-                        const date = new Date(card.obtainedAt);
-                        const dayStr = date.toISOString().split('T')[0];
-
-                        dropCountsByDay[dayStr] = (dropCountsByDay[dayStr] || 0) + 1;
-
-                        if (card.obtainedAt >= todayStart) droppedToday++;
-                    }
-                });
-            }
-        }
-
-        const totalPacks = packTimestamps.size;
-
-        // Calculate weekly averages
-        const sortedDays = Object.keys(dropCountsByDay).sort();
-        const lastWeek = [];
-        const thisWeek = [];
-
-        const currentDayOfWeek = now.getDay(); // 0 = Sunday
-        const todayStr = now.toISOString().split('T')[0];
-
-        const lastWeekStart = new Date(todayStart);
-        lastWeekStart.setDate(lastWeekStart.getDate() - currentDayOfWeek - 7); 
-
-        const lastWeekEnd = new Date(todayStart);
-        lastWeekEnd.setDate(lastWeekEnd.getDate() - currentDayOfWeek); 
-
-        const thisWeekStart = new Date(todayStart);
-        thisWeekStart.setDate(thisWeekStart.getDate() - currentDayOfWeek); 
-
-        sortedDays.forEach(day => {
-            const dayTime = new Date(day).getTime();
-
-            if (dayTime >= lastWeekStart.getTime() && dayTime < lastWeekEnd.getTime()) {
-                lastWeek.push(dropCountsByDay[day]);
-            }
-
-            if (dayTime >= thisWeekStart.getTime() && dayTime <= todayStart) {
-                thisWeek.push(dropCountsByDay[day]);
-            }
-        });
-
-        const lastWeekAvg = lastWeek.length ? Math.round(lastWeek.reduce((a, b) => a + b, 0) / lastWeek.length) : 0;
-        const thisWeekAvg = thisWeek.length ? Math.round(thisWeek.reduce((a, b) => a + b, 0) / thisWeek.length) : 0;
-
-        res.json({
-            totalCards,
-            totalUsers,
-            totalPacks,
-            droppedToday,
-            lastWeekAvg,
-            thisWeekAvg
-        });
-
-    } catch (err) {
-        console.error('Failed to load stats:', err.message);
-        res.json({
-            totalCards: 0,
-            totalUsers: 0,
-            totalPacks: 0,
-            droppedToday: 0,
-            lastWeekAvg: 0,
-            thisWeekAvg: 0
-        });
-    }
-});
-
-
-
-
-// Serve homepage
-app.get('/', (req, res) => {
-    let totalCards = 0;
-    let totalUsers = 0;
-
-    if (fs.existsSync('user_inventory.json')) {
-        const data = JSON.parse(fs.readFileSync('user_inventory.json', 'utf8') || '{}');
-        totalUsers = Object.keys(data).length;
-        for (const userId in data) {
-            const cards = data[userId]?.cards || [];
-            totalCards += cards.length;
-        }
-    }
-
-let html = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Pokebot - Discord Bot</title>
-  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #2c003e, #0d001d);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-    }
-
-    .container { text-align: center; margin-top: 80px; padding: 20px; animation: fadeIn 1.2s ease; }
-    .bot-image { width: 150px; height: 150px; border-radius: 50%; border: 3px solid #00cc99; object-fit: cover; margin-bottom: 20px; }
-    h1 { font-size: 2em; margin-bottom: 10px; }
-    p { max-width: 600px; margin: 0 auto 30px; line-height: 1.5; }
-
-    .btn {
-      display: block;
-      margin: 10px auto;
-      padding: 15px 30px;
-      background: #cc0066;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
-      min-width: 220px;
-      transition: background 0.3s, box-shadow 0.3s;
-      box-shadow: 0 0 10px rgba(204, 0, 102, 0.4);
-    }
-    .btn:hover { background: #b30059; box-shadow: 0 0 20px rgba(204, 0, 102, 0.8); }
-
-    .features, .stats { margin-top: 40px; text-align: center; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 10px 0; font-size: 1.1em; }
-    .footer { margin-top: auto; padding: 20px; font-size: 0.9em; color: #888; }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .topright { position: fixed; top: 20px; right: 20px; display: flex; align-items: center; cursor: pointer; }
-    .topright img { width: 40px; height: 40px; border-radius: 50%; }
-    .dropdown { display: none; position: absolute; top: 60px; right: 0; background: #2c003e; border: 1px solid #00cc99; border-radius: 8px; min-width: 120px; z-index: 999; text-align: left; }
-    .dropdown a { display: block; padding: 10px; color: white; text-decoration: none; }
-    .dropdown a:hover { background: #b30059; }
-
-    /* ✅ NEWS PANEL */
-.news-panel {
-  position: fixed;
-  left: 30px;
-  top: 120px;
-
-  width: 360px;              /* ⬅️ wider */
-  padding: 20px;             /* ⬅️ more spacing */
-
-  background: #2c003e;
-  border: 2px solid #00cc99; /* ⬅️ stronger border */
-  border-radius: 16px;
-
-  box-shadow: 0 0 20px rgba(0, 204, 153, 0.35);
-  z-index: 9999;
-  text-align: left;
-}
-
-.news-panel h3 {
-  font-size: 1.3em;   /* ⬅️ bigger title */
-}
-
-.news-item {
-  padding: 14px;
-  margin-bottom: 14px;
-}
-
-.news-item .date {
-  font-size: 0.9em;
-}
-
-.news-item .title {
-  font-size: 1.05em;  /* ⬅️ more readable */
-}
-
-.news-item .body {
-  font-size: 1em;
-  line-height: 1.5;
-  color: #ddd;
-  white-space: pre-line; /* ✅ SHOW \n LINE BREAKS */
-}
-.news-item .title { margin-top: 4px; font-weight: 700; }
-.news-item .body { margin-top: 8px; }
-
-    @media (max-width: 900px) {
-      .news-panel {
-        position: static;
-        width: auto;
-        margin: 20px auto 0;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-  <!-- ✅ NEWS PANEL HTML -->
-  <div class="news-panel">
-    <h3>📰 News</h3>
-    <div id="newsItems">
-      <div class="news-item">
-        <div class="date">Loading…</div>
-        <div class="title">Fetching updates</div>
-        <div class="body">If this stays forever, /api/news isn’t working.</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="topright" id="profileBtn">
-    ${req.session.user
-      ? `<img src="https://cdn.discordapp.com/avatars/${req.session.user.id}/${req.session.user.avatar}.png" alt="PFP">`
-      : `<img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot">`
-    }
-    <div class="dropdown" id="dropdownMenu">
-      ${req.session.user ? `<a href="/logout">Logout</a>` : `<a href="/login">Login</a>`}
-    </div>
-  </div>
-
-  <div class="container">
-    <img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot Icon" class="bot-image">
-    <h1>🔥 Pokebot — Collect, Battle, Trade!</h1>
-    <p>The ultimate Pokémon-inspired Discord bot. Build your card collection, battle friends, trade rare cards, and climb the leaderboards!</p>
-
-    <a class="btn" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">✨ Invite Pokebot</a>
-    <a class="btn" href="https://discord.gg/zj9Sxz3reR">💬 Support Server</a>
-    <a class="btn" href="https://top.gg/bot/1362516883785515199">✅ Vote Here!</a>
-    <a class="btn" href="${req.session.user ? '/dashboard' : '/login'}">🗂️ View Your Collection</a>
-
-    <div style="margin-top: 10px;">
-      <a class="btn" href="https://thepokebot.com/faq" target="_blank">❓ FAQ / Help</a>
-    </div>
-
-    <div class="features">
-      <h2>Features:</h2>
-      <ul>
-        <li>✅ Card Collecting & Grading</li>
-        <li>✅ Pack Opening from Classic Sets</li>
-        <li>✅ Trading & Marketplace System</li>
-        <li>✅ Competitive Battles & Duels</li>
-        <li>✅ Leaderboards & Achievements</li>
-      </ul>
-    </div>
-
-    <div class="stats">
-      <h2>📊 Pokebot Stats:</h2>
-      <p>📦 Total Cards Dropped: <strong id="cardCount">Loading...</strong></p>
-      <p>👥 Total Users with Collections: <strong id="userCount">Loading...</strong></p>
-      <p>🎁 Total Packs Opened: <strong id="totalPacks">Loading...</strong></p>
-      <p>🎯 Cards Dropped Today: <strong id="droppedToday">Loading...</strong></p>
-      <p>📆 Last Week Avg Drops Per Day: <strong id="lastWeekAvg">Loading...</strong></p>
-      <p>📆 This Week Avg Drops Per Day: <strong id="thisWeekAvg">Loading...</strong></p>
-    </div>
-
-    <div class="footer">© 2024 Pokebot. All rights reserved.</div>
-
-    <script>
-      const previousCounts = {
-        cardCount: 0,
-        userCount: 0,
-        totalPacks: 0,
-        droppedToday: 0,
-        lastWeekAvg: 0,
-        thisWeekAvg: 0
-      };
-
-      function animateCount(id, start, end) {
-        const el = document.getElementById(id);
-        const step = Math.ceil((end - start) / 100) || 1;
-        let current = start;
-
-        const counter = setInterval(() => {
-          current += step;
-          if (current >= end) {
-            el.innerText = end;
-            clearInterval(counter);
-          } else {
-            el.innerText = current;
-          }
-        }, 15);
-      }
-
-      const profileBtn = document.getElementById('profileBtn');
-      const dropdown = document.getElementById('dropdownMenu');
-      profileBtn.addEventListener('click', () => {
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-      });
-      window.addEventListener('click', (e) => {
-        if (!profileBtn.contains(e.target)) dropdown.style.display = 'none';
-      });
-
-      // ✅ NEWS LOADER (NO nested script tags)
-async function loadNews() {
-  const container = document.getElementById('newsItems');
-  if (!container) return;
-
-  try {
-    const res = await fetch('/api/news', { cache: 'no-store' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-
-    const data = await res.json();
-    const news = Array.isArray(data) ? data : (data.news || data.items || []);
-
-    if (!news.length) {
-      container.innerHTML = '<p style="color:#aaa;margin:0;">No updates yet.</p>';
-      return;
-    }
-
-    let html = '';
-    news.slice(0, 5).forEach(item => {
-      const body = (item.body ?? item.text ?? item.description ?? item.message ?? '');
-      const bodyHtml = Array.isArray(body) ? body.join('<br>') : String(body);
-
-      html +=
-        '<div class="news-item">' +
-          '<div class="date">' + (item.date || '') + '</div>' +
-          '<div class="title">' + (item.title || '') + '</div>' +
-          '<div class="body">' + bodyHtml + '</div>' +
-        '</div>';
+    const res = await axios.get(INVENTORY_URL, {
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
+      timeout: 15000
     });
-
-    container.innerHTML = html;
-
-  } catch (e) {
-    console.error('Failed to load news:', e);
-    container.innerHTML = '<p style="color:#aaa;margin:0;">Failed to load updates.</p>';
+    inventoryCache    = res.data;
+    inventoryFetchedAt = now;
+    return inventoryCache;
+  } catch (err) {
+    console.error('Failed to fetch inventory:', err.message);
+    return inventoryCache || {};
   }
 }
 
-loadNews();
+async function getStats() {
+  const now = Date.now();
+  if (statsCache && now - statsFetchedAt < STATS_TTL) return statsCache;
 
-async function updateStats() {
-    try {
-        const res = await fetch('/stats');
-        const data = await res.json();
+  try {
+    const data = await getInventory();
+    let totalCards = 0, totalUsers = 0, droppedToday = 0;
+    const packTimestamps   = new Set();
+    const dropCountsByDay  = {};
+    const todayStart = new Date().setHours(0, 0, 0, 0);
 
-        if (data.totalCards !== previousCounts.cardCount) {
-            animateCount('cardCount', previousCounts.cardCount, data.totalCards);
-            previousCounts.cardCount = data.totalCards;
-        }
+    for (const userId in data) {
+      const cards = data[userId]?.cards;
+      if (!Array.isArray(cards)) continue;
+      totalUsers++;
+      totalCards += cards.length;
 
-        if (data.totalUsers !== previousCounts.userCount) {
-            animateCount('userCount', previousCounts.userCount, data.totalUsers);
-            previousCounts.userCount = data.totalUsers;
-        }
-
-        if (data.totalPacks !== previousCounts.totalPacks) {
-            animateCount('totalPacks', previousCounts.totalPacks, data.totalPacks);
-            previousCounts.totalPacks = data.totalPacks;
-        }
-
-        if (data.droppedToday !== previousCounts.droppedToday) {
-            animateCount('droppedToday', previousCounts.droppedToday, data.droppedToday);
-            previousCounts.droppedToday = data.droppedToday;
-        }
-
-        if (data.lastWeekAvg !== previousCounts.lastWeekAvg) {
-            animateCount('lastWeekAvg', previousCounts.lastWeekAvg, data.lastWeekAvg);
-            previousCounts.lastWeekAvg = data.lastWeekAvg;
-        }
-
-        if (data.thisWeekAvg !== previousCounts.thisWeekAvg) {
-            animateCount('thisWeekAvg', previousCounts.thisWeekAvg, data.thisWeekAvg);
-            previousCounts.thisWeekAvg = data.thisWeekAvg;
-        }
-
-    } catch (err) {
-        console.error('Failed to load stats:', err);
+      for (const card of cards) {
+        if (!card.obtainedAt) continue;
+        packTimestamps.add(card.obtainedAt);
+        const day = new Date(card.obtainedAt).toISOString().split('T')[0];
+        dropCountsByDay[day] = (dropCountsByDay[day] || 0) + 1;
+        if (card.obtainedAt >= todayStart) droppedToday++;
+      }
     }
+
+    const today = new Date();
+    const dow   = today.getDay();
+    const thisWeekStart = new Date(today); thisWeekStart.setDate(today.getDate() - dow); thisWeekStart.setHours(0,0,0,0);
+    const lastWeekStart = new Date(thisWeekStart); lastWeekStart.setDate(thisWeekStart.getDate() - 7);
+    const lastWeekEnd   = new Date(thisWeekStart);
+
+    const thisW = [], lastW = [];
+    for (const [day, count] of Object.entries(dropCountsByDay)) {
+      const t = new Date(day).getTime();
+      if (t >= thisWeekStart.getTime() && t <= todayStart) thisW.push(count);
+      if (t >= lastWeekStart.getTime() && t < lastWeekEnd.getTime()) lastW.push(count);
+    }
+    const avg = arr => arr.length ? Math.round(arr.reduce((a,b) => a+b, 0) / arr.length) : 0;
+
+    statsCache = {
+      totalCards,
+      totalUsers,
+      totalPacks: packTimestamps.size,
+      droppedToday,
+      thisWeekAvg: avg(thisW),
+      lastWeekAvg: avg(lastW)
+    };
+    statsFetchedAt = now;
+    return statsCache;
+  } catch (err) {
+    console.error('Stats error:', err.message);
+    return statsCache || { totalCards:0, totalUsers:0, totalPacks:0, droppedToday:0, thisWeekAvg:0, lastWeekAvg:0 };
+  }
 }
 
-updateStats();
-setInterval(updateStats, 5000);
+// ── Middleware ────────────────────────────────────────────────────────────
+app.use(express.json({ limit: '10mb' }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: 'pk-secret-2024',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'lax', secure: false }
+}));
 
+// ── Vote webhook ──────────────────────────────────────────────────────────
+app.post('/dblwebhook', webhook.middleware(), (req, res) => {
+  try {
+    const userId = req.vote?.user;
+    if (!userId) return res.status(400).send('No user');
+    console.log('✅ Vote received from', userId);
 
-
-
-
-</script>
-
-</div>
-</body>
-</html>`;
-
-    res.send(html);
+    const file = 'vote_rewards.json';
+    let data = {};
+    if (fs.existsSync(file)) {
+      try { data = JSON.parse(fs.readFileSync(file, 'utf8') || '{}'); } catch {}
+    }
+    data[userId] = { pending: true, timestamp: Date.now() };
+    fs.writeFileSync(file, JSON.stringify(data, null, 2));
+    if (!res.headersSent) res.status(200).send('Vote recorded');
+  } catch (err) {
+    console.error('Vote webhook error:', err.message);
+    if (!res.headersSent) res.status(500).send('Error');
+  }
 });
 
-
-app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
-        res.redirect('/');
-    });
+// ── File upload from bot ──────────────────────────────────────────────────
+app.post('/upload', (req, res) => {
+  if (req.body.secret !== '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') {
+    return res.status(403).send('Forbidden');
+  }
+  try {
+    fs.writeFileSync('user_inventory.json', req.body.inventory, 'utf8');
+    // invalidate cache
+    inventoryCache = null;
+    statsCache     = null;
+    res.send('✅ File received');
+  } catch (err) {
+    res.status(500).send('Write failed');
+  }
 });
 
-// Terms and Privacy
-app.get('/terms-of-service', (req, res) => {
-    res.sendFile(path.join(__dirname, 'terms-of-service.html'));
+// ── Static file endpoints ─────────────────────────────────────────────────
+app.get('/user_inventory.json', (req, res) => res.sendFile(path.join(__dirname, 'user_inventory.json')));
+app.get('/vote_rewards.json',   (req, res) => {
+  const f = path.join(__dirname, 'vote_rewards.json');
+  if (fs.existsSync(f)) return res.sendFile(f);
+  res.status(404).send('Not found');
 });
-app.get('/privacy-policy', (req, res) => {
-    res.sendFile(path.join(__dirname, 'privacy-policy.html'));
+app.get('/faq',              (req, res) => res.sendFile(path.join(__dirname, 'Public.html')));
+app.get('/terms-of-service', (req, res) => res.sendFile(path.join(__dirname, 'terms-of-service.html')));
+app.get('/privacy-policy',   (req, res) => res.sendFile(path.join(__dirname, 'privacy-policy.html')));
+
+// ── News API ──────────────────────────────────────────────────────────────
+app.get('/api/news', (req, res) => {
+  try {
+    const raw  = fs.readFileSync(path.join(__dirname, 'news.json'), 'utf8');
+    const news = JSON.parse(raw);
+    res.json(news);
+  } catch (err) {
+    console.error('News API error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// Discord Login
+// ── Stats API ─────────────────────────────────────────────────────────────
+app.get('/stats', async (req, res) => {
+  try {
+    const data = await getStats();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Clear vote ────────────────────────────────────────────────────────────
+app.post('/clear_vote', (req, res) => {
+  const { userId } = req.body;
+  const file = 'vote_rewards.json';
+  if (!userId) return res.status(400).send('Missing userId');
+  try {
+    if (!fs.existsSync(file)) return res.status(404).send('Not found');
+    const data = JSON.parse(fs.readFileSync(file, 'utf8') || '{}');
+    if (!data[userId]) return res.status(404).send('User not found');
+    delete data[userId];
+    fs.writeFileSync(file, JSON.stringify(data, null, 2));
+    res.status(200).send('Cleared');
+  } catch (err) {
+    res.status(500).send('Error');
+  }
+});
+
+// ── Discord OAuth ─────────────────────────────────────────────────────────
 app.get('/login', (req, res) => {
-  const redirect = `https://discord.com/oauth2/authorize` +
+  const url = `https://discord.com/oauth2/authorize` +
     `?client_id=${CLIENT_ID}` +
     `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-    `&response_type=code` +
-    `&scope=identify`;
-
-  res.redirect(redirect);
+    `&response_type=code&scope=identify`;
+  res.redirect(url);
 });
 
 app.get('/callback', async (req, res) => {
   const code = req.query.code;
   if (!code) return res.status(400).send('Missing code');
-
   try {
-    const params = new URLSearchParams();
-    params.append('client_id', CLIENT_ID);
-    params.append('client_secret', CLIENT_SECRET);
-    params.append('grant_type', 'authorization_code');
-    params.append('code', code);
-    params.append('redirect_uri', REDIRECT_URI);
-
+    const params = new URLSearchParams({
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: REDIRECT_URI
+    });
     const tokenRes = await axios.post(
       'https://discord.com/api/oauth2/token',
       params.toString(),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
-
     const userRes = await axios.get('https://discord.com/api/users/@me', {
       headers: { Authorization: `Bearer ${tokenRes.data.access_token}` }
     });
-
     req.session.user = userRes.data;
     return res.redirect('/dashboard');
-
   } catch (err) {
-    // IMPORTANT: log the real discord error
-    console.error('OAuth error status:', err?.response?.status);
-    console.error('OAuth error data:', err?.response?.data || err.message);
-    return res.status(500).send('Login error');
+    console.error('OAuth error:', err?.response?.data || err.message);
+    if (!res.headersSent) return res.status(500).send('Login error');
   }
 });
 
-// Collection Dashboard
-app.get('/dashboard', async (req, res) => {
-    if (!req.session.user) return res.redirect('/login');
-
-    const userId = req.session.user.id;
-
-    let html = `
-    <head>
-        <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
-        <style>
-            body { background: #0d001d; color: white; font-family: Arial; text-align: center; padding: 20px; }
-            .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 30px; }
-            .card { background: #2c003e; padding: 15px; border-radius: 10px; }
-            img { width: 200px; height: 280px; border-radius: 8px; }
-            a { color: #00cc99; text-decoration: none; }
-            .grade { color: #ffcc00; font-weight: bold; }
-.pagination {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 20px;
-}
-
-.pagination button {
-    padding: 10px 16px;
-    min-width: 40px;
-    background: #2c003e;
-    color: #00cc99;
-    border: 1px solid #00cc99;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: bold;
-    box-shadow: 0 0 8px rgba(0, 204, 153, 0.3);
-}
-
-.pagination button:hover {
-    background: #00cc99;
-    color: #0d001d;
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0, 204, 153, 0.7);
-}
-
-.pagination button.active {
-    background: #00cc99;
-    color: #0d001d;
-    border-color: #00cc99;
-    transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(0, 204, 153, 0.9);
-}
-
-
-            .filter-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; background: #2c003e; padding: 15px; border-radius: 10px; margin-top: 20px; }
-            .filter-container select, .filter-container input[type="text"] { padding: 8px; border-radius: 5px; background: #0d001d; color: white; border: none; }
-        </style>
-    </head>
-    <body>
-    <h1>Welcome, ${req.session.user.username}</h1>
-    <h2>Your Collection</h2>
-
-    <div class="filter-container">
-        <div>
-            <label>Rarity:</label>
-            <select id="filterRarity">
-                <option value="all">All</option>
-                <option value="common">Common</option>
-                <option value="uncommon">Uncommon</option>
-                <option value="rare">Rare</option>
-                <option value="promo">Promo</option>
-                <option value="holo">Holo</option>
-                <option value="SIR">SIR</option>
-            </select>
-        </div>
-
-        <div>
-            <label>Grade:</label>
-            <select id="filterGrade">
-                <option value="all">All</option>
-                ${[...Array(11).keys()].slice(1).map(g => `<option value="${g}">${g}</option>`).join('')}
-            </select>
-        </div>
-
-        <div>
-            <label>Condition:</label>
-            <select id="filterCondition">
-                <option value="all">All</option>
-                <option value="Pristine">Pristine</option>
-                <option value="Mint">Mint</option>
-                <option value="Near Mint">Near Mint</option>
-                <option value="Good">Good</option>
-                <option value="Played">Played</option>
-                <option value="Damaged">Damaged</option>
-            </select>
-        </div>
-
-        <div>
-            <label>Search:</label>
-            <input type="text" id="searchInput" placeholder="Search name or code..." autocomplete="off">
-        </div>
-    </div>
-
-    <div class="grid" id="cardGrid"></div>
-    <div id="pagination" style="margin-top: 20px;"></div>
-
-    <a href="/" style="position: fixed; top: 20px; left: 20px; background:#2c003e; color:#00cc99; padding:10px; border-radius:8px;">⬅️ Back</a>
-
-    <script>
-    let currentPage = 1;
-    let searchTimeout;
-
-    function loadCards(page = 1) {
-        currentPage = page;
-        const rarity = document.getElementById('filterRarity').value;
-        const grade = document.getElementById('filterGrade').value;
-        const condition = document.getElementById('filterCondition').value;
-        const search = document.getElementById('searchInput').value;
-
-        fetch(\`/api/cards?rarity=\${rarity}&grade=\${grade}&condition=\${condition}&search=\${encodeURIComponent(search)}&page=\${page}\`)
-            .then(res => res.json())
-            .then(data => {
-                const grid = document.getElementById('cardGrid');
-                grid.innerHTML = '';
-
-                if (data.cards.length === 0) {
-                    grid.innerHTML = '<p>No matching cards found.</p>';
-                } else {
-                    data.cards.forEach(card => {
-                        grid.innerHTML += \`
-                        <div class="card">
-                            <img src="\${card.image}" alt="\${card.name}">
-                            <strong>\${card.name}</strong>
-                            <p>\${card.rarity}, \${card.set}</p>
-                            <p><small>Code: \${card.code}</small></p>
-                            <p><small>Condition: \${card.condition || 'Unknown'}</small></p>
-                            \${card.grade ? \`<div class="grade">Graded: \${card.grade}</div>\` : ''}
-                        </div>\`;
-                    });
-                }
-
-        const pagination = document.getElementById('pagination');
-        pagination.innerHTML = '';
-        
-        for (let i = 1; i <= data.totalPages; i++) {
-            const btn = document.createElement('button');
-            btn.textContent = i;
-            if (i === page) btn.classList.add('active');
-            btn.onclick = () => loadCards(i);
-            pagination.appendChild(btn);
-        }
-            })
-            .catch(err => console.error('Failed to load cards:', err));
-    }
-
-    function delayedSearch() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            loadCards(1);
-        }, 500);
-    }
-
-    window.onload = () => {
-        loadCards(1);
-        document.getElementById('filterRarity').addEventListener('change', () => loadCards(1));
-        document.getElementById('filterGrade').addEventListener('change', () => loadCards(1));
-        document.getElementById('filterCondition').addEventListener('change', () => loadCards(1));
-        document.getElementById('searchInput').addEventListener('input', delayedSearch);
-    };
-    </script>
-    </body>`;
-
-    res.send(html);
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/'));
 });
 
-
-
-
-
-
+// ── Cards API (paginated, filtered) ──────────────────────────────────────
 app.get('/api/cards', async (req, res) => {
-    if (!req.session.user) return res.status(403).json([]);
-
-    const now = Date.now();
-    if (!cachedInventory || now - lastFetch > CACHE_DURATION) {
-        try {
-            const response = await axios.get('https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json');
-            cachedInventory = response.data;
-            lastFetch = now;
-        } catch (err) {
-            console.error('Failed to fetch inventory:', err.message);
-            return res.status(500).json([]);
-        }
-    }
-
-    const userId = req.session.user.id;
-    const rarity = req.query.rarity || 'all';
-    const grade = req.query.grade || 'all';
+  if (!req.session.user) return res.status(403).json({ cards: [], totalPages: 0 });
+  try {
+    const data      = await getInventory();
+    const userId    = req.session.user.id;
+    const rarity    = req.query.rarity    || 'all';
+    const grade     = req.query.grade     || 'all';
     const condition = req.query.condition || 'all';
-    const search = req.query.search?.toLowerCase() || '';
-    const page = parseInt(req.query.page) || 1;
-    const perPage = 250;
+    const search    = (req.query.search   || '').toLowerCase();
+    const page      = Math.max(1, parseInt(req.query.page) || 1);
+    const perPage   = 24;
 
-    const collection = (cachedInventory[userId]?.cards) || [];
-
-    const filtered = collection.filter(card => {
-const matchesRarity =
-  rarity === 'all' || String(card.rarity || '').trim().toLowerCase() === String(rarity).trim().toLowerCase();        const matchesSearch = card.name.toLowerCase().includes(search) || card.code.toLowerCase().includes(search);
-        const matchesGrade = grade === 'all' || String(card.grade || '') === grade;
-        const matchesCondition = condition === 'all' || (card.condition?.toLowerCase() || '') === condition.toLowerCase();
-        return matchesRarity && matchesSearch && matchesGrade && matchesCondition;
-    });
+    const cards = data[userId]?.cards || [];
+    const filtered = cards.filter(c => {
+      if (rarity    !== 'all' && (c.rarity    || '').toLowerCase() !== rarity.toLowerCase()) return false;
+      if (grade     !== 'all' && String(c.grade || '')              !== grade)               return false;
+      if (condition !== 'all' && (c.condition  || '').toLowerCase() !== condition.toLowerCase()) return false;
+      if (search && !(c.name || '').toLowerCase().includes(search) && !(c.code || '').toLowerCase().includes(search)) return false;
+      return true;
+    }).reverse();
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
-    const pageCards = filtered.slice((page - 1) * perPage, page * perPage);
-
-    res.json({ cards: pageCards, totalPages });
+    const pageCards  = filtered.slice((page - 1) * perPage, page * perPage);
+    res.json({ cards: pageCards, totalPages, total: filtered.length });
+  } catch (err) {
+    console.error('Cards API error:', err.message);
+    res.status(500).json({ cards: [], totalPages: 0 });
+  }
 });
 
+// ── Homepage ──────────────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  const user = req.session.user;
+  const avatarUrl = user?.avatar
+    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+    : 'https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png';
 
-// Clear vote endpoint
-app.post('/clear_vote', (req, res) => {
-    const { userId } = req.body;
-    const pathFile = 'vote_rewards.json';
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokebot — Collect, Battle, Trade</title>
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    if (fs.existsSync(pathFile)) {
-        const data = JSON.parse(fs.readFileSync(pathFile, 'utf8') || '{}');
-        if (data[userId]) {
-            delete data[userId];
-            fs.writeFileSync(pathFile, JSON.stringify(data, null, 2));
-            return res.status(200).send('Vote cleared');
-        }
+    :root {
+      --bg:       #08060f;
+      --surface:  #110d1e;
+      --border:   #2a1f4a;
+      --accent:   #c084fc;
+      --gold:     #fbbf24;
+      --teal:     #2dd4bf;
+      --text:     #e2d9f3;
+      --muted:    #7c6ea0;
     }
-    res.status(404).send('User not found');
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* starfield */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 40%, rgba(255,255,255,.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 20%, rgba(255,255,255,.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 60%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 10%, rgba(255,255,255,.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 20% 80%, rgba(255,255,255,.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 90%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 35%, rgba(255,255,255,.5) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 32px;
+      background: rgba(8,6,15,.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 700;
+      color: var(--accent); text-decoration: none;
+    }
+    .nav-logo img { width: 34px; height: 34px; border-radius: 50%; }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-links a {
+      padding: 7px 16px; border-radius: 20px; font-size: .85rem; font-weight: 600;
+      text-decoration: none; color: var(--muted); transition: all .2s;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+    .nav-links a.cta {
+      background: var(--accent); color: #0a0015; padding: 7px 20px;
+    }
+    .nav-links a.cta:hover { background: #d8a5ff; }
+    .user-pill {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 14px 4px 4px; border-radius: 20px;
+      background: var(--surface); border: 1px solid var(--border);
+      font-size: .85rem; font-weight: 600; color: var(--text);
+      text-decoration: none;
+    }
+    .user-pill img { width: 28px; height: 28px; border-radius: 50%; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; padding: 160px 24px 80px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 16px; border-radius: 20px; margin-bottom: 28px;
+      background: rgba(192,132,252,.12); border: 1px solid rgba(192,132,252,.35);
+      font-size: .78rem; font-weight: 700; letter-spacing: .08em;
+      color: var(--accent); text-transform: uppercase;
+    }
+    .hero h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      font-weight: 900; line-height: 1.1;
+      background: linear-gradient(135deg, #e2d9f3 0%, var(--accent) 45%, var(--gold) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+    .hero p {
+      max-width: 520px; font-size: 1.05rem; color: var(--muted);
+      line-height: 1.7; margin-bottom: 40px;
+    }
+    .hero-btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .btn-primary {
+      padding: 13px 28px; border-radius: 10px; font-weight: 700; font-size: .95rem;
+      background: var(--accent); color: #0a0015; text-decoration: none;
+      transition: all .2s; border: none; cursor: pointer;
+    }
+    .btn-primary:hover { background: #d8a5ff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(192,132,252,.4); }
+    .btn-secondary {
+      padding: 13px 28px; border-radius: 10px; font-weight: 700; font-size: .95rem;
+      background: transparent; color: var(--text); text-decoration: none;
+      border: 1px solid var(--border); transition: all .2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* ── STATS STRIP ── */
+    .stats-strip {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px; background: var(--border);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      margin: 0 0 80px;
+    }
+    .stat-box {
+      background: var(--surface);
+      padding: 28px 20px; text-align: center;
+    }
+    .stat-box .num {
+      font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 700;
+      color: var(--gold); display: block;
+    }
+    .stat-box .lbl { font-size: .8rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .06em; }
+
+    /* ── NEWS ── */
+    .section { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto 80px; padding: 0 24px; }
+    .section-title {
+      font-family: 'Cinzel', serif; font-size: 1.5rem; font-weight: 700;
+      color: var(--text); margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .news-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+      transition: border-color .2s, transform .2s;
+    }
+    .news-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .news-date { font-size: .75rem; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .06em; }
+    .news-title { font-weight: 700; font-size: .95rem; color: var(--text); margin-bottom: 10px; }
+    .news-body { font-size: .875rem; color: var(--muted); line-height: 1.6; white-space: pre-line; }
+
+    /* ── FEATURES ── */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .feat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px;
+    }
+    .feat-icon { font-size: 2rem; margin-bottom: 12px; }
+    .feat-title { font-weight: 700; font-size: .95rem; color: var(--text); margin-bottom: 8px; }
+    .feat-desc { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 32px 24px; text-align: center;
+      font-size: .8rem; color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; margin: 0 8px; }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      nav { padding: 12px 16px; }
+      .nav-links a:not(.cta) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <img src="https://raw.githubusercontent.com/Yo0l0/ssss/main/Pokebot.png" alt="Pokebot">
+    Pokebot
+  </a>
+  <div class="nav-links">
+    <a href="/faq">FAQ</a>
+    <a href="https://discord.gg/zj9Sxz3reR" target="_blank">Discord</a>
+    <a href="https://top.gg/bot/1362516883785515199" target="_blank">Vote</a>
+    ${user
+      ? `<a class="user-pill" href="/dashboard">
+           <img src="${avatarUrl}" alt="avatar"> ${user.username}
+         </a>
+         <a href="/logout" class="nav-links" style="color:var(--muted);font-size:.85rem;padding:7px 16px;text-decoration:none;">Logout</a>`
+      : `<a class="cta" href="/login">Login</a>`
+    }
+  </div>
+</nav>
+
+<main>
+  <section class="hero">
+    <div class="hero-badge">✨ The #1 Pokémon Card Bot</div>
+    <h1>Collect. Battle.<br>Trade. Dominate.</h1>
+    <p>Build your ultimate Pokémon card collection on Discord. Open packs, grade rare cards, duel friends, and climb the global leaderboard.</p>
+    <div class="hero-btns">
+      <a class="btn-primary" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">
+        ✨ Add to Discord
+      </a>
+      <a class="btn-secondary" href="${user ? '/dashboard' : '/login'}">
+        🗂️ View Collection
+      </a>
+      <a class="btn-secondary" href="https://discord.gg/zj9Sxz3reR" target="_blank">
+        💬 Support Server
+      </a>
+    </div>
+  </section>
+
+  <div class="stats-strip">
+    <div class="stat-box"><span class="num" id="statCards">—</span><div class="lbl">Cards Dropped</div></div>
+    <div class="stat-box"><span class="num" id="statUsers">—</span><div class="lbl">Active Trainers</div></div>
+    <div class="stat-box"><span class="num" id="statPacks">—</span><div class="lbl">Packs Opened</div></div>
+    <div class="stat-box"><span class="num" id="statToday">—</span><div class="lbl">Drops Today</div></div>
+    <div class="stat-box"><span class="num" id="statWeek">—</span><div class="lbl">Avg/Day This Week</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📰 Latest Updates</div>
+    <div class="news-grid" id="newsGrid">
+      <div class="news-card"><div class="news-body" style="color:var(--muted)">Loading updates…</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">⚡ Features</div>
+    <div class="features-grid">
+      <div class="feat-card"><div class="feat-icon">🎴</div><div class="feat-title">Pack Opening</div><div class="feat-desc">Open packs from classic sets every 20 minutes. Chase holos, promos, and ultra-rare SIR cards.</div></div>
+      <div class="feat-card"><div class="feat-icon">⭐</div><div class="feat-title">Card Grading</div><div class="feat-desc">Send cards to the lab. Pristine condition cards can score a perfect 10 and are worth far more.</div></div>
+      <div class="feat-card"><div class="feat-icon">⚔️</div><div class="feat-title">Duels</div><div class="feat-desc">Challenge other trainers to card battles. Attack, defend, heal, and use special rarity moves.</div></div>
+      <div class="feat-card"><div class="feat-icon">🏪</div><div class="feat-title">Marketplace</div><div class="feat-desc">Buy and sell cards with other players. Track price trends and find the best deals.</div></div>
+      <div class="feat-card"><div class="feat-icon">🧪</div><div class="feat-title">Card Fusion</div><div class="feat-desc">Combine 3 identical cards to upgrade their condition. Fuse your way to a Pristine collection.</div></div>
+      <div class="feat-card"><div class="feat-icon">🏆</div><div class="feat-title">Leaderboards</div><div class="feat-desc">Compete globally and per-server for coins, aura, grades, and card count.</div></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  © 2024 Pokebot
+  <a href="/terms-of-service">Terms</a>
+  <a href="/privacy-policy">Privacy</a>
+  <a href="/faq">FAQ</a>
+  <a href="https://discord.gg/zj9Sxz3reR" target="_blank">Discord</a>
+</footer>
+
+<script>
+function animateNum(el, target) {
+  const start = parseInt(el.textContent) || 0;
+  if (start === target) return;
+  const steps = 40, inc = (target - start) / steps;
+  let cur = start, i = 0;
+  const t = setInterval(() => {
+    i++;
+    cur += inc;
+    el.textContent = Math.round(i < steps ? cur : target).toLocaleString();
+    if (i >= steps) clearInterval(t);
+  }, 16);
+}
+
+async function loadStats() {
+  try {
+    const r = await fetch('/stats');
+    const d = await r.json();
+    animateNum(document.getElementById('statCards'),  d.totalCards  || 0);
+    animateNum(document.getElementById('statUsers'),  d.totalUsers  || 0);
+    animateNum(document.getElementById('statPacks'),  d.totalPacks  || 0);
+    animateNum(document.getElementById('statToday'),  d.droppedToday|| 0);
+    animateNum(document.getElementById('statWeek'),   d.thisWeekAvg || 0);
+  } catch(e) { console.error('Stats failed:', e); }
+}
+
+async function loadNews() {
+  const grid = document.getElementById('newsGrid');
+  try {
+    const r    = await fetch('/api/news', { cache: 'no-store' });
+    const data = await r.json();
+    const news = Array.isArray(data) ? data : (data.news || data.items || []);
+    if (!news.length) { grid.innerHTML = '<div class="news-card"><div class="news-body">No updates yet.</div></div>'; return; }
+    grid.innerHTML = news.slice(0, 6).map(item => {
+      const body = Array.isArray(item.body) ? item.body.join('\\n') : String(item.body || item.text || item.description || '');
+      return \`<div class="news-card">
+        <div class="news-date">\${item.date || ''}</div>
+        <div class="news-title">\${item.title || ''}</div>
+        <div class="news-body">\${body}</div>
+      </div>\`;
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = '<div class="news-card"><div class="news-body">Failed to load updates.</div></div>';
+  }
+}
+
+loadStats();
+loadNews();
+setInterval(loadStats, 60000);
+</script>
+</body>
+</html>`);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+// ── Dashboard ─────────────────────────────────────────────────────────────
+app.get('/dashboard', (req, res) => {
+  if (!req.session.user) return res.redirect('/login');
+  const user = req.session.user;
+
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Collection — Pokebot</title>
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Yo0l0/ssss/refs/heads/main/GengarImages.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #08060f; --surface: #110d1e; --border: #2a1f4a;
+      --accent: #c084fc; --gold: #fbbf24; --text: #e2d9f3; --muted: #7c6ea0;
+    }
+    body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 32px;
+      background: rgba(8,6,15,.9); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 700; color: var(--accent); text-decoration: none; }
+    .nav-right { display: flex; align-items: center; gap: 12px; font-size: .85rem; color: var(--muted); }
+    .nav-right a { color: var(--muted); text-decoration: none; }
+    .nav-right a:hover { color: var(--accent); }
+
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .toolbar select, .toolbar input {
+      padding: 8px 14px; border-radius: 8px; font-size: .85rem; font-family: 'Nunito', sans-serif;
+      background: var(--bg); color: var(--text); border: 1px solid var(--border); outline: none;
+    }
+    .toolbar select:focus, .toolbar input:focus { border-color: var(--accent); }
+    .toolbar input { flex: 1; min-width: 180px; }
+    .count-label { font-size: .8rem; color: var(--muted); margin-left: auto; white-space: nowrap; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px; padding: 24px;
+    }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      transition: transform .2s, border-color .2s;
+      cursor: default;
+    }
+    .card:hover { transform: translateY(-4px); border-color: var(--accent); }
+    .card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
+    .card-info { padding: 10px 12px; }
+    .card-name { font-weight: 700; font-size: .85rem; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-meta { font-size: .75rem; color: var(--muted); line-height: 1.6; }
+    .card-code { font-size: .7rem; color: var(--muted); font-family: monospace; }
+    .grade-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .7rem; font-weight: 700;
+      background: rgba(251,191,36,.15); color: var(--gold); border: 1px solid rgba(251,191,36,.3);
+      margin-top: 4px;
+    }
+    .rarity-holo    { border-top: 3px solid #06b6d4; }
+    .rarity-sir     { border-top: 3px solid #a855f7; }
+    .rarity-mythical{ border-top: 3px solid #fbbf24; }
+    .rarity-promo   { border-top: 3px solid #f97316; }
+    .rarity-rare    { border-top: 3px solid #ef4444; }
+    .rarity-uncommon{ border-top: 3px solid #3b82f6; }
+    .rarity-common  { border-top: 3px solid #6b7280; }
+
+    .empty { grid-column: 1/-1; text-align: center; padding: 60px; color: var(--muted); }
+
+    .pagination {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      padding: 24px; border-top: 1px solid var(--border);
+    }
+    .page-btn {
+      padding: 8px 16px; border-radius: 8px; font-size: .85rem; font-weight: 700;
+      background: var(--surface); color: var(--muted); border: 1px solid var(--border);
+      cursor: pointer; transition: all .15s;
+    }
+    .page-btn:hover, .page-btn.active {
+      background: var(--accent); color: #0a0015; border-color: var(--accent);
+    }
+    .loading { text-align: center; padding: 60px; color: var(--muted); }
+  </style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/">← Pokebot</a>
+  <div class="nav-right">
+    <span>${user.username}'s Collection</span>
+    <a href="/logout">Logout</a>
+  </div>
+</nav>
+
+<div class="toolbar">
+  <select id="fRarity">
+    <option value="all">All Rarities</option>
+    <option value="mythical">🌟 Mythical</option>
+    <option value="SIR">💎 SIR</option>
+    <option value="holo">✨ Holo</option>
+    <option value="promo">🎁 Promo</option>
+    <option value="rare">🔴 Rare</option>
+    <option value="uncommon">🔵 Uncommon</option>
+    <option value="common">⚪ Common</option>
+  </select>
+  <select id="fGrade">
+    <option value="all">All Grades</option>
+    ${[10,9,8,7,6].map(g => `<option value="${g}">Grade ${g}</option>`).join('')}
+  </select>
+  <select id="fCondition">
+    <option value="all">All Conditions</option>
+    <option value="Pristine">Pristine</option>
+    <option value="Mint">Mint</option>
+    <option value="Near Mint">Near Mint</option>
+    <option value="Light play">Light Play</option>
+    <option value="Damaged">Damaged</option>
+  </select>
+  <input id="fSearch" type="text" placeholder="Search name or code…" autocomplete="off">
+  <span class="count-label" id="countLabel">Loading…</span>
+</div>
+
+<div class="grid" id="cardGrid"><div class="loading">Loading your collection…</div></div>
+<div class="pagination" id="pagination"></div>
+
+<script>
+let page = 1, searchTimer;
+
+function load(p) {
+  page = p || 1;
+  const r = document.getElementById('fRarity').value;
+  const g = document.getElementById('fGrade').value;
+  const c = document.getElementById('fCondition').value;
+  const s = encodeURIComponent(document.getElementById('fSearch').value);
+  const grid = document.getElementById('cardGrid');
+  const pag  = document.getElementById('pagination');
+  grid.innerHTML = '<div class="loading">Loading…</div>';
+  pag.innerHTML  = '';
+
+  fetch(\`/api/cards?rarity=\${r}&grade=\${g}&condition=\${c}&search=\${s}&page=\${page}\`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('countLabel').textContent = \`\${data.total || 0} cards\`;
+
+      if (!data.cards.length) {
+        grid.innerHTML = '<div class="empty">No cards match your filters.</div>';
+        return;
+      }
+
+      const rarityClass = r => ('rarity-' + (r||'common').toLowerCase());
+
+      grid.innerHTML = data.cards.map(c => \`
+        <div class="card \${rarityClass(c.rarity)}">
+          <img src="\${c.image || ''}" alt="\${c.name}" loading="lazy">
+          <div class="card-info">
+            <div class="card-name">\${c.name}</div>
+            <div class="card-meta">\${c.set || ''}<br>\${c.rarity || ''} · \${c.condition || ''}</div>
+            <div class="card-code">\${c.code}</div>
+            \${c.grade ? \`<span class="grade-badge">Grade \${c.grade}/10</span>\` : ''}
+          </div>
+        </div>\`).join('');
+
+      pag.innerHTML = '';
+      for (let i = 1; i <= data.totalPages; i++) {
+        const b = document.createElement('button');
+        b.className = 'page-btn' + (i === page ? ' active' : '');
+        b.textContent = i;
+        b.onclick = () => load(i);
+        pag.appendChild(b);
+      }
+    })
+    .catch(() => { grid.innerHTML = '<div class="empty">Failed to load cards.</div>'; });
+}
+
+['fRarity','fGrade','fCondition'].forEach(id => document.getElementById(id).addEventListener('change', () => load(1)));
+document.getElementById('fSearch').addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => load(1), 400); });
+load(1);
+</script>
+</body>
+</html>`);
 });
+
+// ── Start ─────────────────────────────────────────────────────────────────
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
