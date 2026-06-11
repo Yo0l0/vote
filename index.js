@@ -9,7 +9,7 @@ const app = express();
 const webhook = new Webhook('252566');
 
 const CLIENT_ID     = '1362516883785515199';
-const CLIENT_SECRET = 'eXuBq95536h177-RfcgvBOybWouxwK5k';
+const CLIENT_SECRET = process.env.CLIENT_SECRET || '';
 const REDIRECT_URI  = 'https://thepokebot.com/callback';
 
 // ── In-memory caches ──────────────────────────────────────────────────────
@@ -37,6 +37,16 @@ function getInventory() {
   }
 }
 
+// Normalize any timestamp shape (number, numeric string, ISO string) to ms
+function toMillis(ts) {
+  if (ts == null) return NaN;
+  if (typeof ts === 'number') return ts;
+  const n = Number(ts);
+  if (!Number.isNaN(n)) return n;          // numeric string
+  const d = new Date(ts).getTime();        // ISO / date string
+  return Number.isNaN(d) ? NaN : d;
+}
+
 function getStats() {
   const now = Date.now();
   if (statsCache && now - statsFetchedAt < STATS_TTL) return statsCache;
@@ -55,11 +65,13 @@ function getStats() {
       totalCards += cards.length;
 
       for (const card of cards) {
-        if (!card.obtainedAt) continue;
-        packTimestamps.add(card.obtainedAt);
-        const day = new Date(card.obtainedAt).toISOString().split('T')[0];
+        const ms = toMillis(card.obtainedAt);
+        if (Number.isNaN(ms)) continue;
+
+        packTimestamps.add(ms);
+        const day = new Date(ms).toISOString().split('T')[0];
         dropCountsByDay[day] = (dropCountsByDay[day] || 0) + 1;
-        if (card.obtainedAt >= todayStart) droppedToday++;
+        if (ms >= todayStart) droppedToday++;
       }
     }
 
@@ -72,8 +84,8 @@ function getStats() {
     const thisW = [], lastW = [];
     for (const [day, count] of Object.entries(dropCountsByDay)) {
       const t = new Date(day).getTime();
-      if (t >= thisWeekStart.getTime() && t <= todayStart) thisW.push(count);
-      if (t >= lastWeekStart.getTime() && t < lastWeekEnd.getTime()) lastW.push(count);
+      if (t >= thisWeekStart.getTime() && t <= now)                       thisW.push(count);
+      if (t >= lastWeekStart.getTime() && t <  lastWeekEnd.getTime())     lastW.push(count);
     }
     const avg = arr => arr.length ? Math.round(arr.reduce((a,b) => a+b, 0) / arr.length) : 0;
 
@@ -126,7 +138,7 @@ app.post('/dblwebhook', webhook.middleware(), (req, res) => {
 
 // ── File upload from bot ──────────────────────────────────────────────────
 app.post('/upload', (req, res) => {
-  if (req.body.secret !== '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') {
+  if (req.body.secret !== (process.env.UPLOAD_SECRET || '')) {
     return res.status(403).send('Forbidden');
   }
   try {
@@ -168,6 +180,26 @@ app.get('/stats', (req, res) => {
   try {
     const data = getStats();
     res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Stats debug (raw view of what the server computes) ─────────────────────
+app.get('/stats/debug', (req, res) => {
+  try {
+    const data = getInventory();
+    let sampleStamps = [];
+    for (const userId in data) {
+      const cards = data[userId]?.cards;
+      if (Array.isArray(cards)) {
+        for (const c of cards.slice(0, 3)) {
+          sampleStamps.push({ raw: c.obtainedAt, ms: toMillis(c.obtainedAt) });
+        }
+      }
+      if (sampleStamps.length >= 9) break;
+    }
+    res.json({ stats: getStats(), now: Date.now(), todayStart: new Date().setHours(0,0,0,0), sampleStamps });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
