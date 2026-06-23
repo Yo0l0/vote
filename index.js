@@ -22,13 +22,45 @@ const STATS_TTL     = 3 * 60 * 1000; // 3 min
 const LOCAL_INVENTORY = path.join(__dirname, 'user_inventory.json');
 
 // Reads from local disk — the bot uploads via POST /upload, no GitHub needed
+// The bot commits user_inventory.json to GitHub every ~3 min. The site reads it
+// back so the dashboard stays live. Override the URL with an env var if the
+// repo/branch ever changes. Local disk is used as a cold-start fallback.
+const INVENTORY_URL = process.env.INVENTORY_URL ||
+  'https://raw.githubusercontent.com/Yo0l0/ssss/main/user_inventory.json';
+
+// Background refresh — pulls the latest inventory and updates the cache.
+async function refreshInventory() {
+  if (!INVENTORY_URL) return;
+  try {
+    const res = await axios.get(INVENTORY_URL, {
+      params: { _: Date.now() },            // cache-buster vs GitHub's CDN
+      headers: { 'Cache-Control': 'no-cache' },
+      timeout: 10000,
+      responseType: 'text',
+      transformResponse: [d => d]           // keep raw text; we JSON.parse below
+    });
+    const data = JSON.parse(res.data);      // throws on bad/HTML response → caught
+    if (data && typeof data === 'object' && !Array.isArray(data)) {
+      inventoryCache     = data;
+      inventoryFetchedAt = Date.now();
+      statsCache         = null;            // force stats to recompute
+      try { fs.writeFileSync(LOCAL_INVENTORY, res.data, 'utf8'); } catch {}
+      console.log('✅ Inventory refreshed from GitHub —', Object.keys(data).length, 'users');
+    }
+  } catch (err) {
+    console.error('Inventory refresh failed:', err?.response?.status || '', err.message);
+  }
+}
+
+// Sync accessor for the routes: returns the cache instantly, refreshes in the
+// background when stale (never blocks a request).
 function getInventory() {
   const now = Date.now();
-  if (inventoryCache && now - inventoryFetchedAt < INVENTORY_TTL) return inventoryCache;
+  if (now - inventoryFetchedAt > INVENTORY_TTL) refreshInventory(); // fire-and-forget
+  if (inventoryCache) return inventoryCache;
   try {
-    if (!fs.existsSync(LOCAL_INVENTORY)) return inventoryCache || {};
-    const raw = fs.readFileSync(LOCAL_INVENTORY, 'utf8');
-    inventoryCache    = JSON.parse(raw);
+    if (!fs.existsSync(LOCAL_INVENTORY)) return {};
+    inventoryCache     = JSON.parse(fs.readFileSync(LOCAL_INVENTORY, 'utf8'));
     inventoryFetchedAt = now;
     return inventoryCache;
   } catch (err) {
@@ -830,5 +862,10 @@ load(1);
 });
 
 // ── Start ─────────────────────────────────────────────────────────────────
+// ── Start ─────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  refreshInventory();                            // warm the cache on boot
+  setInterval(refreshInventory, INVENTORY_TTL);  // keep it fresh even with no traffic
+});
