@@ -56,8 +56,7 @@ function getStats() {
     let totalCards = 0, totalUsers = 0, droppedToday = 0;
     const packTimestamps   = new Set();
     const dropCountsByDay  = {};
-    const todayStart = new Date().setHours(0, 0, 0, 0);
-
+  const todayStart = new Date().setUTCHours(0, 0, 0, 0);
     for (const userId in data) {
       const cards = data[userId]?.cards;
       if (!Array.isArray(cards)) continue;
@@ -75,27 +74,29 @@ function getStats() {
       }
     }
 
-    const today = new Date();
-    const dow   = today.getDay();
-    const thisWeekStart = new Date(today); thisWeekStart.setDate(today.getDate() - dow); thisWeekStart.setHours(0,0,0,0);
-    const lastWeekStart = new Date(thisWeekStart); lastWeekStart.setDate(thisWeekStart.getDate() - 7);
-    const lastWeekEnd   = new Date(thisWeekStart);
+   // Week averages: total drops ÷ days ELAPSED (not just active days). All UTC
+    // so the day buckets (built with toISOString) and the week math agree.
+    const DAY = 24 * 60 * 60 * 1000;
+    const utcMidnight = new Date(now); utcMidnight.setUTCHours(0, 0, 0, 0);
+    const dowUTC = utcMidnight.getUTCDay();                  // 0 = Sunday
+    const thisWeekStart = utcMidnight.getTime() - dowUTC * DAY;
+    const lastWeekStart = thisWeekStart - 7 * DAY;
 
-    const thisW = [], lastW = [];
+    let thisWeekDrops = 0, lastWeekDrops = 0;
     for (const [day, count] of Object.entries(dropCountsByDay)) {
-      const t = new Date(day).getTime();
-      if (t >= thisWeekStart.getTime() && t <= now)                       thisW.push(count);
-      if (t >= lastWeekStart.getTime() && t <  lastWeekEnd.getTime())     lastW.push(count);
+      const t = Date.parse(day + 'T00:00:00Z');
+      if (t >= thisWeekStart && t <= now)                 thisWeekDrops += count;
+      else if (t >= lastWeekStart && t < thisWeekStart)   lastWeekDrops += count;
     }
-    const avg = arr => arr.length ? Math.round(arr.reduce((a,b) => a+b, 0) / arr.length) : 0;
+    const daysElapsed = Math.max(1, Math.floor((now - thisWeekStart) / DAY) + 1); // 1–7
 
     statsCache = {
       totalCards,
       totalUsers,
       totalPacks: packTimestamps.size,
       droppedToday,
-      thisWeekAvg: avg(thisW),
-      lastWeekAvg: avg(lastW)
+      thisWeekAvg: Math.round(thisWeekDrops / daysElapsed),
+      lastWeekAvg: Math.round(lastWeekDrops / 7)
     };
     statsFetchedAt = now;
     return statsCache;
@@ -106,6 +107,7 @@ function getStats() {
 }
 
 // ── Middleware ────────────────────────────────────────────────────────────
+app.set('trust proxy', 1); // behind nginx/Render/Heroku — needed for correct protocol & secure cookies
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
@@ -232,8 +234,18 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/callback', async (req, res) => {
+  if (req.query.error) {                 // user cancelled or Discord rejected
+    console.warn('OAuth denied:', req.query.error, req.query.error_description || '');
+    return res.redirect('/');
+  }
   const code = req.query.code;
   if (!code) return res.status(400).send('Missing code');
+
+  if (!CLIENT_SECRET) {
+    console.error('OAuth error: CLIENT_SECRET env var is not set on the server.');
+    return res.status(500).send('Login is misconfigured (missing client secret). Contact the bot owner.');
+  }
+
   try {
     const params = new URLSearchParams({
       client_id: CLIENT_ID,
@@ -251,10 +263,18 @@ app.get('/callback', async (req, res) => {
       headers: { Authorization: `Bearer ${tokenRes.data.access_token}` }
     });
     req.session.user = userRes.data;
-    return res.redirect('/dashboard');
+    req.session.save(() => res.redirect('/dashboard')); // persist before redirect
   } catch (err) {
-    console.error('OAuth error:', err?.response?.data || err.message);
-    if (!res.headersSent) return res.status(500).send('Login error');
+    const discord = err?.response?.data;
+    console.error('OAuth error:', discord || err.message);
+    if (res.headersSent) return;
+    if (discord?.error === 'invalid_client') {
+      return res.status(500).send('Login failed: invalid client credentials (check CLIENT_SECRET).');
+    }
+    if (discord?.error === 'invalid_grant' || discord?.error === 'redirect_uri_mismatch') {
+      return res.status(500).send('Login failed: redirect URI must exactly equal ' + REDIRECT_URI + ' in the Discord Developer Portal.');
+    }
+    return res.status(500).send('Login error. Please try again.');
   }
 });
 
@@ -564,8 +584,12 @@ app.get('/', (req, res) => {
 
 <script>
 function animateNum(el, target) {
-  const start = parseInt(el.textContent) || 0;
-  if (start === target) return;
+  target = Number(target) || 0;
+  const start = parseInt(String(el.textContent).replace(/[^0-9-]/g, ''), 10) || 0;
+  if (start === target) {            // includes the 0 → 0 case that left "—" stuck
+    el.textContent = target.toLocaleString();
+    return;
+  }
   const steps = 40, inc = (target - start) / steps;
   let cur = start, i = 0;
   const t = setInterval(() => {
