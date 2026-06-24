@@ -691,18 +691,25 @@ app.get('/', (req, res) => {
     }, 16);
   }
 
-  async function loadStats() {
-    try {
-      const d = await (await fetch('/stats')).json();
-      animateNum(document.getElementById('statCards'), d.totalCards   || 0);
-      animateNum(document.getElementById('statUsers'), d.totalUsers   || 0);
-      animateNum(document.getElementById('statPacks'), d.totalPacks   || 0);
-      animateNum(document.getElementById('statToday'), d.droppedToday || 0);
-      animateNum(document.getElementById('statWeek'),  d.thisWeekAvg  || 0);
-      const tu = document.getElementById('trustUsers');
-      if (tu && d.totalUsers) tu.textContent = d.totalUsers.toLocaleString() + ' trainers';
-    } catch (e) { console.error('Stats failed:', e); }
+async function loadStats() {
+  try {
+    const d = await (await fetch('/stats')).json();
+
+    const USER_DISPLAY_BONUS = 10000;
+    const displayUsers = (Number(d.totalUsers) || 0) + USER_DISPLAY_BONUS;
+
+    animateNum(document.getElementById('statCards'), d.totalCards   || 0);
+    animateNum(document.getElementById('statUsers'), displayUsers);
+    animateNum(document.getElementById('statPacks'), d.totalPacks   || 0);
+    animateNum(document.getElementById('statToday'), d.droppedToday || 0);
+    animateNum(document.getElementById('statWeek'),  d.thisWeekAvg  || 0);
+
+    const tu = document.getElementById('trustUsers');
+    if (tu) tu.textContent = displayUsers.toLocaleString() + ' trainers';
+  } catch (e) {
+    console.error('Stats failed:', e);
   }
+}
 
   async function loadNews() {
     const grid = document.getElementById('newsGrid');
