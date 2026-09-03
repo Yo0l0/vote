@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<style>
+  .nf { min-height:calc(100vh - 66px); display:grid; place-items:center; text-align:center; padding:40px 0; }
+  .nf .code { font-family:var(--font-d); font-weight:800; font-size:clamp(5rem, 18vw, 11rem); line-height:1; letter-spacing:-.06em; }
+  .nf img { width:120px; height:120px; border-radius:32px; margin:0 auto 18px; box-shadow:0 20px 50px rgba(124,58,237,.45); animation:floaty 5s ease-in-out infinite; }
+  @keyframes floaty { 0%,100% { translate:0 0; } 50% { translate:0 -10px; } }
+  .nf h1 { font-family:var(--font-d); font-size:1.5rem; margin:6px 0 10px; }
+  .nf p { color:var(--muted); max-width:40ch; margin:0 auto 24px; }
+</style>
+</head>
+<body>
+{{> nav}}
+<main class="wrap nf">
+  <div>
+    <img src="/img/pokebot.png" alt="">
+    <div class="code grad">404</div>
+    <h1>Gengar hid this page</h1>
+    <p>Whatever you were looking for isn't here. Maybe it was traded away.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><a class="btn btn-primary" href="/">Back home</a><a class="btn btn-ghost" href="/faq">Browse commands</a></div>
+  </div>
+</main>
+{{> foot}}
+</body>
+</html>

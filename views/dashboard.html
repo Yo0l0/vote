@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/dashboard.css">
+<meta name="robots" content="noindex">
+</head>
+<body>
+{{> nav}}
+
+<main class="wrap dash">
+  <section class="dash-head">
+    <img class="dash-av" src="{{AVATAR}}" alt="" width="64" height="64">
+    <div class="dash-title">
+      <span class="eyebrow">My collection</span>
+      <h1>Welcome back, <span class="grad">{{USERNAME}}</span></h1>
+      <p>Every card you own, live from your inventory. Updates a few minutes after each pull.</p>
+    </div>
+    <div class="dash-actions">
+      <a class="btn btn-ghost btn-sm" href="https://top.gg/bot/1362516883785515199/vote" target="_blank" rel="noopener">🗳️ Vote · +50 coins</a>
+      <a class="btn btn-primary btn-sm" href="https://discord.gg/zj9Sxz3reR" target="_blank" rel="noopener">Open packs in Discord</a>
+    </div>
+  </section>
+
+  <section class="summary" id="summary">
+    <div class="scard panel"><div class="k">Total cards</div><div class="v" id="sTotal">—</div><div class="s" id="sUnique"></div></div>
+    <div class="scard panel"><div class="k">Sets collected</div><div class="v" id="sSets">—</div><div class="s" id="sSetsSub"></div></div>
+    <div class="scard panel"><div class="k">Graded</div><div class="v" id="sGraded">—</div><div class="s" id="sGradedSub"></div></div>
+    <div class="scard panel"><div class="k">Top grade</div><div class="v" id="sTop">—</div><div class="s" id="sTopSub"></div></div>
+    <div class="scard panel rarest" id="sRarest"><div class="rimg skel"></div><div><div class="k">Rarest pull</div><div class="nm">—</div><div class="rb"></div></div></div>
+  </section>
+
+  <section class="breakdown">
+    <div class="panel bd">
+      <div class="bd-head"><h3>Rarity breakdown</h3><span class="bd-note" id="bdNote"></span></div>
+      <div class="rbar" id="rarityBar"></div>
+      <div class="legend" id="rarityLegend"></div>
+    </div>
+    <div class="panel bd">
+      <div class="bd-head"><h3>Cards by set</h3><span class="bd-note">unique · total</span></div>
+      <div class="sets" id="setList"><div class="skel" style="height:18px"></div><div class="skel" style="height:18px"></div><div class="skel" style="height:18px"></div></div>
+    </div>
+  </section>
+
+  <section class="toolbar" id="toolbar">
+    <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="fSearch" type="search" placeholder="Search name or code…" autocomplete="off"></div>
+    <select id="fRarity" aria-label="Rarity">
+      <option value="all">All rarities</option>
+      <option value="mythical">🌟 Mythical</option>
+      <option value="sir">💎 SIR</option>
+      <option value="holo">✨ Holo</option>
+      <option value="promo">🎁 Promo</option>
+      <option value="rare">🔴 Rare</option>
+      <option value="uncommon">🔵 Uncommon</option>
+      <option value="common">⚪ Common</option>
+    </select>
+    <select id="fSet" aria-label="Set"><option value="all">All sets</option></select>
+    <select id="fGrade" aria-label="Grade">
+      <option value="all">All grades</option>
+      <option value="graded">Any graded</option>
+      <option value="10">PSA 10</option><option value="9">PSA 9</option><option value="8">PSA 8</option><option value="7">PSA 7</option><option value="6">PSA 6</option>
+    </select>
+    <select id="fCondition" aria-label="Condition">
+      <option value="all">All conditions</option>
+      <option value="Pristine">Pristine</option>
+      <option value="Mint">Mint</option>
+      <option value="Near Mint">Near Mint</option>
+      <option value="Light Play">Light Play</option>
+      <option value="Damaged">Damaged</option>
+    </select>
+    <select id="fSort" aria-label="Sort">
+      <option value="newest">Newest first</option>
+      <option value="oldest">Oldest first</option>
+      <option value="rarity">Rarity ↓</option>
+      <option value="grade">Grade ↓</option>
+      <option value="name">Name A→Z</option>
+      <option value="set">Set</option>
+    </select>
+    <button class="tb-btn" id="resetBtn" type="button" title="Clear filters">Reset</button>
+    <span class="count" id="countLabel">Loading…</span>
+  </section>
+
+  <div class="grid" id="cardGrid"></div>
+  <div class="pagination" id="pagination"></div>
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Card details">
+  <button class="mnav prev" id="mPrev" aria-label="Previous card">‹</button>
+  <div class="sheet" id="sheet"></div>
+  <button class="mnav next" id="mNext" aria-label="Next card">›</button>
+</div>
+
+{{> foot}}
+<script src="/js/dashboard.js" defer></script>
+</body>
+</html>
