@@ -1,7 +1,108 @@
 [
   {
-    "title": "Gambling Cooldown",
+    "id": "weekly-roundup",
+    "date": "2026-09-08",
+    "tag": "New",
+    "title": "Sunday round-up",
+    "body": [
+      "Every Sunday your server gets one picture: the week's top three collectors, the rarest pull, the best grade back and the set everyone is chasing.",
+      "Nothing to set up — it posts itself."
+    ]
+  },
+  {
+    "id": "set-posters",
+    "date": "2026-09-08",
+    "tag": "New",
+    "title": "New sets arrive with a poster",
+    "body": [
+      "Every weekly set now lands with its three chase cards, the card count and how many holos are inside.",
+      "One button on the post makes it your chase set."
+    ]
+  },
+  {
+    "id": "fix-sweep-0908",
+    "date": "2026-09-08",
+    "tag": "Fixed",
+    "title": "Gym fights work again",
+    "body": [
+      "/gym and every battle button were dead. Fixed — along with SIR cards missing Power Strike and a double payout on a fast double click.",
+      "Also fixed: /swapcodes, /cardtrend, inventory filters, and blackjack and /pickcard timing out."
+    ]
+  },
+  {
+    "id": "wishlist-board",
+    "date": "2026-09-07",
+    "tag": "New",
+    "title": "Wishlist hunt board",
+    "body": [
+      "Pin up to eight cards to a MOST WANTED board your server can see, with the real odds on each one.",
+      "Pull one and it's a WISH GRANTED: +25 coins, +10 XP. Pull someone else's and they hear about your spare."
+    ]
+  },
+  {
+    "id": "public-by-default",
+    "date": "2026-09-07",
+    "tag": "Changed",
+    "title": "Out in the open",
+    "body": [
+      "Grading orders, wishlist pins, level-ups and achievements now post where the room can see them.",
+      "Errors, pickers and your ledger stay private."
+    ]
+  },
+  {
+    "id": "pack-energy",
+    "date": "2026-09-02",
+    "tag": "Changed",
+    "title": "Pack Energy replaces the timer",
+    "body": [
+      "The 20-minute wait is gone: hold up to 3 packs, with one coming back every 2 hours.",
+      "Earn more from /daily, gym wins, Peeks, votes and quiz streaks — stacking up to 6."
+    ]
+  },
+  {
+    "id": "grading-house",
+    "date": "2026-09-02",
+    "tag": "New",
+    "title": "The grading house",
+    "body": [
+      "Four sub-grades — centering, corners, edges, surface — and the lowest one sets your grade. Four 10s is a Black Label.",
+      "Four lanes from Economy to Super Express, pricing that moves with the queue, real cert numbers and a printed slab."
+    ]
+  },
+  {
+    "id": "pack-reveal-peek",
+    "date": "2026-09-02",
+    "tag": "New",
+    "title": "New pack reveal, Peek and binders",
+    "body": [
+      "Packs open as a five-card spread with the best pull lifted out of the row.",
+      "A spare goes to the first server-mate who claims it, /showcase prints your top nine, and Holo Weekend doubles bonus holo odds."
+    ]
+  },
+  {
+    "id": "set-catalog",
+    "date": "2026-09-02",
+    "tag": "New",
+    "title": "127 sets, 17,000 cards",
+    "body": [
+      "The full expansion catalog is staged in print order.",
+      "A new set goes live every week — /upcoming shows what's next."
+    ]
+  },
+  {
+    "id": "guide",
+    "date": "2026-09-02",
+    "tag": "New",
+    "title": "/guide",
+    "body": [
+      "Seven chapters on packs, coins, grading, duels and trading, with every number read from the live balance."
+    ]
+  },
+  {
+    "id": "gambling-cooldown",
     "date": "2026-02-24",
+    "tag": "Changed",
+    "title": "Gambling Cooldown",
     "body": [
       "Fixed cooldown system",
       "❌ Old: Win 2 mins | Lose 2 mins | Jackpot 4 mins",
@@ -9,13 +110,17 @@
     ]
   },
   {
-    "title": "New SET",
+    "id": "set-ex-deoxys",
     "date": "2026-02-24",
+    "tag": "New set",
+    "title": "New SET",
     "body": "⭐EX Deoxys⭐"
   },
   {
-    "title": "New Rarity",
+    "id": "rarity-sir",
     "date": "2026-02-24",
+    "tag": "New",
+    "title": "New Rarity",
     "body": "SIR cards are here!!"
   }
 ]

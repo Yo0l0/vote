@@ -55,10 +55,13 @@
       const news = Array.isArray(data) ? data : (data.news || data.items || []);
       if (!news.length) { grid.innerHTML = '<div class="ncard panel"><div class="nb">No updates yet.</div></div>'; return; }
       const newest = news.map(n => Date.parse(n.date) || 0).reduce((a, b) => Math.max(a, b), 0);
-      grid.innerHTML = news.slice(0, 6).map(item => {
+      const newsDate = s => { const t = Date.parse(s); return isNaN(t) ? String(s || '') : new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); };
+      const sorted = news.slice().sort((a, b) => (Date.parse(b.date) || 0) - (Date.parse(a.date) || 0));
+      grid.innerHTML = sorted.slice(0, 6).map((item, i) => {
         const body = Array.isArray(item.body) ? item.body.join('\n') : String(item.body || item.text || item.description || '');
-        const isNew = newest && Date.parse(item.date) === newest && Date.now() - newest < 30 * 86400000;
-        return `<div class="ncard panel lift ${isNew ? 'new' : ''}"><div class="nd">${esc(item.date || '')}</div><div class="nt">${esc(item.title || '')}</div><div class="nb">${esc(body)}</div></div>`;
+        const isNew = i === 0 && newest && Date.now() - newest < 30 * 86400000;
+        const tag  = item.tag ? `<span class="ntag">${esc(item.tag)}</span>` : '';
+        return `<div class="ncard panel lift ${isNew ? 'new' : ''}"><div class="nd">${esc(newsDate(item.date))}${tag}</div><div class="nt">${esc(item.title || '')}</div><div class="nb">${esc(body)}</div></div>`;
       }).join('');
     } catch (e) {
       grid.innerHTML = '<div class="ncard panel"><div class="nb">Couldn\'t load updates. Try refreshing.</div></div>';

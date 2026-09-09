@@ -285,16 +285,52 @@ app.get('/privacy-policy', (req, res) => res.send(render('privacy', {
 })));
 
 // ── News API ──────────────────────────────────────────────────────────────
-app.get('/api/news', (req, res) => {
+// The bot publishes its changelog to GitHub on every deploy — and whenever a
+// new set goes live — so "Latest updates" refreshes without a site deploy.
+// Same shape as the inventory above: memory cache, local file as the fallback.
+const NEWS_URL = process.env.NEWS_URL ||
+  'https://raw.githubusercontent.com/Yo0l0/ssss/main/news.json';
+const LOCAL_NEWS = path.join(__dirname, 'news.json');
+const NEWS_TTL   = 2 * 60 * 1000; // 2 min
+let newsCache     = null;
+let newsFetchedAt = 0;
+
+async function refreshNews() {
+  if (!NEWS_URL) return;
   try {
-    const raw  = fs.readFileSync(path.join(__dirname, 'news.json'), 'utf8');
-    const news = JSON.parse(raw);
-    res.json(news);
+    const res = await axios.get(NEWS_URL, {
+      params: { _: Date.now() },
+      headers: { 'Cache-Control': 'no-cache' },
+      timeout: 10000,
+      responseType: 'text',
+      transformResponse: [d => d]
+    });
+    const data = JSON.parse(res.data);              // throws on bad/HTML response → caught
+    if (Array.isArray(data) && data.length) {
+      newsCache     = data;
+      newsFetchedAt = Date.now();
+      try { fs.writeFileSync(LOCAL_NEWS, res.data, 'utf8'); } catch {}
+      console.log('📰 Changelog refreshed —', data.length, 'entries');
+    }
   } catch (err) {
-    console.error('News API error:', err.message);
-    res.status(500).json({ error: err.message });
+    console.error('News refresh failed:', err?.response?.status || '', err.message);
   }
-});
+}
+
+function getNews() {
+  if (Date.now() - newsFetchedAt > NEWS_TTL) refreshNews();   // fire-and-forget
+  if (newsCache) return newsCache;
+  try {
+    newsCache     = JSON.parse(fs.readFileSync(LOCAL_NEWS, 'utf8'));
+    newsFetchedAt = Date.now();
+  } catch (err) {
+    console.error('Failed to read local news:', err.message);
+    newsCache = [];
+  }
+  return newsCache;
+}
+
+app.get('/api/news', (req, res) => res.json(getNews()));
 
 // ── Stats API ─────────────────────────────────────────────────────────────
 app.get('/stats', (req, res) => {
@@ -526,4 +562,6 @@ app.listen(PORT, () => {
   console.log('CLIENT_SECRET loaded:', CLIENT_SECRET ? `YES (${CLIENT_SECRET.length} chars)` : 'NO');
   refreshInventory();                            // warm the cache on boot
   setInterval(refreshInventory, INVENTORY_TTL);  // keep it fresh even with no traffic
+  refreshNews();
+  setInterval(refreshNews, NEWS_TTL);
 });
