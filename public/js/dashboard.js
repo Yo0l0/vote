@@ -2,10 +2,10 @@
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
-  const HOLO = ['holo', 'sir', 'mythical'];
-  const RANK = ['common', 'uncommon', 'rare', 'promo', 'holo', 'sir', 'mythical'];
+  const HOLO = ['holo', 'ultra', 'sir', 'mythical'];
+  const RANK = ['common', 'uncommon', 'rare', 'promo', 'holo', 'ultra', 'sir', 'mythical'];
   const rar = r => 'rar-' + String(r || 'common').toLowerCase();
-  const rarLabel = r => { r = String(r || 'common'); return r.toLowerCase() === 'sir' ? 'SIR' : r.charAt(0).toUpperCase() + r.slice(1).toLowerCase(); };
+  const rarLabel = r => { r = String(r || 'common'); const k = r.toLowerCase(); return k === 'sir' ? 'SIR' : k === 'ultra' ? 'Ultra Rare' : r.charAt(0).toUpperCase() + k.slice(1); };
   const holoCard = c => `<div class="holo-card ${HOLO.includes(String(c.rarity || '').toLowerCase()) ? 'is-holo' : ''}"><img src="${esc(c.image)}" alt="${esc(c.name)}" loading="lazy" decoding="async"><div class="sk"></div><div class="foil"></div><div class="glare"></div></div>`;
 
   let page = 1, searchTimer, lastCards = [], modalIndex = -1, totalPages = 1;
@@ -52,7 +52,7 @@
       $('rarityBar').innerHTML = order.map(k => `<i class="${rar(k)}" data-w="${(by[k] / total * 100).toFixed(2)}" title="${rarLabel(k)}: ${fmt(by[k])}"></i>`).join('');
       $('rarityLegend').innerHTML = order.map(k => `<span class="${rar(k)}"><span class="rdot"></span>${rarLabel(k)} <b>${fmt(by[k])}</b> · ${Math.round(by[k] / total * 100)}%</span>`).join('');
       requestAnimationFrame(() => $('rarityBar').querySelectorAll('i').forEach(i => i.style.width = i.dataset.w + '%'));
-      const shiny = (by.holo || 0) + (by.sir || 0) + (by.mythical || 0);
+      const shiny = (by.holo || 0) + (by.ultra || 0) + (by.sir || 0) + (by.mythical || 0);
       $('bdNote').textContent = shiny ? `${fmt(shiny)} shiny (${(shiny / total * 100).toFixed(1)}%)` : '';
 
       // sets

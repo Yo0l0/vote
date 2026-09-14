@@ -15,7 +15,7 @@
   --shadow:0 20px 60px rgba(0,0,0,.55);
   --ease:cubic-bezier(.2,.7,.2,1);
   --c-common:#8b93a7; --c-uncommon:#4f8cff; --c-rare:#ff5d5d; --c-holo:#22d3ee;
-  --c-promo:#fb923c; --c-sir:#c084fc; --c-mythical:#fbbf24;
+  --c-promo:#fb923c; --c-ultra:#e879f9; --c-sir:#c084fc; --c-mythical:#fbbf24;
 }
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
@@ -112,7 +112,7 @@ section.blk { padding:72px 0; }
 
 /* ── Rarity accents ───────────────────────────────────────────────────── */
 .rar-common { --rc:var(--c-common); } .rar-uncommon { --rc:var(--c-uncommon); } .rar-rare { --rc:var(--c-rare); }
-.rar-holo { --rc:var(--c-holo); } .rar-promo { --rc:var(--c-promo); } .rar-sir { --rc:var(--c-sir); } .rar-mythical { --rc:var(--c-mythical); }
+.rar-holo { --rc:var(--c-holo); } .rar-promo { --rc:var(--c-promo); } .rar-ultra { --rc:var(--c-ultra); } .rar-sir { --rc:var(--c-sir); } .rar-mythical { --rc:var(--c-mythical); }
 .rdot { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--rc, var(--muted)); box-shadow:0 0 8px var(--rc, transparent); flex:none; }
 .rtag { display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border-radius:8px; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--rc, var(--muted)); background:color-mix(in srgb, var(--rc, #888) 14%, transparent); border:1px solid color-mix(in srgb, var(--rc, #888) 45%, transparent); }
 

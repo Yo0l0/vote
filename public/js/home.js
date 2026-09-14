@@ -3,8 +3,8 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const rar = r => 'rar-' + String(r || 'common').toLowerCase();
-  const rarLabel = r => { r = String(r || 'common'); return r.toLowerCase() === 'sir' ? 'SIR' : r.charAt(0).toUpperCase() + r.slice(1).toLowerCase(); };
-  const holoCard = (c, extra) => `<div class="holo-card ${['holo','sir','mythical'].includes(String(c.rarity||'').toLowerCase()) ? 'is-holo' : ''} ${extra || ''}"><img src="${esc(c.image)}" alt="${esc(c.name)}" loading="lazy" decoding="async"><div class="sk"></div><div class="foil"></div><div class="glare"></div></div>`;
+  const rarLabel = r => { r = String(r || 'common'); const k = r.toLowerCase(); return k === 'sir' ? 'SIR' : k === 'ultra' ? 'Ultra Rare' : r.charAt(0).toUpperCase() + k.slice(1); };
+  const holoCard = (c, extra) => `<div class="holo-card ${['holo','ultra','sir','mythical'].includes(String(c.rarity||'').toLowerCase()) ? 'is-holo' : ''} ${extra || ''}"><img src="${esc(c.image)}" alt="${esc(c.name)}" loading="lazy" decoding="async"><div class="sk"></div><div class="foil"></div><div class="glare"></div></div>`;
 
   /* ── Stats ─────────────────────────────────────────────────────────── */
   async function loadStats() {
@@ -69,7 +69,7 @@
   }
 
   /* ── Demo pack ─────────────────────────────────────────────────────── */
-  const ODDS = [['common', 52], ['uncommon', 30], ['rare', 10], ['promo', 3], ['holo', 4], ['sir', .7], ['mythical', .3]];
+  const ODDS = [['common', 52], ['uncommon', 30], ['rare', 10], ['promo', 3], ['holo', 3.2], ['ultra', 1.3], ['sir', .5]];
   let pool = null, opening = false;
   async function getPool() {
     if (pool) return pool;
@@ -94,7 +94,7 @@
       if (better) out[3] = better[Math.floor(Math.random() * better.length)];
     }
     // best card last for the reveal
-    const rank = { common: 0, uncommon: 1, rare: 2, promo: 3, holo: 4, sir: 5, mythical: 6 };
+    const rank = { common: 0, uncommon: 1, rare: 2, promo: 3, holo: 4, ultra: 5, sir: 6, mythical: 7 };
     const best = out.reduce((b, c, i) => (rank[String(c.rarity).toLowerCase()] || 0) > (rank[String(out[b].rarity).toLowerCase()] || 0) ? i : b, 0);
     out.push(out.splice(best, 1)[0]);
     return out;
@@ -110,7 +110,7 @@
     setTimeout(() => {
       pack.classList.add('hidden'); $('packStage').hidden = true;
       pulls.hidden = false; foot.hidden = true;
-      const rank = { common: 0, uncommon: 1, rare: 2, promo: 3, holo: 4, sir: 5, mythical: 6 };
+      const rank = { common: 0, uncommon: 1, rare: 2, promo: 3, holo: 4, ultra: 5, sir: 6, mythical: 7 };
       pulls.innerHTML = five.map((c, i) => `<div class="pull-card ${rar(c.rarity)} ${rank[String(c.rarity).toLowerCase()] >= 2 ? 'big' : ''}"><div class="burst"></div>${holoCard(c)}<div class="back"><img src="/img/pokebot.png" alt=""></div><div class="cap">${esc(c.name)}<br><span class="rtag">${esc(rarLabel(c.rarity))}</span></div></div>`).join('');
       holoInit(pulls);
       const cards = pulls.querySelectorAll('.pull-card');
