@@ -25,8 +25,7 @@ const INVITE_URL    = `https://discord.com/oauth2/authorize?client_id=${CLIENT_I
 const SUPPORT_URL   = 'https://discord.gg/zj9Sxz3reR';
 const VOTE_URL      = `https://top.gg/bot/${CLIENT_ID}/vote`;
 const DEMO          = process.env.DEMO === '1';
-// Honest by default: the old site added 10,000 to the trainer count. Set TRAINER_DISPLAY_BONUS to bring that back.
-const TRAINER_BONUS = Number(process.env.TRAINER_DISPLAY_BONUS || 0);
+// The trainer count is the real one (the old site added 10,000 to it; the owner removed that on 2026-09-18).
 const RAW = 'https://raw.githubusercontent.com/Yo0l0/ssss/main';
 
 // ── the feeds the bot publishes ───────────────────────────────
@@ -219,7 +218,7 @@ app.get('/terms-of-service', (req, res) => res.send(page(req, 'terms', { TITLE: 
 app.get('/privacy-policy', (req, res) => res.send(page(req, 'privacy', { TITLE: 'Privacy Policy — Pokébot', DESC: 'What Pokébot stores, why, and how to request deletion.', PATH: '/privacy-policy' })));
 
 // ── JSON ──────────────────────────────────────────────────────
-app.get('/stats', (req, res) => { const s = data().stats; res.json({ ...s, totalUsers: s.totalUsers + TRAINER_BONUS, realUsers: s.totalUsers }); });
+app.get('/stats', (req, res) => res.json(data().stats));
 app.get('/api/feed', (req, res) => res.json(data().feed));
 app.get('/api/news', (req, res) => res.json(news.get() || []));
 app.get('/api/help', (req, res) => res.json(help.get() || { groups: [] }));

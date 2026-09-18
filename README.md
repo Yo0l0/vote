@@ -36,4 +36,4 @@ node tools/dev.js              # DEMO=1: a synthetic inventory (no player data),
 npm run build:data             # regenerate data/catalog.json + data/help.json from the bot checkout
 node tools/build-og.js         # regenerate public/img/og.jpg (needs the site running)
 ```
-Env: `TRAINER_DISPLAY_BONUS` (default 0; the old site added 10,000 to the trainer count), `INVENTORY_URL`, `NEWS_URL`, `CATALOG_URL`, `HELP_URL`, `THUMB_MEM_MB` (default 96), `REDIRECT_URI`.
+Env: `INVENTORY_URL`, `NEWS_URL`, `CATALOG_URL`, `HELP_URL`, `THUMB_MEM_MB` (default 96), `REDIRECT_URI`.
