@@ -76,7 +76,8 @@ const page = (req, view, vars = {}) => render(view, { NAV_USER: navUser(req.sess
 const fmtDate = ms => ms ? new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }) : '';
 const rarityLabel = r => ({ sir: 'SIR', ultra: 'Ultra Rare' }[r] || (r ? r[0].toUpperCase() + r.slice(1) : ''));
 const publicSet = s => ({ name: s.name, slug: s.slug, source: s.source, series: s.series, originalRelease: s.originalRelease, releaseAt: s.releaseAt, notes: s.notes, total: s.total });
-const withPop = (s) => ({ ...publicSet(s), pop: P.setPop(data(), s.slug), chase: s.cards.filter(c => P.rank(c.rarity) >= P.RANK.holo).sort((a, b) => P.rank(b.rarity) - P.rank(a.rarity)).slice(0, 4).map(c => ({ ...c, href: `/cards/${s.slug}/${c.slug}` })) });
+// the set's cover: its four rarest cards (a promo-only set like WOTC Promos still gets a cover)
+const withPop = (s) => ({ ...publicSet(s), pop: P.setPop(data(), s.slug), chase: [...s.cards].sort((a, b) => P.rank(b.rarity) - P.rank(a.rarity) || Number(a.n) - Number(b.n)).slice(0, 4).map(c => ({ ...c, href: `/cards/${s.slug}/${c.slug}` })) });
 
 // ── middleware ────────────────────────────────────────────────
 app.set('trust proxy', 1);
