@@ -15,7 +15,7 @@
       animateNum($('statFirst'), d.firstEd);
       $('trustUsers').textContent = fmt(d.totalUsers) + ' trainers';
       $('trustCards').textContent = fmt(d.totalCards) + ' cards';
-      if (d.activeToday) $('statActive').textContent = fmt(d.activeToday) + ' pulled a card today';
+      $('statActive').textContent = d.newThisWeek ? '+' + fmt(d.newThisWeek) + ' joined this week' : '';
       if (d.tens) $('statGems').textContent = fmt(d.tens) + ' Gem Mint' + (d.black ? ' · ' + fmt(d.black) + ' Black Label' : '');
       if (d.worldFirst) $('statWF').textContent = fmt(d.worldFirst) + ' World Firsts';
       if (Array.isArray(d.perDay) && d.perDay.length) $('statSpark').innerHTML = sparkline(d.perDay.map(x => x.n), 120, 26);
