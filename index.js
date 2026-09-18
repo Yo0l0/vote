@@ -34,9 +34,9 @@ const invalidate = () => { built = null; };
 const inventory = remoteJson({ name: 'inventory', url: DEMO ? null : (process.env.INVENTORY_URL || `${RAW}/user_inventory.json`), ttl: 2 * 60 * 1000,
   local: path.join(__dirname, 'user_inventory.json'), validate: d => d && typeof d === 'object' && !Array.isArray(d), onUpdate: invalidate });
 const news = remoteJson({ name: 'changelog', url: process.env.NEWS_URL || `${RAW}/news.json`, ttl: 2 * 60 * 1000, local: path.join(__dirname, 'news.json'), validate: d => Array.isArray(d) && d.length > 0 });
-const catalog = remoteJson({ name: 'catalog', url: DEMO ? null : (process.env.CATALOG_URL || `${RAW}/catalog.json`), ttl: 10 * 60 * 1000, local: path.join(__dirname, 'data', 'catalog.json'), validate: d => Array.isArray(d?.sets), onUpdate: invalidate, quiet404: true });
-const namesFeed = remoteJson({ name: 'names', url: DEMO ? null : (process.env.NAMES_URL || `${RAW}/names.json`), ttl: 10 * 60 * 1000, local: path.join(__dirname, 'names.json'), validate: d => d && typeof d.names === 'object', quiet404: true });
-const help = remoteJson({ name: 'help', url: DEMO ? null : (process.env.HELP_URL || `${RAW}/help.json`), ttl: 10 * 60 * 1000, local: path.join(__dirname, 'data', 'help.json'), validate: d => Array.isArray(d?.groups), quiet404: true });
+const catalog = remoteJson({ name: 'catalog', url: DEMO ? null : (process.env.CATALOG_URL || `${RAW}/catalog.json`), ttl: 10 * 60 * 1000, local: path.join(__dirname, 'data', 'catalog.json'), writeLocal: false, validate: d => Array.isArray(d?.sets), onUpdate: invalidate, quiet404: true });
+const namesFeed = remoteJson({ name: 'names', url: DEMO ? null : (process.env.NAMES_URL || `${RAW}/names.json`), ttl: 10 * 60 * 1000, local: path.join(__dirname, 'names.json'), writeLocal: false, validate: d => d && typeof d.names === 'object', quiet404: true });
+const help = remoteJson({ name: 'help', url: DEMO ? null : (process.env.HELP_URL || `${RAW}/help.json`), ttl: 10 * 60 * 1000, local: path.join(__dirname, 'data', 'help.json'), writeLocal: false, validate: d => Array.isArray(d?.groups), quiet404: true });
 
 if (DEMO) {   // DEMO: a synthetic inventory and the committed catalog/help/names, so a local run is deterministic and touches no player data
   const demo = require('./lib/demo');

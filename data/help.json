@@ -1,1 +1,310 @@
-{"generatedAt":1789763008522,"groups":[{"id":"new","emoji":"🆕","title":"What's New","commands":[{"cmd":"🎨 Case colours","desc":"/slab roll — random colours for your slabs, six tiers, Obsidian Black is 1 in 400. Paint the case or the label, strip, melt."},{"cmd":"⚒️ The forge","desc":"/craft is a roll now: dust + spare ingredients from the same set, boosts, misfires, Perfect Forges"},{"cmd":"📦 Drops fixed","desc":"Claim actually claims the pack now"},{"cmd":"⚡ Pack Energy","desc":"No more 20-min timer: hold 3 packs, refill every 2h, EARN more — daily +2, gym win +1, quiz streak +1, Peek +1, /vote +2"},{"cmd":"🎯 Chase Meter","desc":"Five packs from your chase set = a free Chase Pack with doubled holo odds"},{"cmd":"📦 Server drops","desc":"Busy servers get a sealed pack dropped in their drop channel — first to claim"},{"cmd":"/showcase","desc":"Your binder as a picture — nine best cards, level, chase. Post it."},{"cmd":"👀 Pack Peek","desc":"Open a pack; a friend can take one spare duplicate — you earn coins"},{"cmd":"🎉 Holo Weekend","desc":"Saturday & Sunday: holo odds doubled on the bonus slot"},{"cmd":"🗓️ A new set every week","desc":"Every expansion up to the newest one on sale, in print order"},{"cmd":"💰 Packs pay more","desc":"Coins for every new card, a bonus for the first pack each day"},{"cmd":"🏅 Grading, rebuilt","desc":"Four sub-grades, half-point grades, real slabs — and a queue that sets fees & wait times"},{"cmd":"/gym","desc":"Battle AI Gym Leaders solo — 8 badges, no opponent needed"},{"cmd":"/play","desc":"Your home screen — everything worth doing right now"},{"cmd":"/openpack set:","desc":"Packs now TARGET a set — pick your chase, watch the bar fill"},{"cmd":"/craft","desc":"Stardust ✨ — melt spare dupes, craft your missing cards"},{"cmd":"⭐ Featured set","desc":"Rotates weekly: boosted odds + bigger milestone payouts"},{"cmd":"🔨 Crack & regrade","desc":"Not happy with a slab? Crack it and roll again — at your own risk"},{"cmd":"📖 Set sizes fixed","desc":"Every set is now 100% completable (they weren't before!)"}]},{"id":"start","emoji":"🚀","title":"Getting Started","commands":[{"cmd":"/guide","desc":"How everything works, in 7 short chapters"},{"cmd":"/start","desc":"Welcome tour + starter bundle"},{"cmd":"/play","desc":"Home screen: timers, claims, what's next"},{"cmd":"/profile","desc":"Your trainer stats"},{"cmd":"/daily","desc":"Daily coins, XP & streak packs"}]},{"id":"packs","emoji":"🎴","title":"Packs & Cards","commands":[{"cmd":"/openpack","desc":"Spend a pack of ⚡ energy (hold 3, refill 2h) — or crack sealed packs"},{"cmd":"/buypack","desc":"Standard / Premium 💠 / Legendary 🌟 tiers"},{"cmd":"/collection","desc":"Your cards — filter by set, rarity, 1st Edition, shiny, graded, duplicates; sort by value"},{"cmd":"/card view","desc":"Full card detail + lock 🔒 + population"},{"cmd":"/card search","desc":"Find your cards by name"}]},{"id":"collect","emoji":"📖","title":"Collection & Grading","commands":[{"cmd":"/checklist","desc":"Set progress · missing cards · milestone rewards pay out automatically"},{"cmd":"/craft","desc":"Convert dupes ✨ → the forge: ingredients, odds, boosts"},{"cmd":"/grade","desc":"The grading desk — pick a lane (6h → 5 days), fees move with the queue"},{"cmd":"/checkgrade","desc":"Crack the slab: four sub-grades, half points, cert & pop"},{"cmd":"/slab","desc":"The case shop — roll case colours, paint them on your slabs"},{"cmd":"/fuse","desc":"Fuse 3 copies into better condition (Fusion Token)"},{"cmd":"/swapcodes","desc":"Swap the codes of two cards (Swap Token)"},{"cmd":"/itemshop · /buyitem","desc":"Tokens for coins"}]},{"id":"trade","emoji":"🤝","title":"Trading & Market","commands":[{"cmd":"/find","desc":"Who has a card? Every copy, best first — make an offer"},{"cmd":"/offers","desc":"Offers on your cards and offers you made: accept, counter, decline"},{"cmd":"/trade","desc":"Cards and coins both ways, on a table you can see"},{"cmd":"/market browse","desc":"Buy player-listed cards"},{"cmd":"/market list","desc":"Sell your cards"},{"cmd":"/market trend","desc":"Price history from real sales"},{"cmd":"/give","desc":"Gift coins, a card or a token"},{"cmd":"/auction","desc":"Bid wars on rare cards"},{"cmd":"/wishlist","desc":"Your hunt board — pin cards, see who has spares, WISH GRANTED when you pull one"},{"cmd":"/sell","desc":"Bulk-sell duplicates for coins"}]},{"id":"play","emoji":"🎮","title":"Games & Progression","commands":[{"cmd":"/gym","desc":"Battle AI Gym Leaders solo — no opponent needed!"},{"cmd":"/quiz","desc":"Pokémon trivia for coins"},{"cmd":"/duel","desc":"Battle another trainer — pick a card from your binder"},{"cmd":"/journey · /bag","desc":"A 15-step adventure (6h cooldown) and what you carry"},{"cmd":"/pickcard · /mysterybox","desc":"Card drops for the room, a free box every 15h"},{"cmd":"/namepokemon","desc":"Who's That Pokémon? — a silhouette for the whole room"},{"cmd":"/gamble · /blackjack","desc":"Slots & the blackjack table — mind your coins"},{"cmd":"/quests · /achievements","desc":"Goals with real rewards"},{"cmd":"/leaderboard · /season","desc":"Rankings, the monthly race and its prizes"},{"cmd":"/duelprofile","desc":"Your duel record"}]},{"id":"tools","emoji":"🛠️","title":"Tools & Admin","commands":[{"cmd":"/vote","desc":"Claim your top.gg vote reward — coins, a card and energy every 12h"},{"cmd":"/reminder","desc":"DMs when your cooldowns end"},{"cmd":"/bag","desc":"Packs, tokens, energy, badges"},{"cmd":"/balance","desc":"Coins and level at a glance"},{"cmd":"/upcoming","desc":"The next sets on the schedule"},{"cmd":"/report","desc":"Send a bug or an idea to the developer"},{"cmd":"/setchannel","desc":"Admins: where the bot posts drops — add for:Announcements for updates and new sets"}]}]}
+{
+  "generatedAt": 1789766642779,
+  "groups": [
+    {
+      "id": "new",
+      "emoji": "🆕",
+      "title": "What's New",
+      "commands": [
+        {
+          "cmd": "🎨 Case colours",
+          "desc": "/slab roll — random colours for your slabs, six tiers, Obsidian Black is 1 in 400. Paint the case or the label, strip, melt."
+        },
+        {
+          "cmd": "⚒️ The forge",
+          "desc": "/craft is a roll now: dust + spare ingredients from the same set, boosts, misfires, Perfect Forges"
+        },
+        {
+          "cmd": "📦 Drops fixed",
+          "desc": "Claim actually claims the pack now"
+        },
+        {
+          "cmd": "⚡ Pack Energy",
+          "desc": "No more 20-min timer: hold 3 packs, refill every 2h, EARN more — daily +2, gym win +1, quiz streak +1, Peek +1, /vote +2"
+        },
+        {
+          "cmd": "🎯 Chase Meter",
+          "desc": "Five packs from your chase set = a free Chase Pack with doubled holo odds"
+        },
+        {
+          "cmd": "📦 Server drops",
+          "desc": "Busy servers get a sealed pack dropped in their drop channel — first to claim"
+        },
+        {
+          "cmd": "/showcase",
+          "desc": "Your binder as a picture — nine best cards, level, chase. Post it."
+        },
+        {
+          "cmd": "👀 Pack Peek",
+          "desc": "Open a pack; a friend can take one spare duplicate — you earn coins"
+        },
+        {
+          "cmd": "🎉 Holo Weekend",
+          "desc": "Saturday & Sunday: holo odds doubled on the bonus slot"
+        },
+        {
+          "cmd": "🗓️ A new set every week",
+          "desc": "Every expansion up to the newest one on sale, in print order"
+        },
+        {
+          "cmd": "💰 Packs pay more",
+          "desc": "Coins for every new card, a bonus for the first pack each day"
+        },
+        {
+          "cmd": "🏅 Grading, rebuilt",
+          "desc": "Four sub-grades, half-point grades, real slabs — and a queue that sets fees & wait times"
+        },
+        {
+          "cmd": "/gym",
+          "desc": "Battle AI Gym Leaders solo — 8 badges, no opponent needed"
+        },
+        {
+          "cmd": "/play",
+          "desc": "Your home screen — everything worth doing right now"
+        },
+        {
+          "cmd": "/openpack set:",
+          "desc": "Packs now TARGET a set — pick your chase, watch the bar fill"
+        },
+        {
+          "cmd": "/craft",
+          "desc": "Stardust ✨ — melt spare dupes, craft your missing cards"
+        },
+        {
+          "cmd": "⭐ Featured set",
+          "desc": "Rotates weekly: boosted odds + bigger milestone payouts"
+        },
+        {
+          "cmd": "🔨 Crack & regrade",
+          "desc": "Not happy with a slab? Crack it and roll again — at your own risk"
+        },
+        {
+          "cmd": "📖 Set sizes fixed",
+          "desc": "Every set is now 100% completable (they weren't before!)"
+        }
+      ]
+    },
+    {
+      "id": "start",
+      "emoji": "🚀",
+      "title": "Getting Started",
+      "commands": [
+        {
+          "cmd": "/guide",
+          "desc": "How everything works, in 7 short chapters"
+        },
+        {
+          "cmd": "/start",
+          "desc": "Welcome tour + starter bundle"
+        },
+        {
+          "cmd": "/play",
+          "desc": "Home screen: timers, claims, what's next"
+        },
+        {
+          "cmd": "/profile",
+          "desc": "Your trainer stats"
+        },
+        {
+          "cmd": "/daily",
+          "desc": "Daily coins, XP & streak packs"
+        }
+      ]
+    },
+    {
+      "id": "packs",
+      "emoji": "🎴",
+      "title": "Packs & Cards",
+      "commands": [
+        {
+          "cmd": "/openpack",
+          "desc": "Spend a pack of ⚡ energy (hold 3, refill 2h) — or crack sealed packs"
+        },
+        {
+          "cmd": "/buypack",
+          "desc": "Standard / Premium 💠 / Legendary 🌟 tiers"
+        },
+        {
+          "cmd": "/collection",
+          "desc": "Your cards — filter by set, rarity, 1st Edition, shiny, graded, duplicates; sort by value"
+        },
+        {
+          "cmd": "/card view",
+          "desc": "Full card detail + lock 🔒 + population"
+        },
+        {
+          "cmd": "/card search",
+          "desc": "Find your cards by name"
+        }
+      ]
+    },
+    {
+      "id": "collect",
+      "emoji": "📖",
+      "title": "Collection & Grading",
+      "commands": [
+        {
+          "cmd": "/checklist",
+          "desc": "Set progress · missing cards · milestone rewards pay out automatically"
+        },
+        {
+          "cmd": "/craft",
+          "desc": "Convert dupes ✨ → the forge: ingredients, odds, boosts"
+        },
+        {
+          "cmd": "/grade",
+          "desc": "The grading desk — pick a lane (6h → 5 days), fees move with the queue"
+        },
+        {
+          "cmd": "/checkgrade",
+          "desc": "Crack the slab: four sub-grades, half points, cert & pop"
+        },
+        {
+          "cmd": "/slab",
+          "desc": "The case shop — roll case colours, paint them on your slabs"
+        },
+        {
+          "cmd": "/fuse",
+          "desc": "Fuse 3 copies into better condition (Fusion Token)"
+        },
+        {
+          "cmd": "/swapcodes",
+          "desc": "Swap the codes of two cards (Swap Token)"
+        },
+        {
+          "cmd": "/itemshop · /buyitem",
+          "desc": "Tokens for coins"
+        }
+      ]
+    },
+    {
+      "id": "trade",
+      "emoji": "🤝",
+      "title": "Trading & Market",
+      "commands": [
+        {
+          "cmd": "/find",
+          "desc": "Who has a card? Every copy, best first — make an offer"
+        },
+        {
+          "cmd": "/offers",
+          "desc": "Offers on your cards and offers you made: accept, counter, decline"
+        },
+        {
+          "cmd": "/trade",
+          "desc": "Cards and coins both ways, on a table you can see"
+        },
+        {
+          "cmd": "/market browse",
+          "desc": "Buy player-listed cards"
+        },
+        {
+          "cmd": "/market list",
+          "desc": "Sell your cards"
+        },
+        {
+          "cmd": "/market trend",
+          "desc": "Price history from real sales"
+        },
+        {
+          "cmd": "/give",
+          "desc": "Gift coins, a card or a token"
+        },
+        {
+          "cmd": "/auction",
+          "desc": "Bid wars on rare cards"
+        },
+        {
+          "cmd": "/wishlist",
+          "desc": "Your hunt board — pin cards, see who has spares, WISH GRANTED when you pull one"
+        },
+        {
+          "cmd": "/sell",
+          "desc": "Bulk-sell duplicates for coins"
+        }
+      ]
+    },
+    {
+      "id": "play",
+      "emoji": "🎮",
+      "title": "Games & Progression",
+      "commands": [
+        {
+          "cmd": "/gym",
+          "desc": "Battle AI Gym Leaders solo — no opponent needed!"
+        },
+        {
+          "cmd": "/quiz",
+          "desc": "Pokémon trivia for coins"
+        },
+        {
+          "cmd": "/duel",
+          "desc": "Battle another trainer — pick a card from your binder"
+        },
+        {
+          "cmd": "/journey · /bag",
+          "desc": "A 15-step adventure (6h cooldown) and what you carry"
+        },
+        {
+          "cmd": "/pickcard · /mysterybox",
+          "desc": "Card drops for the room, a free box every 15h"
+        },
+        {
+          "cmd": "/namepokemon",
+          "desc": "Who's That Pokémon? — a silhouette for the whole room"
+        },
+        {
+          "cmd": "/gamble · /blackjack",
+          "desc": "Slots & the blackjack table — mind your coins"
+        },
+        {
+          "cmd": "/quests · /achievements",
+          "desc": "Goals with real rewards"
+        },
+        {
+          "cmd": "/leaderboard · /season",
+          "desc": "Rankings, the monthly race and its prizes"
+        },
+        {
+          "cmd": "/duelprofile",
+          "desc": "Your duel record"
+        }
+      ]
+    },
+    {
+      "id": "tools",
+      "emoji": "🛠️",
+      "title": "Tools & Admin",
+      "commands": [
+        {
+          "cmd": "/vote",
+          "desc": "Claim your top.gg vote reward — coins, a card and energy every 12h"
+        },
+        {
+          "cmd": "/reminder",
+          "desc": "DMs when your cooldowns end"
+        },
+        {
+          "cmd": "/bag",
+          "desc": "Packs, tokens, energy, badges"
+        },
+        {
+          "cmd": "/balance",
+          "desc": "Coins and level at a glance"
+        },
+        {
+          "cmd": "/upcoming",
+          "desc": "The next sets on the schedule"
+        },
+        {
+          "cmd": "/report",
+          "desc": "Send a bug or an idea to the developer"
+        },
+        {
+          "cmd": "/setchannel",
+          "desc": "Admins: where the bot posts drops — add for:Announcements for updates and new sets"
+        }
+      ]
+    }
+  ]
+}
