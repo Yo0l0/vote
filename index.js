@@ -174,7 +174,7 @@ app.get('/sets/:slug', (req, res) => {
     TITLE: `${set.name} — ${set.total} cards · Pokébot`, DESC: `${set.name} in Pokébot: ${set.total} cards, ${(pop.copies || 0).toLocaleString('en-US')} in circulation, ${pop.completions || 0} trainers have the full set.`,
     PATH: `/sets/${set.slug}`, OG_IMAGE: chase?.image || `${SITE}/img/og.jpg`,
     SET_NAME: set.name, SET_SLUG: set.slug, SET_TOTAL: set.total, SET_SERIES: set.series || (set.source === 'classic' ? 'Classic' : ''), SET_RELEASE: set.releaseAt ? `Released ${fmtDate(set.releaseAt)}` : 'Original set',
-    SET_LEAD: set.notes ? `${set.notes}.` : set.originalRelease ? `First printed ${fmtDate(Date.parse(set.originalRelease))}.` : 'One of the original sets.', SET_BACKDROP: chase ? images.thumbUrl(chase.image, 480) : '',
+    SET_LEAD: set.notes ? `${set.notes.replace(/\s*·\s*\d+ cards$/, '')}.` : set.originalRelease ? `First printed ${fmtDate(Date.parse(set.originalRelease))}.` : 'One of the original sets.', SET_BACKDROP: chase ? images.thumbUrl(chase.image, 480) : '',
   }));
 });
 
