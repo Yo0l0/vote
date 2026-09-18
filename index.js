@@ -34,11 +34,11 @@ const invalidate = () => { built = null; };
 const inventory = remoteJson({ name: 'inventory', url: DEMO ? null : (process.env.INVENTORY_URL || `${RAW}/user_inventory.json`), ttl: 2 * 60 * 1000,
   local: path.join(__dirname, 'user_inventory.json'), validate: d => d && typeof d === 'object' && !Array.isArray(d), onUpdate: invalidate });
 const news = remoteJson({ name: 'changelog', url: process.env.NEWS_URL || `${RAW}/news.json`, ttl: 2 * 60 * 1000, local: path.join(__dirname, 'news.json'), validate: d => Array.isArray(d) && d.length > 0 });
-const catalog = remoteJson({ name: 'catalog', url: process.env.CATALOG_URL || `${RAW}/catalog.json`, ttl: 10 * 60 * 1000, local: path.join(__dirname, 'data', 'catalog.json'), validate: d => Array.isArray(d?.sets), onUpdate: invalidate, quiet404: true });
-const namesFeed = remoteJson({ name: 'names', url: process.env.NAMES_URL || `${RAW}/names.json`, ttl: 10 * 60 * 1000, local: path.join(__dirname, 'names.json'), validate: d => d && typeof d.names === 'object', quiet404: true });
-const help = remoteJson({ name: 'help', url: process.env.HELP_URL || `${RAW}/help.json`, ttl: 10 * 60 * 1000, local: path.join(__dirname, 'data', 'help.json'), validate: d => Array.isArray(d?.groups), quiet404: true });
+const catalog = remoteJson({ name: 'catalog', url: DEMO ? null : (process.env.CATALOG_URL || `${RAW}/catalog.json`), ttl: 10 * 60 * 1000, local: path.join(__dirname, 'data', 'catalog.json'), writeLocal: false, validate: d => Array.isArray(d?.sets), onUpdate: invalidate, quiet404: true });
+const namesFeed = remoteJson({ name: 'names', url: DEMO ? null : (process.env.NAMES_URL || `${RAW}/names.json`), ttl: 10 * 60 * 1000, local: path.join(__dirname, 'names.json'), writeLocal: false, validate: d => d && typeof d.names === 'object', quiet404: true });
+const help = remoteJson({ name: 'help', url: DEMO ? null : (process.env.HELP_URL || `${RAW}/help.json`), ttl: 10 * 60 * 1000, local: path.join(__dirname, 'data', 'help.json'), writeLocal: false, validate: d => Array.isArray(d?.groups), quiet404: true });
 
-if (DEMO) {
+if (DEMO) {   // DEMO: a synthetic inventory and the committed catalog/help/names, so a local run is deterministic and touches no player data
   const demo = require('./lib/demo');
   inventory.set(demo.inventory(catalog.get(), { devUser: process.env.DEV_USER || '000000000000000001' }));
   console.log('🧪 DEMO mode: synthetic inventory, no player data');
@@ -58,7 +58,10 @@ function data() {
   return built;
 }
 const cat = () => catalog.get() || { sets: [], upcoming: [] };
-const nameOf = (uid) => P.displayName(data(), inventory.get(), uid) || namesFeed.get()?.names?.[uid] || P.maskName(uid);   // names.json is the bot's cache of display names
+// names.json is the bot's roster: uid → { name, avatar } (the first version was a bare string)
+const nameEntry = (uid) => { const v = namesFeed.get()?.names?.[uid]; return typeof v === 'string' ? { name: v, avatar: null } : (v || null); };
+const nameOf = (uid, req = null) => (req?.session?.user?.id === uid ? (req.session.user.global_name || req.session.user.username) : null) || P.displayName(data(), inventory.get(), uid) || nameEntry(uid)?.name || P.maskName(uid);
+const avatarOf = (uid, req = null) => (req?.session?.user?.id === uid ? avatarFor(req.session.user) : null) || nameEntry(uid)?.avatar || null;
 
 // ── helpers ───────────────────────────────────────────────────
 function avatarFor(user) {
@@ -73,7 +76,8 @@ const page = (req, view, vars = {}) => render(view, { NAV_USER: navUser(req.sess
 const fmtDate = ms => ms ? new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }) : '';
 const rarityLabel = r => ({ sir: 'SIR', ultra: 'Ultra Rare' }[r] || (r ? r[0].toUpperCase() + r.slice(1) : ''));
 const publicSet = s => ({ name: s.name, slug: s.slug, source: s.source, series: s.series, originalRelease: s.originalRelease, releaseAt: s.releaseAt, notes: s.notes, total: s.total });
-const withPop = (s) => ({ ...publicSet(s), pop: P.setPop(data(), s.slug), chase: s.cards.filter(c => P.rank(c.rarity) >= P.RANK.holo).sort((a, b) => P.rank(b.rarity) - P.rank(a.rarity)).slice(0, 4).map(c => ({ ...c, href: `/cards/${s.slug}/${c.slug}` })) });
+// the set's cover: its four rarest cards (a promo-only set like WOTC Promos still gets a cover)
+const withPop = (s) => ({ ...publicSet(s), pop: P.setPop(data(), s.slug), chase: [...s.cards].sort((a, b) => P.rank(b.rarity) - P.rank(a.rarity) || Number(a.n) - Number(b.n)).slice(0, 4).map(c => ({ ...c, href: `/cards/${s.slug}/${c.slug}` })) });
 
 // ── middleware ────────────────────────────────────────────────
 app.set('trust proxy', 1);
@@ -152,7 +156,9 @@ app.get('/', (req, res) => {
   const user = req.session.user;
   const c = cat();
   const next = c.upcoming[0] || null;
+  const teaser = (next?.teaser || []).map(c => `<img src="${escapeHtml(images.thumbUrl(c.image, 160))}" alt="${escapeHtml(c.name)}" title="${escapeHtml(c.name)}" loading="lazy">`).join('');
   res.send(page(req, 'home', {
+    NEXT_TEASER: teaser, NEXT_TEASER_NAMES: (next?.teaser || []).map(c => c.name).join(' · '),
     COLLECTION_HREF: user ? '/dashboard' : '/login', COLLECTION_TEXT: user ? 'My binder' : 'Log in — see your binder',
     NEXT_SET_NAME: next ? next.name : '', NEXT_SET_AT: next ? next.releaseAt : 0, NEXT_SET_TOTAL: next ? next.total : 0, NEXT_SET_DATE: next ? fmtDate(next.releaseAt) : '',
     NEWEST_SET_NAME: c.sets[0]?.name || '', NEWEST_SET_SLUG: c.sets[0]?.slug || '', SETS_OUT: c.sets.length, CARDS_OUT: c.sets.reduce((n, s) => n + s.total, 0),
@@ -197,12 +203,12 @@ app.get('/t/:uid', (req, res) => {
   const uid = String(req.params.uid).replace(/\D/g, '');
   const d = P.userDetail(data(), inventory.get(), cat(), uid);
   if (!d) return notFound(req, res);
-  const name = nameOf(uid);
+  const name = nameOf(uid, req);
   const me = req.session.user && req.session.user.id === uid;
   res.send(page(req, 'profile', {
     TITLE: `${name}'s binder — Pokébot`, DESC: `${d.total.toLocaleString('en-US')} cards, ${d.unique} unique, ${d.graded} slabs${d.tens ? `, ${d.tens} Gem Mint` : ''}${d.shinies ? `, ${d.shinies} shiny` : ''}${d.firstEd ? `, ${d.firstEd} 1st Editions` : ''}.`,
     PATH: `/t/${uid}`, OG_IMAGE: d.rarest?.image || `${SITE}/img/og.jpg`, ROBOTS: '<meta name="robots" content="noindex">',
-    PROFILE_NAME: name, PROFILE_UID: uid, PROFILE_AVATAR: me ? avatarFor(req.session.user) : '/img/pokebot.png', IS_ME: me ? '1' : '',
+    PROFILE_NAME: name, PROFILE_UID: uid, PROFILE_AVATAR: avatarOf(uid, req) || '/img/pokebot.png', IS_ME: me ? '1' : '',
   }));
 });
 
@@ -251,14 +257,14 @@ app.get('/api/search', (req, res) => {
 app.get('/api/boards', (req, res) => {
   const b = data().boards; const me = req.session.user?.id || null;
   const out = {};
-  for (const [k, v] of Object.entries(b)) out[k] = { title: v.title, unit: v.unit, rows: v.rows.map((r, i) => ({ rank: i + 1, uid: r.uid, name: nameOf(r.uid), v: r.v, sub: r.sub, me: r.uid === me })) };
+  for (const [k, v] of Object.entries(b)) out[k] = { title: v.title, unit: v.unit, rows: v.rows.map((r, i) => ({ rank: i + 1, uid: r.uid, name: nameOf(r.uid, req), avatar: avatarOf(r.uid, req), v: r.v, sub: r.sub, me: r.uid === me })) };
   res.json({ boards: out, updated: data().built, me });
 });
 app.get('/api/profile/:uid', (req, res) => {
   const uid = String(req.params.uid).replace(/\D/g, '');
   const d = P.userDetail(data(), inventory.get(), cat(), uid);
   if (!d) return res.status(404).json({ error: 'Not found' });
-  res.json({ ...d, name: nameOf(uid), me: req.session.user?.id === uid });
+  res.json({ ...d, name: nameOf(uid, req), avatar: avatarOf(uid, req), me: req.session.user?.id === uid });
 });
 app.get('/api/pool', (req, res) => {   // the simulator: every card of a released set (or all of them), with the bot's odds
   const slug = req.query.set ? String(req.query.set) : null;

@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1789757145760,
+  "generatedAt": 1789766642779,
   "groups": [
     {
       "id": "new",
@@ -75,8 +75,8 @@
           "desc": "Rotates weekly: boosted odds + bigger milestone payouts"
         },
         {
-          "cmd": "🔨 Crack slab",
-          "desc": "Not happy with a slab? Crack it and regrade — or keep the card raw to fuse it"
+          "cmd": "🔨 Crack & regrade",
+          "desc": "Not happy with a slab? Crack it and roll again — at your own risk"
         },
         {
           "cmd": "📖 Set sizes fixed",

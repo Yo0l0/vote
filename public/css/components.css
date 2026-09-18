@@ -116,7 +116,10 @@ a.tile:hover .holo-card { transform:translateY(-4px); box-shadow:0 0 0 1px var(-
 .table tr.me td { background:rgba(168,120,255,.1); }
 .table .rank { font-family:var(--font-d); font-weight:800; color:var(--dim); width:52px; }
 .table tr:nth-child(1) .rank { color:var(--gold); } .table tr:nth-child(2) .rank { color:#cfd6e6; } .table tr:nth-child(3) .rank { color:#d59a5f; }
-.table .who a { color:inherit; text-decoration:none; font-weight:700; }
+.table .who a { display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none; font-weight:700; }
+.table .who span { display:flex; flex-direction:column; min-width:0; }
+.table .who small.sub { color:var(--dim); font-size:.78rem; font-weight:400; }
+.who-av { width:36px; height:36px; border-radius:50%; object-fit:cover; flex:none; background:var(--bg3); box-shadow:0 0 0 1px var(--line-2); }
 .table .who a:hover { color:var(--violet); }
 .table .val { font-family:var(--font-d); font-weight:700; color:var(--gold); text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .table .sub { color:var(--dim); font-size:.78rem; }

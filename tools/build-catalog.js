@@ -75,7 +75,7 @@ for (const set of all) {
     released.push({ name: set.name, slug: set.slug, source: set.source, series: set.series, originalRelease: set.originalRelease,
       releaseAt, notes: set.notes || (s && s.notes) || null, total: set.cards.length, cards: set.cards });
   } else if (releaseAt) {
-    upcoming.push({ name: set.name, slug: set.slug, series: set.series, originalRelease: set.originalRelease, releaseAt, notes: (s && s.notes) || set.notes || null, total: set.cards.length });
+    upcoming.push({ name: set.name, slug: set.slug, series: set.series, originalRelease: set.originalRelease, releaseAt, notes: (s && s.notes) || set.notes || null, total: set.cards.length, cards: set.cards });
   }
 }
 // newest release first; classic sets (no date) keep their original print order at the end
@@ -86,7 +86,10 @@ upcoming.sort((a, b) => a.releaseAt - b.releaseAt);
 const seen = new Set();
 for (const s of released) { if (seen.has(s.slug)) throw new Error(`duplicate set slug ${s.slug}`); seen.add(s.slug); }
 
-const out = { generatedAt: now, sets: released, upcoming };
+// the very next set shows its three best cards (owner's call 2026-09-18); every other unreleased set stays names-only
+const RANK = { common: 1, uncommon: 2, rare: 3, promo: 4, holo: 5, ultra: 6, sir: 7 };
+const teaserOf = (cards) => [...cards].sort((a, b) => (RANK[b.rarity] || 0) - (RANK[a.rarity] || 0) || Number(a.n) - Number(b.n)).slice(0, 3).map(c => ({ n: c.n, name: c.name, rarity: c.rarity, image: c.image }));
+const out = { generatedAt: now, sets: released, upcoming: upcoming.map(({ cards, ...u }, i) => (i === 0 ? { ...u, teaser: teaserOf(cards) } : u)) };
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify(out));
 const cards = released.reduce((n, s) => n + s.cards.length, 0);
