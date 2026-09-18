@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/db.css">
+<link rel="preload" as="image" href="{{CARD_THUMB}}">
+</head>
+<body>
+{{> nav}}
+
+<main class="wrap page" data-card="{{CARD_KEY}}">
+  <div class="crumbs"><a href="/cards">Card database</a> <span>›</span> <a href="/sets/{{SET_SLUG}}">{{SET_NAME}}</a> <span>›</span> <b>{{CARD_NAME}}</b></div>
+  <section class="card-page">
+    <div class="card-art" data-holo-group data-tilt-max="12">
+      <div class="holo-card {{CARD_RARITY}} rar-{{CARD_RARITY}}" id="artCard"><img src="{{CARD_THUMB}}" alt="{{CARD_NAME}}" decoding="async" fetchpriority="high"><div class="sk"></div><div class="foil"></div><div class="glare"></div></div>
+      <div class="card-nav" id="cardNav"></div>
+    </div>
+    <div class="card-body">
+      <span class="eyebrow">{{SET_NAME}} · #{{CARD_N}} of {{SET_TOTAL}}</span>
+      <h1>{{CARD_NAME}}</h1>
+      <div class="card-tags"><span class="rtag rar-{{CARD_RARITY}}"><span class="rdot"></span>{{CARD_RARITY_LABEL}}</span><span class="odds" id="odds"></span></div>
+
+      <div class="kpis" id="kpis">
+        <div class="kpi panel"><div class="k">In circulation</div><div class="v" id="kCopies">—</div><div class="s" id="kLast7"></div></div>
+        <div class="kpi panel"><div class="k">Trainers holding</div><div class="v" id="kHolders">—</div><div class="s" id="kScarce"></div></div>
+        <div class="kpi panel"><div class="k">Slabs</div><div class="v" id="kGraded">—</div><div class="s" id="kTens"></div></div>
+        <div class="kpi panel"><div class="k">1st Editions</div><div class="v" id="kFirst">—</div><div class="s" id="kWF"></div></div>
+      </div>
+
+      <div class="card-panels">
+        <div class="panel bd" id="gradePanel"><div class="bd-head"><h3>Grade distribution</h3><span class="bd-note" id="gradeNote"></span></div><div class="hbar" id="gradeBar"></div><div class="legend" id="gradeLegend"></div></div>
+        <div class="panel bd"><div class="bd-head"><h3>Condition in the wild</h3><span class="bd-note" id="condNote"></span></div><div class="hbar" id="condBar"></div><div class="legend" id="condLegend"></div></div>
+      </div>
+
+      <div class="panel bd" id="slabPanel" hidden><div class="bd-head"><h3>Top slabs</h3><span class="bd-note">best grades on record</span></div><div class="slab-list" id="slabList"></div></div>
+
+      <div class="want panel">
+        <div><h3>Want one?</h3><p>In Discord, <code class="cmd" data-copy="/find card:{{CARD_NAME}}">/find card:{{CARD_NAME}}</code> shows every copy and who holds it, best first. Pick one and make an offer with coins, cards or both.</p></div>
+        <div class="want-btns"><button class="btn btn-ghost btn-sm" data-copy="/find card:{{CARD_NAME}}">Copy the command</button><a class="btn btn-primary btn-sm" href="{{INVITE_URL}}">Add Pokébot</a></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+{{> foot}}
+<script src="/js/db.js" defer></script>
+</body>
+</html>

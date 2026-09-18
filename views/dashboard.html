@@ -2,86 +2,59 @@
 <html lang="en">
 <head>
 {{> head}}
+<link rel="stylesheet" href="/css/db.css">
 <link rel="stylesheet" href="/css/dashboard.css">
-<meta name="robots" content="noindex">
 </head>
 <body>
 {{> nav}}
 
-<main class="wrap dash">
-  <section class="dash-head">
-    <img class="dash-av" src="{{AVATAR}}" alt="" width="64" height="64">
-    <div class="dash-title">
-      <span class="eyebrow">My collection</span>
+<main class="wrap page dash" data-uid="{{UID}}">
+  <section class="prof-head">
+    <img class="prof-av" src="{{AVATAR}}" alt="" width="72" height="72">
+    <div class="prof-title">
+      <span class="eyebrow">My binder</span>
       <h1>Welcome back, <span class="grad">{{USERNAME}}</span></h1>
-      <p>Every card you own, live from your inventory. Updates a few minutes after each pull.</p>
+      <p class="prof-sub" id="profSub">Every card you own, a few minutes behind the game.</p>
     </div>
-    <div class="dash-actions">
-      <a class="btn btn-ghost btn-sm" href="https://top.gg/bot/1362516883785515199/vote" target="_blank" rel="noopener">🗳️ Vote · +50 coins</a>
-      <a class="btn btn-primary btn-sm" href="https://discord.gg/zj9Sxz3reR" target="_blank" rel="noopener">Open packs in Discord</a>
-    </div>
-  </section>
-
-  <section class="summary" id="summary">
-    <div class="scard panel"><div class="k">Total cards</div><div class="v" id="sTotal">—</div><div class="s" id="sUnique"></div></div>
-    <div class="scard panel"><div class="k">Sets collected</div><div class="v" id="sSets">—</div><div class="s" id="sSetsSub"></div></div>
-    <div class="scard panel"><div class="k">Graded</div><div class="v" id="sGraded">—</div><div class="s" id="sGradedSub"></div></div>
-    <div class="scard panel"><div class="k">Top grade</div><div class="v" id="sTop">—</div><div class="s" id="sTopSub"></div></div>
-    <div class="scard panel rarest" id="sRarest"><div class="rimg skel"></div><div><div class="k">Rarest pull</div><div class="nm">—</div><div class="rb"></div></div></div>
-  </section>
-
-  <section class="breakdown">
-    <div class="panel bd">
-      <div class="bd-head"><h3>Rarity breakdown</h3><span class="bd-note" id="bdNote"></span></div>
-      <div class="rbar" id="rarityBar"></div>
-      <div class="legend" id="rarityLegend"></div>
-    </div>
-    <div class="panel bd">
-      <div class="bd-head"><h3>Cards by set</h3><span class="bd-note">unique · total</span></div>
-      <div class="sets" id="setList"><div class="skel" style="height:18px"></div><div class="skel" style="height:18px"></div><div class="skel" style="height:18px"></div></div>
+    <div class="prof-actions">
+      <button class="btn btn-ghost btn-sm" data-copy="{{SITE}}/t/{{UID}}">Copy my profile link</button>
+      <a class="btn btn-ghost btn-sm" href="/t/{{UID}}">Public profile</a>
+      <a class="btn btn-primary btn-sm" href="{{VOTE_URL}}" target="_blank" rel="noopener">🗳️ Vote · coins + energy</a>
     </div>
   </section>
 
-  <section class="toolbar" id="toolbar">
-    <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="fSearch" type="search" placeholder="Search name or code…" autocomplete="off"></div>
-    <select id="fRarity" aria-label="Rarity">
-      <option value="all">All rarities</option>
-      <option value="sir">🌈 SIR</option>
-      <option value="ultra">💎 Ultra Rare</option>
-      <option value="holo">✨ Holo</option>
-      <option value="promo">🎁 Promo</option>
-      <option value="rare">🔴 Rare</option>
-      <option value="uncommon">🔵 Uncommon</option>
-      <option value="common">⚪ Common</option>
-    </select>
-    <select id="fSet" aria-label="Set"><option value="all">All sets</option></select>
-    <select id="fGrade" aria-label="Grade">
-      <option value="all">All grades</option>
-      <option value="graded">Any graded</option>
-      <option value="10">PSA 10</option><option value="9">PSA 9</option><option value="8">PSA 8</option><option value="7">PSA 7</option><option value="6">PSA 6</option>
-    </select>
-    <select id="fCondition" aria-label="Condition">
-      <option value="all">All conditions</option>
-      <option value="Pristine">Pristine</option>
-      <option value="Mint">Mint</option>
-      <option value="Near Mint">Near Mint</option>
-      <option value="Light Play">Light Play</option>
-      <option value="Damaged">Damaged</option>
-    </select>
-    <select id="fSort" aria-label="Sort">
-      <option value="newest">Newest first</option>
-      <option value="oldest">Oldest first</option>
-      <option value="rarity">Rarity ↓</option>
-      <option value="grade">Grade ↓</option>
-      <option value="name">Name A→Z</option>
-      <option value="set">Set</option>
-    </select>
-    <button class="tb-btn" id="resetBtn" type="button" title="Clear filters">Reset</button>
-    <span class="count" id="countLabel">Loading…</span>
+  <section class="kpis prof-kpis" id="profKpis"></section>
+
+  <section class="prof-grid">
+    <div class="panel bd wall-panel"><div class="bd-head"><h3>The wall</h3><span class="bd-note">your best nine · <code class="cmd">/showcase</code> posts it</span></div><div class="wall tiles" id="wall"></div></div>
+    <div class="prof-side">
+      <div class="panel bd"><div class="bd-head"><h3>Set progress</h3><span class="bd-note" id="setsNote"></span></div><div class="sets" id="sets"></div></div>
+      <div class="panel bd"><div class="bd-head"><h3>Rarity</h3><span class="bd-note" id="rarNote"></span></div><div class="hbar" id="rarBar"></div><div class="legend" id="rarLegend"></div></div>
+    </div>
   </section>
 
-  <div class="grid" id="cardGrid"></div>
-  <div class="pagination" id="pagination"></div>
+  <section class="blk-sm" id="checklistSec">
+    <div class="sec-head"><div><span class="eyebrow">Checklist</span><h2 class="h-section">What's missing</h2></div><label class="set-pick">Set <select class="field" id="checkSet"></select></label></div>
+    <div class="check-head" id="checkHead"></div>
+    <div class="tiles sm" id="checklist"></div>
+  </section>
+
+  <section class="blk-sm" id="binderSec">
+    <div class="sec-head"><div><span class="eyebrow">Binder</span><h2 class="h-section">Every card</h2></div></div>
+    <div class="toolbar" id="toolbar">
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="fSearch" type="search" placeholder="Search name or code…" autocomplete="off"></div>
+      <select id="fSpecial" aria-label="Special"><option value="all">Everything</option><option value="first">🥇 1st Editions</option><option value="wf">🌍 World Firsts</option><option value="shiny">✦ Shinies</option><option value="dupes">Duplicates</option><option value="locked">🔒 Locked</option></select>
+      <select id="fRarity" aria-label="Rarity"><option value="all">All rarities</option><option value="sir">🌈 SIR</option><option value="ultra">💎 Ultra Rare</option><option value="holo">✨ Holo</option><option value="promo">🎁 Promo</option><option value="rare">🔴 Rare</option><option value="uncommon">🔵 Uncommon</option><option value="common">⚪ Common</option></select>
+      <select id="fSet" aria-label="Set"><option value="all">All sets</option></select>
+      <select id="fGrade" aria-label="Grade"><option value="all">Slabs &amp; raw</option><option value="graded">Any slab</option><option value="raw">Raw only</option><option value="10">10</option><option value="9.5">9.5</option><option value="9">9</option><option value="8.5">8.5</option><option value="8">8</option><option value="7">7</option></select>
+      <select id="fCondition" aria-label="Condition"><option value="all">All conditions</option><option value="flawless">Flawless</option><option value="pristine">Pristine</option><option value="mint">Mint</option><option value="near mint">Near Mint</option><option value="light play">Light Play</option><option value="damaged">Damaged</option></select>
+      <select id="fSort" aria-label="Sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="rarity">Best first</option><option value="value">Value ↓</option><option value="grade">Grade ↓</option><option value="name">Name A→Z</option><option value="set">Set</option></select>
+      <button class="tb-btn" id="resetBtn" type="button" title="Clear filters">Reset</button>
+      <span class="count" id="countLabel">Loading…</span>
+    </div>
+    <div class="tiles lg" id="cardGrid"></div>
+    <div class="pagination" id="pagination"></div>
+  </section>
 </main>
 
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Card details">
@@ -91,6 +64,7 @@
 </div>
 
 {{> foot}}
+<script src="/js/db.js" defer></script>
 <script src="/js/dashboard.js" defer></script>
 </body>
 </html>

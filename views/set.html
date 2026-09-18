@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/db.css">
+</head>
+<body>
+{{> nav}}
+
+<main class="wrap page" data-set="{{SET_SLUG}}">
+  <div class="crumbs"><a href="/cards">Card database</a> <span>›</span> <b>{{SET_NAME}}</b></div>
+  <section class="set-hero panel" style="--backdrop:url('{{SET_BACKDROP}}')">
+    <div class="set-hero-copy">
+      <span class="eyebrow">{{SET_SERIES}} · {{SET_RELEASE}}</span>
+      <h1>{{SET_NAME}}</h1>
+      <p class="lead">{{SET_TOTAL}} cards. {{SET_LEAD}}</p>
+      <div class="kpis" id="setKpis">
+        <div class="kpi panel"><div class="k">In circulation</div><div class="v" id="kCopies">—</div><div class="s" id="kCopiesSub"></div></div>
+        <div class="kpi panel"><div class="k">Trainers holding</div><div class="v" id="kHolders">—</div><div class="s"></div></div>
+        <div class="kpi panel"><div class="k">Cards found</div><div class="v" id="kHeld">—</div><div class="s" id="kHeldSub"></div></div>
+        <div class="kpi panel"><div class="k">Full sets</div><div class="v" id="kFull">—</div><div class="s">complete binders</div></div>
+      </div>
+    </div>
+    <div class="set-hero-art" id="chaseRow"></div>
+  </section>
+
+  <section class="blk-sm">
+    <div class="toolbar">
+      <div class="chips" id="rarityChips"><button class="active" data-r="all">All</button></div>
+      <select class="field" id="sort" aria-label="Sort"><option value="number">By number</option><option value="rarity">Rarity ↓</option><option value="copies">Most copies</option><option value="rarest">Fewest copies</option><option value="graded">Most slabs</option></select>
+      <label class="check"><input type="checkbox" id="onlyMissing" hidden> <span id="onlyMissingLabel"></span></label>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="tiles" id="grid"><div class="skel-tiles"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div></div>
+  </section>
+</main>
+
+{{> foot}}
+<script src="/js/db.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/db.css">
+</head>
+<body>
+{{> nav}}
+
+<main class="wrap page">
+  <section class="page-head">
+    <div>
+      <span class="eyebrow">Leaderboards</span>
+      <h1>Who's <span class="grad">winning</span></h1>
+      <p class="lead">Across every server. Binders, slabs, Gem Mints, 1st Editions, World Firsts and shinies, straight from the game. Log in to see your own row.</p>
+    </div>
+    <span class="band-note" id="boardsNote"></span>
+  </section>
+
+  <div class="tabs" id="tabs"></div>
+  <section class="board panel" id="board"><div class="skel" style="height:420px"></div></section>
+  <p class="hint-line" id="boardHint"></p>
+</main>
+
+{{> foot}}
+<script src="/js/db.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/db.css">
+</head>
+<body>
+{{> nav}}
+
+<main class="wrap page profile" data-uid="{{PROFILE_UID}}" data-me="{{IS_ME}}">
+  <section class="prof-head">
+    <img class="prof-av" src="{{PROFILE_AVATAR}}" alt="" width="72" height="72">
+    <div class="prof-title">
+      <span class="eyebrow">Trainer</span>
+      <h1>{{PROFILE_NAME}}</h1>
+      <p class="prof-sub" id="profSub">—</p>
+    </div>
+    <div class="prof-actions"><button class="btn btn-ghost btn-sm" data-copy="{{SITE}}/t/{{PROFILE_UID}}">Copy profile link</button><a class="btn btn-primary btn-sm" id="profMine" href="/dashboard" hidden>Open my binder</a></div>
+  </section>
+
+  <section class="kpis prof-kpis" id="profKpis"></section>
+
+  <section class="prof-grid">
+    <div class="panel bd wall-panel"><div class="bd-head"><h3>The wall</h3><span class="bd-note">best nine</span></div><div class="wall tiles" id="wall"></div></div>
+    <div class="prof-side">
+      <div class="panel bd"><div class="bd-head"><h3>Sets</h3><span class="bd-note" id="setsNote"></span></div><div class="sets" id="sets"></div></div>
+      <div class="panel bd"><div class="bd-head"><h3>Rarity</h3><span class="bd-note" id="rarNote"></span></div><div class="hbar" id="rarBar"></div><div class="legend" id="rarLegend"></div></div>
+    </div>
+  </section>
+
+  <section class="blk-sm" id="slabsSec" hidden><div class="sec-head"><div><span class="eyebrow">Slabbed</span><h2 class="h-section">Best slabs</h2></div></div><div class="slabs" id="slabs"></div></section>
+  <section class="blk-sm" id="firstSec" hidden><div class="sec-head"><div><span class="eyebrow">Numbered</span><h2 class="h-section">1st Editions &amp; World Firsts</h2></div></div><div class="tiles" id="firsts"></div></section>
+  <section class="blk-sm" id="shinySec" hidden><div class="sec-head"><div><span class="eyebrow">One in five thousand</span><h2 class="h-section">Shinies</h2></div></div><div class="tiles" id="shinies"></div></section>
+  <section class="blk-sm" id="recentSec" hidden><div class="sec-head"><div><span class="eyebrow">Latest</span><h2 class="h-section">Recent pulls</h2></div></div><div class="tiles sm" id="recent"></div></section>
+</main>
+
+{{> foot}}
+<script src="/js/db.js" defer></script>
+</body>
+</html>
