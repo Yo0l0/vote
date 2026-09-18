@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/db.css">
+</head>
+<body>
+{{> nav}}
+
+<main class="wrap page">
+  <section class="page-head">
+    <div>
+      <span class="eyebrow">Card database</span>
+      <h1>Every card. Every set. <span class="grad">Live population.</span></h1>
+      <p class="lead">{{SETS_OUT}} sets and {{CARDS_OUT}} cards are in the game right now, with {{UPCOMING}} more on the schedule. Every number here comes from the binders themselves and refreshes every few minutes.</p>
+    </div>
+    <div class="db-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Search a card or a set… e.g. Charizard" autocomplete="off"><kbd>/</kbd></div>
+  </section>
+
+  <section class="results" id="results" hidden>
+    <div class="sec-head"><div><span class="eyebrow">Results</span><h2 class="h-section" id="resultsTitle">Cards</h2></div><button class="tb-btn" id="clearSearch" type="button">Clear</button></div>
+    <div class="tiles lg" id="resultsGrid"></div>
+  </section>
+
+  <section class="blk-sm" id="browse">
+    <div class="sec-head"><div><span class="eyebrow">Released sets</span><h2 class="h-section">Browse by set</h2></div><p>Newest first. Classic WOTC sets use real 1st Edition scans.</p></div>
+    <div class="setgrid" id="setGrid"><div class="skel" style="height:260px"></div><div class="skel" style="height:260px"></div><div class="skel" style="height:260px"></div><div class="skel" style="height:260px"></div></div>
+  </section>
+
+  <section class="blk-sm" id="upcoming">
+    <div class="sec-head"><div><span class="eyebrow">Coming up</span><h2 class="h-section">A new set every week</h2></div><p>Every expansion, in print order. Each one gets a 1st Edition week the moment it lands.</p></div>
+    <div class="schedule" id="schedule"></div>
+  </section>
+</main>
+
+{{> foot}}
+<script src="/js/db.js" defer></script>
+</body>
+</html>

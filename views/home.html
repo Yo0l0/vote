@@ -3,7 +3,6 @@
 <head>
 {{> head}}
 <link rel="stylesheet" href="/css/home.css">
-<link rel="preload" as="image" href="https://www.pikawiz.com/images/fossil/5.png">
 </head>
 <body>
 {{> nav}}
@@ -12,79 +11,109 @@
   <!-- ═══ HERO ═══ -->
   <section class="hero wrap">
     <div class="hero-copy">
-      <span class="chip"><span class="dot"></span> Live on Discord</span>
+      <span class="chip"><span class="dot"></span> Live on Discord · {{SETS_OUT}} sets · {{CARDS_OUT}} cards</span>
       <h1>Rip packs.<br>Chase the <span class="grad">foil.</span></h1>
-      <p class="lead">A premium Pokémon-style card game for your server. Open classic sets, grade your best pulls, duel rivals and corner the marketplace — all inside Discord.</p>
+      <p class="lead">A Pokémon-style card game that lives in your Discord server. Rip packs on ⚡ energy, chase 🥇 1st Editions and ✦ shinies, get your best pulls slabbed with real sub-grades, then trade, auction and duel with everyone else.</p>
       <div class="hero-btns">
-        <a class="btn btn-primary" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">
+        <a class="btn btn-primary" href="{{INVITE_URL}}">
           <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.2.4a18 18 0 0 1 4.4 2.2 16 16 0 0 0-15.2 0A18 18 0 0 1 8.8 3.4L8.6 3a19.8 19.8 0 0 0-4.9 1.5C.6 9.1-.2 13.6.2 18a20 20 0 0 0 6 3l1.3-2a12.6 12.6 0 0 1-2-1l.5-.4a14.3 14.3 0 0 0 12 0l.5.4-2 1 1.3 2a20 20 0 0 0 6-3c.5-5.1-.8-9.6-3.5-13.6ZM8.5 15.3c-1.2 0-2.1-1.1-2.1-2.4s1-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Zm7 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Z"/></svg>
           Add to Discord
         </a>
+        <a class="btn btn-ghost" href="/cards">Browse every card</a>
         <a class="btn btn-ghost" href="{{COLLECTION_HREF}}">{{COLLECTION_TEXT}}</a>
       </div>
       <div class="trust">
         <div class="avatars" aria-hidden="true"><i style="--c:#7c3aed"></i><i style="--c:#ff5ea2"></i><i style="--c:#3ee0d0"></i><i style="--c:#ffc94d"></i></div>
-        <span>Trusted by <b id="trustUsers">thousands of trainers</b> across Discord</span>
+        <span><b id="trustUsers">Trainers</b> have pulled <b id="trustCards">cards</b> across Discord</span>
       </div>
     </div>
 
     <div class="hero-art">
-      <div class="fan" data-holo-group data-tilt-max="12" id="fan">
-        <div class="holo-card is-holo c1"><img src="https://www.pikawiz.com/images/baseset/4.png" alt="Charizard holo card" decoding="async"><div class="sk"></div><div class="foil"></div><div class="glare"></div></div>
-        <div class="holo-card is-holo c2"><img src="https://www.pikawiz.com/images/fossil/5.png" alt="Gengar holo card" decoding="async"><div class="sk"></div><div class="foil"></div><div class="glare"></div></div>
-        <div class="holo-card is-holo c3"><img src="https://www.pikawiz.com/images/baseset/10.png" alt="Mewtwo holo card" decoding="async"><div class="sk"></div><div class="foil"></div><div class="glare"></div></div>
-        <div class="float f1"><span class="rdot rar-holo"></span> HOLO PULL!</div>
-        <div class="float f2">⭐ PSA 10 · Pristine</div>
-        <div class="float f3">+50 coins for voting</div>
+      <div class="fan" data-holo-group data-tilt-max="10" id="fan">
+        <div class="holo-card is-holo c1 first"><img src="/img/card?u=https%3A%2F%2Fwww.pikawiz.com%2Fimages%2Fbaseset%2F4.png&w=480" alt="Charizard, Base Set — 1st Edition World First" decoding="async"><div class="sk"></div><div class="foil"></div><div class="glare"></div></div>
+        <div class="c2">
+          <div class="slab hero-slab" style="--case:#111111">
+            <div class="slab-label"><div class="sl-co">Pokébot Grading Co.</div><div class="sl-name">Gengar <span>· Fossil · Holo</span></div><div class="sl-grade"><b>10</b><i>Black Label</i></div><div class="sl-subs"><span>CEN 10</span><span>COR 10</span><span>EDG 10</span><span>SUR 10</span></div><div class="sl-cert">PB-100842 · POP 1</div></div>
+            <div class="holo-card is-holo"><img src="/img/card?u=https%3A%2F%2Fwww.pikawiz.com%2Fimages%2Ffossil%2F5.png&w=480" alt="Gengar, Fossil — Black Label slab" decoding="async"><div class="sk"></div><div class="foil"></div><div class="glare"></div></div>
+          </div>
+        </div>
+        <div class="holo-card is-holo c3 shiny-neon"><img src="/img/card?u=https%3A%2F%2Fwww.pikawiz.com%2Fimages%2Fbaseset%2F10.png&w=480" alt="Mewtwo, Base Set — a Neon shiny" decoding="async"><div class="sk"></div><div class="foil"></div><div class="glare"></div><div class="sparkles"></div></div>
+        <div class="float f1">🥇 1st Edition #1 · <b>World First</b></div>
+        <div class="float f2">🖤 Four 10s · <b>Black Label</b></div>
+        <div class="float f3">✦ <b>Neon Mewtwo</b> · 1 in 5,000</div>
       </div>
     </div>
   </section>
 
   <!-- ═══ LIVE STATS ═══ -->
   <section class="wrap band reveal" id="stats">
-    <div class="band-head"><span class="chip"><span class="dot"></span> Live network stats</span><span class="band-note" id="statsNote">Updates every minute</span></div>
+    <div class="band-head"><span class="chip"><span class="dot"></span> Live across every server</span><span class="band-note" id="statsNote">Updates every minute</span></div>
     <div class="stats">
-      <div class="stat panel lift"><div class="ic">🎴</div><span class="num" id="statCards">—</span><div class="lbl">Cards dropped</div></div>
-      <div class="stat panel lift"><div class="ic">🧑‍🚀</div><span class="num" id="statUsers">—</span><div class="lbl">Trainers</div></div>
-      <div class="stat panel lift"><div class="ic">📦</div><span class="num" id="statPacks">—</span><div class="lbl">Packs opened</div></div>
-      <div class="stat panel lift"><div class="ic">⚡</div><span class="num" id="statToday">—</span><div class="lbl">Drops today</div></div>
-      <div class="stat panel lift"><div class="ic">📈</div><span class="num" id="statWeek">—</span><div class="lbl">Avg / day this week</div><div class="delta" id="statDelta"></div></div>
+      <div class="stat panel lift"><div class="ic">🎴</div><span class="num" id="statCards">—</span><div class="lbl">Cards pulled</div></div>
+      <div class="stat panel lift"><div class="ic">🧑‍🚀</div><span class="num" id="statUsers">—</span><div class="lbl">Trainers</div><div class="delta" id="statActive"></div></div>
+      <div class="stat panel lift"><div class="ic">📦</div><span class="num" id="statPacks">—</span><div class="lbl">Packs ripped</div></div>
+      <div class="stat panel lift"><div class="ic">⚡</div><span class="num" id="statToday">—</span><div class="lbl">Pulled today</div><div class="spark" id="statSpark" aria-label="Pulls per day, last 14 days"></div><div class="delta" id="statDelta"></div></div>
+      <div class="stat panel lift"><div class="ic">🏅</div><span class="num" id="statSlabs">—</span><div class="lbl">Slabs graded</div><div class="delta" id="statGems"></div></div>
+      <div class="stat panel lift"><div class="ic">🥇</div><span class="num" id="statFirst">—</span><div class="lbl">1st Editions</div><div class="delta" id="statWF"></div></div>
     </div>
+    <p class="band-foot" id="shinyLine" hidden></p>
   </section>
 
   <!-- ═══ LIVE FEED ═══ -->
   <section class="feed reveal" id="feed" hidden>
-    <div class="wrap feed-head"><span class="eyebrow">Recent pulls across the network</span></div>
+    <div class="wrap feed-head"><span class="eyebrow">Pulled just now, somewhere on Discord</span></div>
     <div class="marquee"><div class="track" id="feedTrack"></div></div>
+  </section>
+
+  <!-- ═══ BIG PULLS ═══ -->
+  <section class="blk wrap" id="showcase" hidden>
+    <div class="sec-head reveal">
+      <div><span class="eyebrow">Fresh from the packs</span><h2 class="h-section">This week's big pulls</h2></div>
+      <p>The best cards ripped on the network in the last seven days. Every one links to its page in the card database.</p>
+    </div>
+    <div class="showcase reveal" id="showcaseGrid"></div>
+  </section>
+
+  <!-- ═══ NEXT SET ═══ -->
+  <section class="wrap reveal" id="nextset" data-at="{{NEXT_SET_AT}}">
+    <div class="next panel">
+      <div class="next-copy">
+        <span class="eyebrow">A new set every week</span>
+        <h2 class="h-section">Next up: <span class="grad">{{NEXT_SET_NAME}}</span></h2>
+        <p>{{NEXT_SET_TOTAL}} cards drop on {{NEXT_SET_DATE}}. Every card pulled in its first seven days is a numbered <b>🥇 1st Edition</b>, and the very first copy of each card is its <b>🌍 World First</b>. After the week, it prints Unlimited forever.</p>
+        <div class="hero-btns"><a class="btn btn-ghost btn-sm" href="/cards#upcoming">See the whole schedule</a><a class="btn btn-primary btn-sm" href="/sets/{{NEWEST_SET_SLUG}}">Newest set: {{NEWEST_SET_NAME}}</a></div>
+      </div>
+      <div class="countdown" id="countdown"><div><b>—</b><span>days</span></div><div><b>—</b><span>hours</span></div><div><b>—</b><span>min</span></div><div><b>—</b><span>sec</span></div></div>
+    </div>
   </section>
 
   <!-- ═══ HOW IT WORKS ═══ -->
   <section class="blk wrap" id="how">
     <div class="sec-head reveal">
       <div><span class="eyebrow">How it works</span><h2 class="h-section">From invite to first holo<br>in <span class="grad">under a minute</span></h2></div>
-      <p>No setup, no config. Add the bot, type a slash command, and the packs start dropping.</p>
+      <p>No setup, no config. Add the bot, type <code class="cmd">/play</code>, and the packs start dropping.</p>
     </div>
     <div class="how">
       <div class="steps">
-        <div class="step panel reveal" data-delay="1"><div class="n">1</div><h3>Add Pokebot</h3><p>Invite it to your server with one click. Optionally set a drop channel with <code class="cmd">/setchannel</code> for holo events.</p></div>
-        <div class="step panel reveal" data-delay="2"><div class="n">2</div><h3>Rip your first pack</h3><p>Run <code class="cmd">/openpack</code> or pick a set with <code class="cmd">/packs</code>. Claim <code class="cmd">/daily</code> coins and <code class="cmd">/vote</code> rewards to open more.</p></div>
-        <div class="step panel reveal" data-delay="3"><div class="n">3</div><h3>Grade, duel, trade</h3><p>Send pulls to <code class="cmd">/grade</code>, build a 5-card <code class="cmd">/deck</code>, <code class="cmd">/duel</code> rivals and list cards on the <code class="cmd">/shop</code>.</p></div>
+        <div class="step panel reveal" data-delay="1"><div class="n">1</div><h3>Add Pokébot</h3><p>One click. <code class="cmd">/start</code> hands you a starter bundle; an admin can pick a drop channel with <code class="cmd">/setchannel</code> so wild drops and new-set announcements land somewhere everyone sees.</p></div>
+        <div class="step panel reveal" data-delay="2"><div class="n">2</div><h3>Rip packs on energy</h3><p>No timers to babysit: you hold up to <b>3 packs of ⚡ energy</b>, one refills every 2 hours, and you earn more from <code class="cmd">/daily</code>, gym wins, quiz streaks and <code class="cmd">/vote</code>. Aim <code class="cmd">/openpack</code> at the set you're chasing.</p></div>
+        <div class="step panel reveal" data-delay="3"><div class="n">3</div><h3>Grade, trade, battle</h3><p>Send a pull to the <code class="cmd">/grade</code> desk and crack the slab in front of your server. <code class="cmd">/find</code> any card and make an offer on it. Take on the <code class="cmd">/gym</code> leaders or <code class="cmd">/duel</code> a rival.</p></div>
       </div>
 
-      <div class="discord reveal" aria-label="Example of Pokebot in Discord">
+      <div class="discord reveal" aria-label="Example of Pokébot in Discord">
         <div class="dc-top"><span></span><span></span><span></span><em># card-drops</em></div>
-        <div class="msg"><div class="av u"></div><div><div class="who">Trainer <time>Today at 9:41 PM</time></div><div class="txt"><span class="slash">/openpack</span></div></div></div>
-        <div class="msg"><img class="av" src="/img/pokebot.png" alt=""><div><div class="who">Pokebot <i class="bot">APP</i> <time>Today at 9:41 PM</time></div>
+        <div class="msg"><div class="av u"></div><div><div class="who">Trainer <time>Today at 9:41 PM</time></div><div class="txt"><span class="slash">/openpack</span> <span class="slash-opt">set: {{NEWEST_SET_NAME}}</span></div></div></div>
+        <div class="msg"><img class="av" src="/img/pokebot.png" alt=""><div><div class="who">Pokébot <i class="bot">APP</i> <time>Today at 9:41 PM</time></div>
           <div class="embed">
-            <div class="et">📦 You opened a <b>Base Set</b> pack!</div>
+            <div class="et">📦 Trainer ripped a <b>{{NEWEST_SET_NAME}}</b> pack — 🥇 1st Edition week!</div>
             <ul class="pulls-list">
-              <li class="rar-common"><span class="rdot"></span> Magnemite <span class="rtag">Common</span></li>
-              <li class="rar-common"><span class="rdot"></span> Squirtle <span class="rtag">Common</span></li>
-              <li class="rar-uncommon"><span class="rdot"></span> Dratini <span class="rtag">Uncommon</span></li>
-              <li class="rar-rare"><span class="rdot"></span> Nidoking <span class="rtag">Rare</span></li>
-              <li class="rar-holo hot"><span class="rdot"></span> Charizard <span class="rtag">Holo ✨</span></li>
+              <li class="rar-common"><span class="rdot"></span> Zubat <span class="rtag">Common</span></li>
+              <li class="rar-common"><span class="rdot"></span> Slugma <span class="rtag">Common</span></li>
+              <li class="rar-uncommon"><span class="rdot"></span> Flaaffy <span class="rtag">Uncommon</span></li>
+              <li class="rar-uncommon"><span class="rdot"></span> Golbat <span class="rtag">Uncommon</span></li>
+              <li class="rar-ultra hot"><span class="rdot"></span> Shining Gyarados · 🥇 #17 <span class="rtag">Ultra Rare</span></li>
             </ul>
-            <div class="ef">Next pack in 5:00 · <b>/grade</b> that Charizard!</div>
+            <div class="ef">⚡ 2 packs of energy left · refills in 1h 42m · <b>/grade</b> that Gyarados!</div>
           </div>
         </div></div>
       </div>
@@ -94,17 +123,21 @@
   <!-- ═══ RARITY LADDER ═══ -->
   <section class="blk wrap" id="rarity">
     <div class="sec-head reveal">
-      <div><span class="eyebrow">Rarity ladder</span><h2 class="h-section">Seven tiers to chase</h2></div>
-      <p>Every pack rolls the ladder. Most pulls are staples; the shimmering ones are why you keep opening.</p>
+      <div><span class="eyebrow">Rarity ladder</span><h2 class="h-section">Seven tiers to chase, and two ways any card turns legendary</h2></div>
+      <p>Every pack has two commons, two uncommons and one bonus slot that rolls the ladder. Holo Weekends double the holo odds; a Legendary pack triples the chance of a God Pack (all five Holo or better, 1 in 200).</p>
     </div>
     <div class="ladder reveal">
       <div class="tier rar-common"><div class="bar"></div><div class="tn">Common</div><div class="td">The backbone of every binder.</div></div>
       <div class="tier rar-uncommon"><div class="bar"></div><div class="tn">Uncommon</div><div class="td">A cut above the staples.</div></div>
-      <div class="tier rar-rare"><div class="bar"></div><div class="tn">Rare</div><div class="td">Worth setting aside.</div></div>
+      <div class="tier rar-rare"><div class="bar"></div><div class="tn">Rare</div><div class="td">20% of bonus slots.</div></div>
       <div class="tier rar-promo"><div class="bar"></div><div class="tn">Promo</div><div class="td">Black-star exclusives.</div></div>
-      <div class="tier rar-holo shine"><div class="bar"></div><div class="tn">Holo</div><div class="td">The classic shimmer.</div></div>
-      <div class="tier rar-ultra shine"><div class="bar"></div><div class="tn">Ultra Rare</div><div class="td">Full arts: ex, V, VMAX, LV.X, Illustration Rares.</div></div>
-      <div class="tier rar-sir shine"><div class="bar"></div><div class="tn">SIR</div><div class="td">Special illustrations, rainbows, golds. The crown.</div></div>
+      <div class="tier rar-holo shine"><div class="bar"></div><div class="tn">Holo</div><div class="td">The classic shimmer. 9% of bonus slots.</div></div>
+      <div class="tier rar-ultra shine"><div class="bar"></div><div class="tn">Ultra Rare</div><div class="td">Full arts, ex, V, VMAX, Shinings. 4%.</div></div>
+      <div class="tier rar-sir shine"><div class="bar"></div><div class="tn">SIR</div><div class="td">Special illustrations, rainbows, golds. 1.5%.</div></div>
+    </div>
+    <div class="specials reveal">
+      <div class="special panel"><div class="sp-ic">🥇</div><div><h3>1st Edition &amp; World First</h3><p>Every card pulled in a set's first seven days is a numbered 1st Edition with the real WOTC stamp, never printed again. Copy #1 is the World First, stamped in gold. 1st Editions sell for 3×, World Firsts for 10×, and a slab prints <b>1ST EDITION</b> on its label.</p></div></div>
+      <div class="special panel shiny-panel"><div class="sp-ic">✦</div><div><h3>Shinies</h3><p>One card in five thousand is born shiny: the whole card re-toned by the bot (Neon, Noir, Ghost, Chrome, Gold, Void) with a look and a name rolled from its code, so no two are alike. Ranks above SIR, sells for 20×, and the whole server hears about it.</p></div></div>
     </div>
   </section>
 
@@ -112,54 +145,61 @@
   <section class="blk wrap" id="features">
     <div class="sec-head reveal">
       <div><span class="eyebrow">Features</span><h2 class="h-section">Everything a collector wants</h2></div>
-      <p>Built like a real trading-card economy: scarcity, condition, grading and a player-driven market.</p>
+      <p>Built like a real card economy: scarcity, condition, grading, a player market, and a server full of people watching every reveal.</p>
     </div>
     <div class="grid3">
-      <div class="feat panel lift reveal" data-delay="1"><div class="fi" style="--a:#a878ff"><svg viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2-2h8l6 6v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z"/><path d="M14 5v6h6"/></svg></div><h3>Pack opening</h3><p>Rip packs from Base Set, Jungle, Fossil, Team Rocket, Gym Heroes and more on a cooldown. Buy extra packs with coins.</p></div>
-      <div class="feat panel lift reveal" data-delay="2"><div class="fi" style="--a:#ffc94d"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/></svg></div><h3>Pro grading</h3><p>Send cards to the lab with <code class="cmd">/grade</code>. Pristine cards can hit a perfect 10 — and are worth far more.</p></div>
-      <div class="feat panel lift reveal" data-delay="3"><div class="fi" style="--a:#ff5ea2"><svg viewBox="0 0 24 24"><path d="M14.5 3.5L20 9l-9.5 9.5L5 13z"/><path d="M4 20l3-3M16 5l3 3"/></svg></div><h3>Duels</h3><p>Build a 5-card deck and challenge trainers. Attack, defend, heal and unleash rarity moves to win.</p></div>
-      <div class="feat panel lift reveal" data-delay="1"><div class="fi" style="--a:#3ee0d0"><svg viewBox="0 0 24 24"><path d="M3 9l1-4h16l1 4M3 9h18v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9z"/><path d="M9 20v-6h6v6"/></svg></div><h3>Marketplace</h3><p>List cards, browse player shops and track price history with <code class="cmd">/cardtrend</code> to snipe the best deals.</p></div>
-      <div class="feat panel lift reveal" data-delay="2"><div class="fi" style="--a:#5effa6"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 18a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 9V3"/></svg></div><h3>Card fusion</h3><p>Fuse three identical cards with <code class="cmd">/fuse</code> to upgrade their condition toward Pristine.</p></div>
-      <div class="feat panel lift reveal" data-delay="3"><div class="fi" style="--a:#fb923c"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg></div><h3>Leaderboards</h3><p>Compete globally and per-server for coins, aura, top grades and collection size. Quizzes and journeys earn extra.</p></div>
+      <div class="feat panel lift reveal" data-delay="1"><div class="fi" style="--a:#ffc94d"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/></svg></div><h3>Pokébot Grading Co.</h3><p>Four sub-grades on a half-point scale, the Beckett lowest-sub rule, Black Labels for four straight 10s. Pick a lane from 6 hours to 5 days; fees and wait times move with the queue. Roll case colours (Obsidian Black is 1 in 400) and paint your slab.</p></div>
+      <div class="feat panel lift reveal" data-delay="2"><div class="fi" style="--a:#3ee0d0"><svg viewBox="0 0 24 24"><path d="M3 9l1-4h16l1 4M3 9h18v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9z"/><path d="M9 20v-6h6v6"/></svg></div><h3>Find, offer, trade, auction</h3><p><code class="cmd">/find</code> shows every copy of a card and who holds it. Put coins, cards or both on the table and haggle for six rounds by DM — every deal is escrowed, so a yes always goes through. Or run a bid war with <code class="cmd">/auction</code>.</p></div>
+      <div class="feat panel lift reveal" data-delay="3"><div class="fi" style="--a:#ff5ea2"><svg viewBox="0 0 24 24"><path d="M14.5 3.5L20 9l-9.5 9.5L5 13z"/><path d="M4 20l3-3M16 5l3 3"/></svg></div><h3>Gym leaders &amp; duels</h3><p>Battle eight AI Gym Leaders solo, read their moves, earn badges, coins and packs. Or <code class="cmd">/duel</code> another trainer with a card straight from your binder. Graded cards fight harder.</p></div>
+      <div class="feat panel lift reveal" data-delay="1"><div class="fi" style="--a:#5effa6"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 18a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 9V3"/></svg></div><h3>The forge &amp; fusion</h3><p>Melt spare duplicates into stardust and forge the exact cards your binder is missing, boosts, misfires and Perfect Forges included. Or <code class="cmd">/fuse</code> three copies into one of better condition, all the way to Flawless.</p></div>
+      <div class="feat panel lift reveal" data-delay="2"><div class="fi" style="--a:#a878ff"><svg viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2-2h8l6 6v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z"/><path d="M14 5v6h6"/></svg></div><h3>Checklists, chase &amp; wild drops</h3><p>Aim every pack at your chase set and watch the Chase Meter fill: five packs earn a free Chase Pack with doubled holo odds. Set milestones pay out automatically. Busy servers get sealed packs dropped in the channel: first to claim keeps it.</p></div>
+      <div class="feat panel lift reveal" data-delay="3"><div class="fi" style="--a:#fb923c"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg></div><h3>Seasons, quests, leaderboards</h3><p>A monthly race with prizes, daily and weekly quests, achievements with real rewards, a weekly drop champion in every server, and global boards for binders, Gem Mints, 1st Editions and shinies, <a href="/leaderboards">right here on the site</a>.</p></div>
     </div>
+    <div class="also reveal">
+      <span class="eyebrow">Also in the box</span>
+      <div class="also-chips"><span>🎯 Chase Meter</span><span>👀 Pack Peek</span><span>🎉 Holo Weekend</span><span>🖼️ /showcase</span><span>📋 Hunt board</span><span>🎁 Mystery box</span><span>🧠 /quiz</span><span>🗺️ /journey</span><span>🎰 Slots &amp; blackjack</span><span>⏰ Reminders</span><span>🏆 Achievements</span><span>📣 Update posts</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ CARD DATABASE TEASER ═══ -->
+  <section class="blk wrap" id="database">
+    <div class="sec-head reveal">
+      <div><span class="eyebrow">Card database</span><h2 class="h-section">Every card. Every set. <span class="grad">Live population.</span></h2></div>
+      <p>How many copies of a card exist, how many trainers hold one, the best slab, every 1st Edition and shiny, updated every few minutes from the game itself.</p>
+    </div>
+    <div class="setgrid reveal" id="dbTeaser"></div>
+    <div class="center reveal"><a class="btn btn-ghost" href="/cards">Open the database</a></div>
   </section>
 
   <!-- ═══ TRY A PACK ═══ -->
   <section class="blk wrap" id="try">
     <div class="sec-head reveal">
       <div><span class="eyebrow">Try it here</span><h2 class="h-section">Open a <span class="grad">demo pack</span></h2></div>
-      <p>Five real cards from the live card pool, rolled with pack-style odds. Just a taste — real pulls happen in Discord.</p>
+      <p>The bot's real pack shape and real odds on the live card pool: two commons, two uncommons, one bonus slot; God Packs at 1 in 200; shinies at 1 in 5,000. Real pulls happen in Discord.</p>
     </div>
     <div class="try reveal">
+      <div class="try-top"><label class="set-pick">Set <select id="packSet"><option value="">Every released set</option></select></label><span class="try-note" id="tryNote">Base and Neo sets are WOTC scans; pull odds match <code class="cmd">/openpack odds</code></span></div>
       <div class="pack-stage" id="packStage">
         <button class="pack" id="packBtn" aria-label="Open a demo pack">
           <div class="pk-foil"></div>
-          <div class="pk-body"><img src="/img/pokebot.png" alt=""><div class="pk-name">Pokebot</div><div class="pk-sub">Booster pack · 5 cards</div></div>
+          <div class="pk-body"><img src="/img/pokebot.png" alt=""><div class="pk-name">Pokébot</div><div class="pk-sub" id="pkSub">Booster pack · 5 cards</div></div>
           <div class="pk-hint">Click to rip open</div>
         </button>
       </div>
       <div class="pulls" id="pulls" hidden></div>
       <div class="try-foot" id="tryFoot" hidden>
         <div class="try-sum" id="trySummary"></div>
-        <div class="try-btns"><button class="btn btn-ghost btn-sm" id="againBtn">Open another</button><a class="btn btn-primary btn-sm" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">Open real packs</a></div>
+        <div class="try-btns"><button class="btn btn-ghost btn-sm" id="againBtn">Open another</button><a class="btn btn-primary btn-sm" href="{{INVITE_URL}}">Open real packs</a></div>
       </div>
+      <div class="try-stats" id="tryStats" hidden></div>
     </div>
-  </section>
-
-  <!-- ═══ SHOWCASE (latest big pulls) ═══ -->
-  <section class="blk wrap" id="showcase" hidden>
-    <div class="sec-head reveal">
-      <div><span class="eyebrow">Fresh from the packs</span><h2 class="h-section">Latest big pulls</h2></div>
-      <p>The rarest cards ripped on the network in the last few days.</p>
-    </div>
-    <div class="showcase reveal" id="showcaseGrid"></div>
   </section>
 
   <!-- ═══ UPDATES ═══ -->
   <section class="blk wrap" id="updates">
     <div class="sec-head reveal">
       <div><span class="eyebrow">Changelog</span><h2 class="h-section">Latest updates</h2></div>
-      <p>New sets, rarities and balance changes land here first.</p>
+      <p>Straight from the bot: every deploy and every new set writes its own entry here.</p>
     </div>
     <div class="news reveal" id="newsGrid"><div class="skel" style="height:120px"></div><div class="skel" style="height:120px"></div><div class="skel" style="height:120px"></div></div>
   </section>
@@ -169,11 +209,11 @@
     <div class="cta-band reveal">
       <div class="cta-glow" aria-hidden="true"></div>
       <span class="eyebrow">Ready when you are</span>
-      <h2>Start your collection tonight</h2>
-      <p>Add Pokebot to your server and open your first pack in seconds. Free to play, no setup.</p>
+      <h2>Start your binder tonight</h2>
+      <p>Add Pokébot to your server and rip your starter pack in seconds. Free to play, no setup, new set every week.</p>
       <div class="hero-btns" style="justify-content:center">
-        <a class="btn btn-primary" href="https://discord.com/oauth2/authorize?client_id=1362516883785515199&permissions=534723951680&scope=bot+applications.commands">Add to Discord</a>
-        <a class="btn btn-ghost" href="https://discord.gg/zj9Sxz3reR" target="_blank" rel="noopener">Join the support server</a>
+        <a class="btn btn-primary" href="{{INVITE_URL}}">Add to Discord</a>
+        <a class="btn btn-ghost" href="{{SUPPORT_URL}}" target="_blank" rel="noopener">Join the support server</a>
       </div>
     </div>
   </section>

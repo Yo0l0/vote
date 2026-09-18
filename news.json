@@ -1,126 +1,253 @@
 [
   {
-    "id": "weekly-roundup",
-    "date": "2026-09-08",
-    "tag": "New",
-    "title": "Sunday round-up",
-    "body": [
-      "Every Sunday your server gets one picture: the week's top three collectors, the rarest pull, the best grade back and the set everyone is chasing.",
-      "Nothing to set up — it posts itself."
-    ]
-  },
-  {
-    "id": "set-posters",
-    "date": "2026-09-08",
-    "tag": "New",
-    "title": "New sets arrive with a poster",
-    "body": [
-      "Every weekly set now lands with its three chase cards, the card count and how many holos are inside.",
-      "One button on the post makes it your chase set."
-    ]
-  },
-  {
-    "id": "fix-sweep-0908",
-    "date": "2026-09-08",
-    "tag": "Fixed",
-    "title": "Gym fights work again",
-    "body": [
-      "/gym and every battle button were dead. Fixed — along with SIR cards missing Power Strike and a double payout on a fast double click.",
-      "Also fixed: /swapcodes, /cardtrend, inventory filters, and blackjack and /pickcard timing out."
-    ]
-  },
-  {
-    "id": "wishlist-board",
-    "date": "2026-09-07",
-    "tag": "New",
-    "title": "Wishlist hunt board",
-    "body": [
-      "Pin up to eight cards to a MOST WANTED board your server can see, with the real odds on each one.",
-      "Pull one and it's a WISH GRANTED: +25 coins, +10 XP. Pull someone else's and they hear about your spare."
-    ]
-  },
-  {
-    "id": "public-by-default",
-    "date": "2026-09-07",
-    "tag": "Changed",
-    "title": "Out in the open",
-    "body": [
-      "Grading orders, wishlist pins, level-ups and achievements now post where the room can see them.",
-      "Errors, pickers and your ledger stay private."
-    ]
-  },
-  {
-    "id": "pack-energy",
-    "date": "2026-09-02",
-    "tag": "Changed",
-    "title": "Pack Energy replaces the timer",
-    "body": [
-      "The 20-minute wait is gone: hold up to 3 packs, with one coming back every 2 hours.",
-      "Earn more from /daily, gym wins, Peeks, votes and quiz streaks — stacking up to 6."
-    ]
-  },
-  {
-    "id": "grading-house",
-    "date": "2026-09-02",
-    "tag": "New",
-    "title": "The grading house",
-    "body": [
-      "Four sub-grades — centering, corners, edges, surface — and the lowest one sets your grade. Four 10s is a Black Label.",
-      "Four lanes from Economy to Super Express, pricing that moves with the queue, real cert numbers and a printed slab."
-    ]
-  },
-  {
-    "id": "pack-reveal-peek",
-    "date": "2026-09-02",
-    "tag": "New",
-    "title": "New pack reveal, Peek and binders",
-    "body": [
-      "Packs open as a five-card spread with the best pull lifted out of the row.",
-      "A spare goes to the first server-mate who claims it, /showcase prints your top nine, and Holo Weekend doubles bonus holo odds."
-    ]
-  },
-  {
-    "id": "set-catalog",
-    "date": "2026-09-02",
-    "tag": "New",
-    "title": "127 sets, 17,000 cards",
-    "body": [
-      "The full expansion catalog is staged in print order.",
-      "A new set goes live every week — /upcoming shows what's next."
-    ]
-  },
-  {
-    "id": "guide",
-    "date": "2026-09-02",
-    "tag": "New",
-    "title": "/guide",
-    "body": [
-      "Seven chapters on packs, coins, grading, duels and trading, with every number read from the live balance."
-    ]
-  },
-  {
-    "id": "gambling-cooldown",
-    "date": "2026-02-24",
-    "tag": "Changed",
-    "title": "Gambling Cooldown",
-    "body": [
-      "Fixed cooldown system",
-      "❌ Old: Win 2 mins | Lose 2 mins | Jackpot 4 mins",
-      "✅ New: Win 10s | Lose 5s | Jackpot 20s"
-    ]
-  },
-  {
-    "id": "set-ex-deoxys",
-    "date": "2026-02-24",
+    "date": "2026-09-16",
     "tag": "New set",
-    "title": "New SET",
-    "body": "⭐EX Deoxys⭐"
+    "id": "set:Neo Revelation",
+    "title": "Neo Revelation",
+    "body": [
+      "61 new cards · 14 holos are in the packs.",
+      "The chase: Shining Gyarados · Shining Magikarp · Ho-oh"
+    ]
   },
   {
-    "id": "rarity-sir",
-    "date": "2026-02-24",
+    "id": "find-offers-collection-2026-09-15",
+    "date": "2026-09-15",
     "tag": "New",
-    "title": "New Rarity",
-    "body": "SIR cards are here!!"
+    "title": "🔎 Find & offer · /collection",
+    "body": [
+      "/find card: shows every copy of a card and who has it — trainers in your server by name, everyone else as a trainer in another server. Pick a copy to make an offer.",
+      "Offers: put coins, cards or both on the table. The owner gets a DM to accept, counter or decline, and you can go back and forth for up to 6 rounds. Your coins and cards are held while they decide, so a yes always goes through. Every finished deal is posted in the channel where it started. /offers inbox shows yours; /offers settings controls who can send you offers.",
+      "/inventory is now /collection, with filters that combine: name, set, rarity, 1st Edition / World First / Unlimited, condition, shiny, graded, duplicates and tradeable — sorted by value, 1st Edition number and more. /collection user: shows anyone's cards, with a button to make an offer. The set checklist is now /checklist.",
+      "Also: your hunt board shows who owns each card, you get a DM when a card you hunt is listed on the market, and market and auction pages with six listings load again."
+    ]
+  },
+  {
+    "id": "first-edition-2026-09-15",
+    "date": "2026-09-15",
+    "tag": "New",
+    "title": "🥇 1st Edition",
+    "body": [
+      "The card pictures for Base Set through Neo Destiny have always been scans of real 1st Edition cards, so every copy wore the 1st Edition stamp. Now 1st Edition is real — and rare.",
+      "Cards from before today: the first 25 copies of every card, by the date they were pulled, are 1st Edition #1–#25. Every other copy is Unlimited — the same card with the stamp lifted off. From today those sets come out Unlimited.",
+      "New sets: every set that releases from now on has a 1st Edition week. Every card of that set pulled in its first 7 days is 1st Edition, numbered in the order it was pulled, and never printed again. The first copy of each card is its World First, with the stamp in gold. Neo Revelation is the first.",
+      "How the stamp is made: on Base–Neo cards it is the genuine WOTC stamp from the scan. Sets that were never printed with one get that same stamp copied onto them, where WOTC put it: just under the bottom-left of the artwork on a Pokémon, beside the illustrator's name on a Trainer. 1st Editions sell for 3× (World First 10×), can't be fused or dusted, show their number everywhere, and a slab prints 1ST EDITION on its label."
+    ]
+  },
+  {
+    "id": "god-pack-rarer-2026-09-15",
+    "date": "2026-09-15",
+    "tag": "Changed",
+    "title": "🌟 God Packs are rarer",
+    "body": [
+      "A God Pack — all five cards Holo or better — is now 1 in 200 packs instead of 1 in 100. A Legendary pack still rolls 3x that, and a pack aimed at the week's featured set still doubles it.",
+      "About ten were opened every day across every server, which made the announcement ordinary. Half as many should make it worth shouting about again. /openpack odds and /guide show the live numbers."
+    ]
+  },
+  {
+    "id": "drop-champion-2026-09-14",
+    "date": "2026-09-14",
+    "tag": "New",
+    "title": "🌟 Weekly drop champion",
+    "body": [
+      "Every Sunday the round-up in your server names the drop champion: whoever claimed the most wild drops there that week (at least three). The champion gets 500 coins and a sealed pack.",
+      "Servers where nobody has claimed a drop in a while now get one drop a day instead of a stream of them. As soon as someone claims one, or a few players start using the bot there again, drops come back at the usual pace."
+    ]
+  },
+  {
+    "id": "shiny-2026-09-14",
+    "date": "2026-09-14",
+    "tag": "New",
+    "title": "✦ Shiny cards",
+    "body": [
+      "One card in five thousand from packs (one in five thousand wild drops) is born shiny — about one shiny every 1,000 packs, so most players will never pull one. Every card in a Premium pack rolls 1.5× the shiny chance, and in a Legendary pack 2×: the whole card re-coloured by the bot — frame, name, text and all — in a look rolled when it's born. Plain new colours are common; Midnight, Pastel and Sepia are uncommon; Neon, Noir (black and white) and Negative are rare; Ghost and Chrome are epic; Void (black, with every outline glowing in one colour) and Gold are legendary — about one in 125,000 cards.",
+      "A shiny's hue, sparkles and name come from its code, so the same shiny always looks the same and no two are alike. It ranks above Special Illustration, is numbered per card, sells for 20× the card, costs double to grade, can't be dusted or fused, and wears its ✦ and name in every list, trade, market and auction. /shinies shows every one that exists and who holds it. When one is pulled, the whole server hears about it — and a shiny wild drop never expires: it waits in its channel until someone claims it."
+    ]
+  },
+  {
+    "id": "pack-result-2026-09-14",
+    "date": "2026-09-14",
+    "tag": "Changed",
+    "title": "The pack picture got bigger — and honest",
+    "body": [
+      "Discord shows the pack picture about 400 px wide, and the old wide canvas came out 400×208 — the four \"also in this pack\" cards were 47 px on screen. The picture is now near-square, so every card is about the size the old hero was, under a torn foil band that carries the set, the tier, how many were new and your set progress.",
+      "A Damaged Uncommon no longer gets the big hero treatment. A plain pack shows all five cards as a spread; a Holo or better gets the hero layout with its four companions beside it.",
+      "The text under it says less: the set name once, the Chase Meter as a field next to your progress, no repeated NEW count or headline card, and the low-energy vote hint lives in the footer. The Peek button explains itself."
+    ]
+  },
+  {
+    "id": "drops-when-you-are-there",
+    "date": "2026-09-14",
+    "tag": "Changed",
+    "title": "Way more drops — and some are Ultra Rares",
+    "body": [
+      "Wild drops used to roll blindly around the clock — about two a day per server, at any hour, and fewer than half were ever claimed. Now every server rolls for a drop every 10 minutes, with no daily limit: a quiet server still sees one about every 2 hours, and while someone has used the bot there in the last hour the odds jump — an active 8-hour evening sees around 14. One drop in ten is a 💎 Ultra Rare instead of a Holo, and drops only come from sets that are already out.",
+      "Pack drops needed 10 commands in an hour and gave you 10 minutes to claim — only 19 servers ever saw one and two thirds expired. Now it's 3 commands in an hour, a drop can come every 30 minutes, and you have 30 minutes to claim it."
+    ]
+  },
+  {
+    "id": "ultra-rare",
+    "date": "2026-09-14",
+    "tag": "New",
+    "title": "💎 Ultra Rare — a new tier between Holo and Special Illustration",
+    "body": [
+      "Until now a plain Holo and a full-art Charizard ex were the same rarity. The full arts have their own tier now: ex, EX, GX, V, VMAX, VSTAR, LV.X, Prime, LEGEND, Illustration Rares, ACE SPECs, Radiants, Amazing Rares, Prism Stars, the Neo Destiny Shinings and the baby shinies — about 3,000 printings — are 💎 Ultra Rare. Gold Stars join the 🌈 Special Illustration tier at the top.",
+      "The bonus slot rolls an Ultra Rare about 4% of the time (5% in the featured set); a Legendary pack's guaranteed slot is an Ultra Rare one time in four; a God Pack is five cards that are Holo or better. Ultra Rares sell for 20, cost 135 to grade, give 22 stardust, hit harder in the gym and have their own forge recipe (900 dust + 2 spare holos). Cards you already own were re-tiered automatically — check your binder."
+    ]
+  },
+  {
+    "id": "card-corrections",
+    "date": "2026-09-14",
+    "tag": "Fixed",
+    "title": "Every card checked against the real set lists",
+    "body": [
+      "All 18,151 printings were checked against the official set lists. In the original eleven sets a few cards showed a different card's art (Base Set Metapod had Magmar's picture; a run of Gym Heroes cards was shifted by one) and about 130 rarities were wrong — Neo Genesis had no uncommons at all, the Neo Destiny Shinings were plain rares, Gym Heroes had rares listed as commons. Fixed in the pool and in every binder: cards you already own now carry the right picture and rarity.",
+      "Also tidied: 7,800 cards that said \"Light play\" or had no condition at all now read Light Play / Near Mint like every other card."
+    ]
+  },
+  {
+    "id": "pictures-reliable",
+    "date": "2026-09-14",
+    "tag": "Fixed",
+    "title": "Card pictures that never showed up",
+    "body": [
+      "When a picture host was slow, the bot gave up after one try and baked a Poké Ball placeholder into your pack picture or slab for good. Every card picture now gets a second, longer try and is kept on the server once fetched, so it shows up in milliseconds next time — and a graded Ancient Mew finally looks like an Ancient Mew (its old link was dead)."
+    ]
+  },
+  {
+    "id": "gym-2",
+    "date": "2026-09-11",
+    "tag": "Changed",
+    "title": "The gym fights back",
+    "body": [
+      "Gym battles were a click-Attack-twenty-times chore. Now every round the leader's Pokémon shows its next move — a hit, a big hit, a brace or a charge — and you answer with one of five: Strike, Power, Guard, Focus or Type Burst. Guard a hit and you counter; Focus through a brace; Power through a charge to break it. Three perfect reads and your next blow crits.",
+      "Eight rounds, then the bell — more HP left wins on decision. Types matter both ways (bring Water to Brock, not Fire), and each leader has a trick: Koga poisons, Blaine burns, Erika drains, Lt. Surge charges, Sabrina hides her hand. Every round is a picture."
+    ]
+  },
+  {
+    "id": "slots-motion",
+    "date": "2026-09-11",
+    "tag": "Changed",
+    "title": "The reels spin again",
+    "body": [
+      "Slots lost their motion in the rebuild — one still frame, then the result. Now the machine itself animates: the reels scroll past with motion blur, slow down and land one at a time, left to right, with a glowing \"two down, one to go\" tease when the first two match, and the win line lights up on the result. About three seconds a spin, like the old machine.",
+      "Under the hood, 8,600 lines of retired code left the bot. Nothing you use changed."
+    ]
+  },
+  {
+    "id": "cleanup-batch-4",
+    "date": "2026-09-11",
+    "tag": "Fixed",
+    "title": "Reminders that keep reminding, and a tidy-up",
+    "body": [
+      "/reminder used to DM you exactly once per cooldown, ever. It now fires every time a cooldown ends, and covers the daily, pack energy, quiz, mystery box, journey, card drops and votes.",
+      "/setchannel needs Manage Server now (any member could move a server's drop channel before) and checks the bot can actually post there. /itemshop has Buy buttons. /report is rate-limited and kept safe. /vote checks your cooldown before calling out, and its reward posts publicly.",
+      "Retired: /resetpack (charged 40 coins for nothing since Pack Energy), /avatarchoice, /announcesets, /claimgift and /tint. Cards that /tint had pointed at expiring Discord links are back on their real art."
+    ]
+  },
+  {
+    "id": "no-house-fee",
+    "date": "2026-09-11",
+    "tag": "Changed",
+    "title": "No house fee",
+    "body": [
+      "Market sales and auctions pay the seller the full price. The few fees taken today have been refunded."
+    ]
+  },
+  {
+    "id": "loot-batch-3b",
+    "date": "2026-09-11",
+    "tag": "Changed",
+    "title": "Mystery box, card drops, the journey and your bag",
+    "body": [
+      "/mysterybox hands out a Fusion Token you can actually spend (the old box stored it under the wrong name — those stranded tokens are now usable), gives cards with a condition and a date, only from released sets, and scores season points.",
+      "/pickcard drops three cards as a picture; one each, the dropper gets a two-second head start, and a claim can't be lost to a restart.",
+      "/journey rewards are what the story says — a rare card is rare, tokens go to your bag, trinkets are kept — and a run you abandon expires after a day instead of skipping the cooldown forever. /bag shows packs, tokens, energy, badges and trinkets.",
+      "/duelprofile is a proper record with the top duelists. /deck is retired: duels never used it."
+    ]
+  },
+  {
+    "id": "progression-batch-3a",
+    "date": "2026-09-11",
+    "tag": "Changed",
+    "title": "Leaderboards, quests, achievements and the season, rebuilt",
+    "body": [
+      "/leaderboard is a picture with medals and avatars, per server or across all servers, with your own rank underneath — cards, coins, gem mints, XP, streaks, season points and aura. Half-point grades count now, and coins-only players are ranked too. /serverleaderboard races the servers by the players who actually use the bot there.",
+      "/quests: eight quests in the pool (forging, gym wins, pack buys and quiz answers included), the same three for everyone each day, and a claim button that keeps working after a restart.",
+      "/achievements is paged with progress bars, and an achievement you just earned is announced instead of silently ticked.",
+      "/season pays the top three when the month ends — automatically. The August podium, which had gone unpaid, is paid now."
+    ]
+  },
+  {
+    "id": "trading-batch-2b",
+    "date": "2026-09-11",
+    "tag": "Changed",
+    "title": "Trades and auctions, rebuilt",
+    "body": [
+      "/trade is a table you can see: both offers as cards, coins on either side, lock and accept. Offered cards are held so nothing else can move them, the trade survives a restart, and the final swap re-checks everything before anything changes hands.",
+      "/auction keeps the card in your binder while it runs, holds bids until you're outbid (refunded automatically), extends the clock when a bid lands in the last two minutes, lets the seller cancel while there are no bids, and settles by itself. Bid from the auction post or the numbered board. The one auction that was open has been moved over."
+    ]
+  },
+  {
+    "id": "economy-batch-2a",
+    "date": "2026-09-11",
+    "tag": "Fixed",
+    "title": "The market works again — and five lost cards are back",
+    "body": [
+      "Listing a card used to move it out of your binder, and every purchase then failed because \"the seller no longer owns it\" — deleting the listing and the card. Nobody ever completed a market sale. A listing is now a price tag on a card that stays in your binder until it sells; the five cards that vanished this way have been put back with their owners.",
+      "/market browse is a numbered board with buy buttons, purchases post publicly, sellers get a DM, big sales reach the drop channel, and /market trend (or /cardtrend) charts real sales. The house keeps 5% of each sale.",
+      "/sell re-checks every card when you confirm and pays only for what actually left; SIR and non-holo filters work. /give has confirmations, a 1,000-coin gift cap, 2,000 a day and a minute between gifts — gifted coins no longer count as earned. /fuse works again (it was looking for the wrong token) with a preview of the odds. /swapcodes refuses locked, listed, graded or traded cards."
+    ]
+  },
+  {
+    "id": "games-batch-1",
+    "date": "2026-09-11",
+    "tag": "Changed",
+    "title": "Slots, quiz and Who's That Pokémon, rebuilt",
+    "body": [
+      "Slots: Pokémon symbols on real reels with a printed paytable — Caterpie ×3 up to Dragonite ×50, any pair ×1.5 — a bet cap of 500, and Spin-again buttons. The old machine had no cap and paid out more than it took.",
+      "Quiz: ten distinct questions, your own scoreboard (two players at once no longer scramble each other's score), coins and aura per right answer, pack energy every three in a row.",
+      "Who's That Pokémon is now a room game: the silhouette is public, anyone can press Guess, the first right answer takes the round, hints appear on the card, coins for every solve (capped per day) and a scoreboard at the end.",
+      "Duel pictures no longer show boxes where the icons should be."
+    ]
+  },
+  {
+    "id": "blackjack-table",
+    "date": "2026-09-11",
+    "tag": "Changed",
+    "title": "Blackjack, rebuilt",
+    "body": [
+      "A new table: no more boxes where the icons should be, the corner indices sit inside the cards, and a Pokémon deals — Meowth most nights.",
+      "Double down on your first two cards, play again straight from the result, and a private record of your hands. A hand nobody finishes now stands on its own instead of handing the bet back."
+    ]
+  },
+  {
+    "id": "label-colours",
+    "date": "2026-09-10",
+    "tag": "New",
+    "title": "Labels take colour too",
+    "body": [
+      "A colour from your palette can go on the label of a slab as well as the case — Galaxy case, Gold label. Same roll, same palette, your choice where.",
+      "The label's text picks its own ink from whatever is painted under it, so a Poké Ball label stays readable."
+    ]
+  },
+  {
+    "id": "case-colours",
+    "date": "2026-09-10",
+    "tag": "New",
+    "title": "Case colours for your slabs",
+    "body": [
+      "Every graded card sits in a clear case — now /slab roll gives it a colour. Six tiers, 58 colours, five shades for the solids: Frost and Slate are everywhere, Obsidian Black is one in four hundred, Void and Master Ball one in a few thousand.",
+      "Colours land in a palette; paint one onto any slab, strip it back off, melt the ones you don't want. A Gem Mint 10 comes back from the graders with a free roll."
+    ]
+  },
+  {
+    "id": "forge-rework",
+    "date": "2026-09-10",
+    "tag": "Changed",
+    "title": "The forge replaces crafting",
+    "body": [
+      "Crafting was a vending machine. Now every recipe wants dust AND spare ingredients from the same set, and the forge is a roll: a Holo comes out 60% of the time, a Special Illustration 45%.",
+      "Boosts buy better odds for more dust. A misfire eats the ingredients, refunds a quarter of the dust and spits out a random card one rarity down. A Pristine result is a Perfect Forge."
+    ]
   }
 ]
