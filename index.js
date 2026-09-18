@@ -36,6 +36,7 @@ const inventory = remoteJson({ name: 'inventory', url: DEMO ? null : (process.en
   local: path.join(__dirname, 'user_inventory.json'), validate: d => d && typeof d === 'object' && !Array.isArray(d), onUpdate: invalidate });
 const news = remoteJson({ name: 'changelog', url: process.env.NEWS_URL || `${RAW}/news.json`, ttl: 2 * 60 * 1000, local: path.join(__dirname, 'news.json'), validate: d => Array.isArray(d) && d.length > 0 });
 const catalog = remoteJson({ name: 'catalog', url: process.env.CATALOG_URL || `${RAW}/catalog.json`, ttl: 10 * 60 * 1000, local: path.join(__dirname, 'data', 'catalog.json'), validate: d => Array.isArray(d?.sets), onUpdate: invalidate, quiet404: true });
+const namesFeed = remoteJson({ name: 'names', url: process.env.NAMES_URL || `${RAW}/names.json`, ttl: 10 * 60 * 1000, local: path.join(__dirname, 'names.json'), validate: d => d && typeof d.names === 'object', quiet404: true });
 const help = remoteJson({ name: 'help', url: process.env.HELP_URL || `${RAW}/help.json`, ttl: 10 * 60 * 1000, local: path.join(__dirname, 'data', 'help.json'), validate: d => Array.isArray(d?.groups), quiet404: true });
 
 if (DEMO) {
@@ -58,7 +59,7 @@ function data() {
   return built;
 }
 const cat = () => catalog.get() || { sets: [], upcoming: [] };
-const nameOf = (uid) => P.displayName(data(), inventory.get(), uid) || P.maskName(uid);
+const nameOf = (uid) => P.displayName(data(), inventory.get(), uid) || namesFeed.get()?.names?.[uid] || P.maskName(uid);   // names.json is the bot's cache of display names
 
 // ── helpers ───────────────────────────────────────────────────
 function avatarFor(user) {
@@ -338,7 +339,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 thepokebot.com on port ${PORT}${DEMO ? ' (DEMO)' : ''}`);
   console.log('CLIENT_SECRET loaded:', CLIENT_SECRET ? `YES (${CLIENT_SECRET.length} chars)` : 'NO');
-  catalog.get(); help.get(); news.get(); inventory.get();       // warm every feed, then keep them fresh
+  catalog.get(); help.get(); news.get(); inventory.get(); namesFeed.get();       // warm every feed, then keep them fresh
   setTimeout(() => { const urls = []; for (const s of cat().sets) for (const c of s.cards.filter(c => P.rank(c.rarity) >= P.RANK.holo).slice(0, 4)) urls.push(c.image); images.warm(urls, [160, 240]); }, 5000);   // set covers
-  setInterval(() => { inventory.get(); news.get(); catalog.get(); help.get(); }, 60 * 1000);
+  setInterval(() => { inventory.get(); news.get(); catalog.get(); help.get(); namesFeed.get(); }, 60 * 1000);
 });
