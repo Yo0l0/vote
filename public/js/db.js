@@ -26,7 +26,7 @@
         <div class="sc-bar" title="${held} of ${s.total} cards found by someone"><i style="--w:${pct(held, s.total)}%"></i></div></div></a>`; }).join('');
       requestAnimationFrame(() => grid.querySelectorAll('.sc-bar i').forEach(i => i.style.transform = 'scaleX(' + parseFloat(i.style.getPropertyValue('--w')) / 100 + ')'));
       const up = d.upcoming || [];
-      sched.innerHTML = up.slice(0, 12).map((u, i) => `<div class="sched-row panel ${i === 0 ? 'next' : ''}"><div class="sd-date"><b>${esc(new Date(u.releaseAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }))}</b><span>${esc(new Date(u.releaseAt).toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' }))}</span></div><div class="sd-body"><div class="sd-name">${esc(u.name)}${i === 0 ? ' <span class="bdg b-first">next</span>' : ''}</div><div class="sd-meta">${esc(u.total)} cards${u.series ? ' · ' + esc(u.series) : ''}${u.originalRelease ? ' · first printed ' + esc(String(u.originalRelease).slice(0, 4)) : ''}</div></div>${i === 0 ? '<div class="countdown sm" id="schedCountdown"><div><b>—</b><span>d</span></div><div><b>—</b><span>h</span></div><div><b>—</b><span>m</span></div><div><b>—</b><span>s</span></div></div>' : ''}</div>`).join('')
+      sched.innerHTML = up.slice(0, 12).map((u, i) => `<div class="sched-row panel ${i === 0 ? 'next' : ''}"><div class="sd-date"><b>${esc(new Date(u.releaseAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }))}</b><span>${esc(new Date(u.releaseAt).toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' }))}</span></div><div class="sd-body"><div class="sd-name">${esc(u.name)}${i === 0 ? ' <span class="bdg b-first">next</span>' : ''}</div><div class="sd-meta">${esc(u.total)} cards${u.series && u.series !== 'Other' ? ' · ' + esc(u.series) : ''}${u.originalRelease ? ' · first printed ' + esc(String(u.originalRelease).slice(0, 4)) : ''}</div>${u.teaser && u.teaser.length ? `<div class="sd-chase">🎯 The chase: ${u.teaser.map(c => esc(c.name)).join(' · ')}</div>` : ''}</div>${u.teaser && u.teaser.length ? `<div class="sd-teaser">${u.teaser.map(c => `<img src="${esc(thumb(c.image, 160))}" alt="${esc(c.name)}" title="${esc(c.name)}" loading="lazy">`).join('')}</div>` : ''}${i === 0 ? '<div class="countdown sm" id="schedCountdown"><div><b>—</b><span>d</span></div><div><b>—</b><span>h</span></div><div><b>—</b><span>m</span></div><div><b>—</b><span>s</span></div></div>' : ''}</div>`).join('')
         + (up.length > 12 ? `<p class="hint-line">…and ${up.length - 12} more, one a week.</p>` : '');
       if (up[0]) countdown($('schedCountdown'), up[0].releaseAt);
     } catch (e) { grid.innerHTML = '<div class="empty"><h3>Couldn\'t load the catalog</h3></div>'; }
@@ -111,7 +111,7 @@
     const draw = () => {
       const b = d.boards[cur];
       history.replaceState(null, '', '#' + cur);
-      $('board').innerHTML = b.rows.length ? `<table class="table"><thead><tr><th>#</th><th>Trainer</th><th style="text-align:right">${esc(b.unit)}</th></tr></thead><tbody>${b.rows.map(r => `<tr class="${r.me ? 'me' : ''}"><td class="rank">${r.rank <= 3 ? ['🥇', '🥈', '🥉'][r.rank - 1] : r.rank}</td><td class="who"><a href="/t/${esc(r.uid)}">${esc(r.name)}${r.me ? ' <span class="bdg b-lab">you</span>' : ''}</a>${r.sub ? `<div class="sub">${esc(r.sub)}</div>` : ''}</td><td class="val">${b.unit === '%' ? r.v + '%' : fmt(r.v)}</td></tr>`).join('')}</tbody></table>` : '<div class="empty"><div class="big">🌱</div><h3>Nobody on this board yet</h3></div>';
+      $('board').innerHTML = b.rows.length ? `<table class="table"><thead><tr><th>#</th><th>Trainer</th><th style="text-align:right">${esc(b.unit)}</th></tr></thead><tbody>${b.rows.map(r => `<tr class="${r.me ? 'me' : ''}"><td class="rank">${r.rank <= 3 ? ['🥇', '🥈', '🥉'][r.rank - 1] : r.rank}</td><td class="who"><a href="/t/${esc(r.uid)}"><img class="who-av" src="${esc(r.avatar || '/img/pokebot.png')}" alt="" loading="lazy" width="36" height="36"><span><b>${esc(r.name)}</b>${r.me ? ' <span class="bdg b-lab">you</span>' : ''}${r.sub ? `<small class="sub">${esc(r.sub)}</small>` : ''}</span></a></td><td class="val">${b.unit === '%' ? r.v + '%' : fmt(r.v)}</td></tr>`).join('')}</tbody></table>` : '<div class="empty"><div class="big">🌱</div><h3>Nobody on this board yet</h3></div>';
       $('boardHint').textContent = d.me ? (b.rows.some(r => r.me) ? 'That\'s you, highlighted.' : 'You\'re not in the top 25 of this one yet.') : 'Log in with Discord to see where you stand.';
     };
     $('tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cur = b.dataset.k; $('tabs').querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b)); draw(); });
@@ -147,6 +147,7 @@
       const d = await (await fetch('/api/profile/' + uid)).json();
       if (d.error) return;
       renderProfile(d);
+      if (d.avatar) { const av = document.querySelector('.prof-av'); if (av) av.src = d.avatar; }
       if (d.me) $('profMine').hidden = false;
     } catch (e) { console.error('Profile failed:', e); }
   }

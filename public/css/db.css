@@ -15,7 +15,13 @@
 /* schedule */
 .schedule { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .sched-row { display: grid; grid-template-columns: 74px 1fr auto; gap: 14px; align-items: center; padding: 12px 16px; }
-.sched-row.next { grid-column: 1 / -1; border-color: rgba(255,201,77,.4); background: linear-gradient(180deg, rgba(60,40,10,.35), rgba(12,7,24,.85)); }
+.sched-row.next { grid-column: 1 / -1; grid-template-columns: 74px minmax(0, 1fr) auto auto; border-color: rgba(255,201,77,.4); background: linear-gradient(180deg, rgba(60,40,10,.35), rgba(12,7,24,.85)); }
+.sd-chase { font-size: .76rem; color: var(--gold); margin-top: 4px; }
+.sd-teaser { display: flex; align-items: center; height: 104px; padding: 0 18px; }
+.sd-teaser img { width: 66px; aspect-ratio: 600/825; object-fit: cover; border-radius: 5px; box-shadow: 0 12px 26px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08); transform: rotate(-9deg) translateY(4px); transition: transform .4s var(--ease); }
+.sd-teaser img:nth-child(2) { transform: none; z-index: 2; margin: 0 -10px; box-shadow: 0 16px 34px rgba(124,58,237,.45), 0 0 0 1px rgba(255,255,255,.12); }
+.sd-teaser img:nth-child(3) { transform: rotate(9deg) translateY(4px); }
+.sched-row:hover .sd-teaser img:first-child { transform: rotate(-13deg) translate(-6px, 2px); } .sched-row:hover .sd-teaser img:nth-child(2) { transform: translateY(-5px) scale(1.04); } .sched-row:hover .sd-teaser img:nth-child(3) { transform: rotate(13deg) translate(6px, 2px); }
 .sd-date { text-align: center; line-height: 1.1; }
 .sd-date b { display: block; font-family: var(--font-d); font-weight: 800; font-size: 1rem; color: var(--gold); }
 .sd-date span { font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
@@ -124,5 +130,5 @@
   .prof-head { grid-template-columns: auto 1fr; } .prof-actions { grid-column: 1 / -1; }
   .set-hero { padding: 22px 18px; } .set-hero-art { grid-template-columns: repeat(4, 1fr); gap: 6px; }
   .toolbar { top: 58px; margin: 0 0 18px; } .toolbar .count { width: 100%; margin: 0; text-align: right; }
-  .cats { top: 58px; } .sched-row { grid-template-columns: 62px 1fr; } .sched-row .countdown { grid-column: 1 / -1; }
+  .cats { top: 58px; } .sched-row, .sched-row.next { grid-template-columns: 62px 1fr; } .sched-row .countdown, .sched-row .sd-teaser { grid-column: 1 / -1; } .sd-teaser { justify-content: center; }
 }

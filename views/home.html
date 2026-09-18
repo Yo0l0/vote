@@ -80,9 +80,10 @@
       <div class="next-copy">
         <span class="eyebrow">A new set every week</span>
         <h2 class="h-section">Next up: <span class="grad">{{NEXT_SET_NAME}}</span></h2>
-        <p>{{NEXT_SET_TOTAL}} cards drop on {{NEXT_SET_DATE}}. Every card pulled in its first seven days is a numbered <b>🥇 1st Edition</b>, and the very first copy of each card is its <b>🌍 World First</b>. After the week, it prints Unlimited forever.</p>
+        <p>{{NEXT_SET_TOTAL}} cards drop on {{NEXT_SET_DATE}}. The chase: <b>{{NEXT_TEASER_NAMES}}</b>. Every card pulled in its first seven days is a numbered <b>🥇 1st Edition</b>, and the very first copy of each card is its <b>🌍 World First</b>. After the week, it prints Unlimited forever.</p>
         <div class="hero-btns"><a class="btn btn-ghost btn-sm" href="/cards#upcoming">See the whole schedule</a><a class="btn btn-primary btn-sm" href="/sets/{{NEWEST_SET_SLUG}}">Newest set: {{NEWEST_SET_NAME}}</a></div>
       </div>
+      <div class="next-teaser" title="{{NEXT_TEASER_NAMES}}" aria-label="The chase: {{NEXT_TEASER_NAMES}}">{{{NEXT_TEASER}}}</div>
       <div class="countdown" id="countdown"><div><b>—</b><span>days</span></div><div><b>—</b><span>hours</span></div><div><b>—</b><span>min</span></div><div><b>—</b><span>sec</span></div></div>
     </div>
   </section>

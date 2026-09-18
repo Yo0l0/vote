@@ -58,7 +58,10 @@ function data() {
   return built;
 }
 const cat = () => catalog.get() || { sets: [], upcoming: [] };
-const nameOf = (uid) => P.displayName(data(), inventory.get(), uid) || namesFeed.get()?.names?.[uid] || P.maskName(uid);   // names.json is the bot's cache of display names
+// names.json is the bot's roster: uid → { name, avatar } (the first version was a bare string)
+const nameEntry = (uid) => { const v = namesFeed.get()?.names?.[uid]; return typeof v === 'string' ? { name: v, avatar: null } : (v || null); };
+const nameOf = (uid, req = null) => (req?.session?.user?.id === uid ? (req.session.user.global_name || req.session.user.username) : null) || P.displayName(data(), inventory.get(), uid) || nameEntry(uid)?.name || P.maskName(uid);
+const avatarOf = (uid, req = null) => (req?.session?.user?.id === uid ? avatarFor(req.session.user) : null) || nameEntry(uid)?.avatar || null;
 
 // ── helpers ───────────────────────────────────────────────────
 function avatarFor(user) {
@@ -152,7 +155,9 @@ app.get('/', (req, res) => {
   const user = req.session.user;
   const c = cat();
   const next = c.upcoming[0] || null;
+  const teaser = (next?.teaser || []).map(c => `<img src="${escapeHtml(images.thumbUrl(c.image, 160))}" alt="${escapeHtml(c.name)}" title="${escapeHtml(c.name)}" loading="lazy">`).join('');
   res.send(page(req, 'home', {
+    NEXT_TEASER: teaser, NEXT_TEASER_NAMES: (next?.teaser || []).map(c => c.name).join(' · '),
     COLLECTION_HREF: user ? '/dashboard' : '/login', COLLECTION_TEXT: user ? 'My binder' : 'Log in — see your binder',
     NEXT_SET_NAME: next ? next.name : '', NEXT_SET_AT: next ? next.releaseAt : 0, NEXT_SET_TOTAL: next ? next.total : 0, NEXT_SET_DATE: next ? fmtDate(next.releaseAt) : '',
     NEWEST_SET_NAME: c.sets[0]?.name || '', NEWEST_SET_SLUG: c.sets[0]?.slug || '', SETS_OUT: c.sets.length, CARDS_OUT: c.sets.reduce((n, s) => n + s.total, 0),
@@ -197,12 +202,12 @@ app.get('/t/:uid', (req, res) => {
   const uid = String(req.params.uid).replace(/\D/g, '');
   const d = P.userDetail(data(), inventory.get(), cat(), uid);
   if (!d) return notFound(req, res);
-  const name = nameOf(uid);
+  const name = nameOf(uid, req);
   const me = req.session.user && req.session.user.id === uid;
   res.send(page(req, 'profile', {
     TITLE: `${name}'s binder — Pokébot`, DESC: `${d.total.toLocaleString('en-US')} cards, ${d.unique} unique, ${d.graded} slabs${d.tens ? `, ${d.tens} Gem Mint` : ''}${d.shinies ? `, ${d.shinies} shiny` : ''}${d.firstEd ? `, ${d.firstEd} 1st Editions` : ''}.`,
     PATH: `/t/${uid}`, OG_IMAGE: d.rarest?.image || `${SITE}/img/og.jpg`, ROBOTS: '<meta name="robots" content="noindex">',
-    PROFILE_NAME: name, PROFILE_UID: uid, PROFILE_AVATAR: me ? avatarFor(req.session.user) : '/img/pokebot.png', IS_ME: me ? '1' : '',
+    PROFILE_NAME: name, PROFILE_UID: uid, PROFILE_AVATAR: avatarOf(uid, req) || '/img/pokebot.png', IS_ME: me ? '1' : '',
   }));
 });
 
@@ -251,14 +256,14 @@ app.get('/api/search', (req, res) => {
 app.get('/api/boards', (req, res) => {
   const b = data().boards; const me = req.session.user?.id || null;
   const out = {};
-  for (const [k, v] of Object.entries(b)) out[k] = { title: v.title, unit: v.unit, rows: v.rows.map((r, i) => ({ rank: i + 1, uid: r.uid, name: nameOf(r.uid), v: r.v, sub: r.sub, me: r.uid === me })) };
+  for (const [k, v] of Object.entries(b)) out[k] = { title: v.title, unit: v.unit, rows: v.rows.map((r, i) => ({ rank: i + 1, uid: r.uid, name: nameOf(r.uid, req), avatar: avatarOf(r.uid, req), v: r.v, sub: r.sub, me: r.uid === me })) };
   res.json({ boards: out, updated: data().built, me });
 });
 app.get('/api/profile/:uid', (req, res) => {
   const uid = String(req.params.uid).replace(/\D/g, '');
   const d = P.userDetail(data(), inventory.get(), cat(), uid);
   if (!d) return res.status(404).json({ error: 'Not found' });
-  res.json({ ...d, name: nameOf(uid), me: req.session.user?.id === uid });
+  res.json({ ...d, name: nameOf(uid, req), avatar: avatarOf(uid, req), me: req.session.user?.id === uid });
 });
 app.get('/api/pool', (req, res) => {   // the simulator: every card of a released set (or all of them), with the bot's odds
   const slug = req.query.set ? String(req.query.set) : null;
